@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "908932428291",
+    "project_id": "rf4-assistant",
+    "storage_bucket": "rf4-assistant.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908932428291:android:76757ff358073559e49436",
+        "android_client_info": {
+          "package_name": "com.rf4.fishingrf4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXe1Q1I-FTo00DiK5n7PU54BcFF-p6NF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
