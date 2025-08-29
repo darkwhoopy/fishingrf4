@@ -20,6 +20,11 @@ import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+
 
 
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -36,6 +41,14 @@ class FishingViewModelFactory(private val context: Context) : ViewModelProvider.
 fun FishingRF4App() {
     val context = LocalContext.current
     val viewModel: FishingViewModel = viewModel(factory = FishingViewModelFactory(context))
+    var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
+    DisposableEffect(Unit) {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            currentUser = auth.currentUser
+        }
+        FirebaseAuth.getInstance().addAuthStateListener(listener)
+        onDispose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
+    }
 
     val uiState by viewModel.uiState.collectAsState()
     val saveCompleted by viewModel.saveCompleted.collectAsState()
@@ -76,14 +89,28 @@ fun FishingRF4App() {
         )
 
         if (uiState.currentScreen in mainScreensWithHeader) {
+            // 1) Header pleine largeur, non compressé
             AppHeader(
                 playerStats = uiState.playerStats,
                 onNavigate = viewModel::navigateTo,
                 onSettingsClick = { viewModel.navigateTo(Screen.SETTINGS) },
                 onLevelChange = viewModel::setPlayerLevel
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            // 2) Petit badge aligné à droite sous l’entête
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                AuthStatusBadge(currentUser)
+            }
+
+            // 3) Espacement unique avant le contenu
+            Spacer(Modifier.height(12.dp))
         }
+
+
 
         when (uiState.currentScreen) {
             Screen.LAKE_SELECTION -> {
@@ -196,4 +223,29 @@ fun SaveConfirmationDialog(onDismiss: () -> Unit) {
         text = { Text("Les modifications ont été sauvegardées.") },
         confirmButton = { Button(onClick = onDismiss) { Text("OK") } }
     )
+}
+@Composable
+private fun AuthStatusBadge(user: FirebaseUser?) {
+    val bg = if (user != null) Color(0xFF065F46) else Color(0xFF7C2D12) // vert / brun
+    val text = if (user != null) "Connecté" else "Hors ligne"
+    val sub = user?.email ?: ""
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = bg.copy(alpha = 0.9f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (user != null) "✅ $text" else "⛔ $text",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            if (sub.isNotBlank()) {
+                Spacer(Modifier.width(8.dp))
+                Text(sub, color = Color(0xFFE5E7EB))
+            }
+        }
+    }
 }

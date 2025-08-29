@@ -9,10 +9,6 @@ import com.rf4.fishingrf4.ui.FishingRF4App
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme {
-                FishingRF4App()
-            }
-        }
+        setContent { MaterialTheme { FishingRF4App() } }
     }
 }
