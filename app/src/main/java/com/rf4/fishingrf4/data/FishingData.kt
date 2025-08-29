@@ -135,7 +135,7 @@ object FishingData {
             "Tinca tinca",
             FishRarity.UNCOMMON,
             weight = 0.3..4.0,
-            preferredBait = listOf("Ver rouge", "Maïs", "Pâte", "Pâte à l'ail"),
+            preferredBait = listOf("Ver rouge", "Maïs", "Pâte"),
             bestHours = listOf(5, 6, 7, 18, 19, 20),
             bestWeather = listOf(WeatherType.OVERCAST, WeatherType.RAIN)
         ),
