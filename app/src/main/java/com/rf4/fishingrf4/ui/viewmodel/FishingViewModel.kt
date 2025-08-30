@@ -109,12 +109,12 @@ class FishingViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             val list: List<SpeciesCount> = withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)
+                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)  // Récupérer le top 5 espèces du jour
                 } catch (_: Exception) {
-                    emptyList()
+                    emptyList()  // Si erreur, retourner une liste vide
                 }
             }
-            onResult(list)
+            onResult(list)  // Passer les résultats à l'UI
         }
     }
 
@@ -163,12 +163,17 @@ class FishingViewModel(context: Context) : ViewModel() {
     ) {
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
-                try { onlineRepo.getTopCommunityBaitsToday(fishId) }
-                catch (_: Exception) { emptyList() }
+                try {
+                    onlineRepo.getTopCommunityBaitsToday(fishId) // On récupère les top appâts du jour
+                } catch (_: Exception) {
+                    emptyList() // Retourne une liste vide en cas d'erreur
+                }
             }
-            onResult(list)
+            onResult(list) // Passe les résultats à l'UI
         }
     }
+
+
     fun getCaptureStatsByTimeOfDay(fishId: String): Map<String, Int> {
         return repository.fishingEntries.value
             .filter { it.fish.id == fishId && it.timeOfDay != null }

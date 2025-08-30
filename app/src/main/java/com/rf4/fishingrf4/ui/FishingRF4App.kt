@@ -20,6 +20,7 @@ import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +28,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
 
 
+// Vue modèle pour la création de FishingViewModel
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -41,7 +43,11 @@ class FishingViewModelFactory(private val context: Context) : ViewModelProvider.
 fun FishingRF4App() {
     val context = LocalContext.current
     val viewModel: FishingViewModel = viewModel(factory = FishingViewModelFactory(context))
+
+    // État de l'utilisateur Firebase
     var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
+
+    // Écouteur pour l'état d'authentification
     DisposableEffect(Unit) {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             currentUser = auth.currentUser
@@ -50,29 +56,43 @@ fun FishingRF4App() {
         onDispose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
     }
 
+    // Collecte de l'état de l'UI et des données
     val uiState by viewModel.uiState.collectAsState()
     val saveCompleted by viewModel.saveCompleted.collectAsState()
-// début "jour de jeu" (déjà calculé par ton VM)
+
+    // Calcul du début du jour de jeu (timestamp réel)
     val startOfDay by viewModel.startOfCurrentGameDayTimestamp.collectAsState()
 
-// états locaux pour l’écran Top 5
-    var topSpecies by remember { mutableStateOf<List<SpeciesCount>>(emptyList()) }
-    var topPlayers by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
-    var topLakes   by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    // États pour les données de Top 5
+    var topSpecies by rememberSaveable { mutableStateOf<List<SpeciesCount>>(emptyList()) }
+    var topPlayers by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    var topLakes by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    var communityTop by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
 
+    // Autres états pour l'interaction avec les écrans
     var favoritesOnly by remember { mutableStateOf(false) }
     var lakeToInteract by remember { mutableStateOf<Lake?>(null) }
     var fishToInteract by remember { mutableStateOf<Fish?>(null) }
     var positionToInteract by remember { mutableStateOf("") }
     var previousScreen by remember { mutableStateOf(Screen.LAKE_SELECTION) }
 
-
+    // Affichage des lacs filtrés selon les favoris
     val displayedLakes = if (favoritesOnly) {
         uiState.availableLakes.filter { uiState.favoriteLakeIds.contains(it.id) }
     } else {
         uiState.availableLakes
     }
 
+    // Récupération des données (Top 5) et votes communautaires
+    LaunchedEffect(startOfDay) {
+        viewModel.fetchTop5SpeciesCountsToday { topSpecies = it }
+        viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
+        viewModel.fetchTop5LakesOfDay(startOfDay) { topLakes = it }
+        // Récupère les votes communautaires
+        viewModel.fetchTopCommunityBaits("fishIdHere") { communityTop = it }
+    }
+
+    // Structure principale de la colonne avec l'UI
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,6 +100,7 @@ fun FishingRF4App() {
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
+        // Affichage de la confirmation de sauvegarde
         if (saveCompleted) {
             SaveConfirmationDialog(onDismiss = {
                 viewModel.onDialogDismissed()
@@ -87,6 +108,7 @@ fun FishingRF4App() {
             })
         }
 
+        // Liste des écrans principaux avec entête
         val mainScreensWithHeader = listOf(
             Screen.LAKE_SELECTION,
             Screen.FISH_SEARCH,
@@ -95,8 +117,9 @@ fun FishingRF4App() {
             Screen.SETTINGS
         )
 
+        // Affichage de l'en-tête si l'écran appartient aux écrans avec en-tête
         if (uiState.currentScreen in mainScreensWithHeader) {
-            // 1) Header pleine largeur, non compressé
+            // 1) Affiche l'en-tête
             AppHeader(
                 playerStats = uiState.playerStats,
                 onNavigate = viewModel::navigateTo,
@@ -104,7 +127,7 @@ fun FishingRF4App() {
                 onLevelChange = viewModel::setPlayerLevel
             )
 
-            // 2) Petit badge aligné à droite sous l’entête
+            // 2) Affiche le badge de statut de connexion
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -113,13 +136,22 @@ fun FishingRF4App() {
                 AuthStatusBadge(currentUser)
             }
 
-            // 3) Espacement unique avant le contenu
+            // 3) Espacement avant le contenu principal
             Spacer(Modifier.height(12.dp))
         }
 
-
-
+        // Gestion des écrans spécifiques
         when (uiState.currentScreen) {
+            Screen.TOP_FIVE -> {
+                TopFiveScreen(
+                    speciesTop5 = topSpecies,
+                    playersTop5 = topPlayers,
+                    lakesTop5 = topLakes,
+                    communityTop5 = communityTop, // Passez les votes communautaires ici
+                    onBack = { viewModel.navigateTo(Screen.PLAYER_PROFILE) }
+                )
+            }
+
             Screen.LAKE_SELECTION -> {
                 LakeSelectionScreen(
                     lakes = displayedLakes,
@@ -138,6 +170,7 @@ fun FishingRF4App() {
                     onToggleFavoritesFilter = { favoritesOnly = !favoritesOnly }
                 )
             }
+
             Screen.POSITION_SELECTION -> {
                 PositionSelectionScreen(
                     lake = lakeToInteract!!,
@@ -149,14 +182,16 @@ fun FishingRF4App() {
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
             }
+
             Screen.FISH_SELECTION -> {
                 FishSelectionScreen(
                     lake = lakeToInteract!!,
                     position = positionToInteract,
                     fishingEntries = uiState.fishingEntries,
-                    // ✅ On passe le viewModel à l'écran
                     viewModel = viewModel,
-                    onFishSelected = { fish -> viewModel.catchFish(fish, lakeToInteract!!, positionToInteract) },
+                    onFishSelected = { fish ->
+                        viewModel.catchFish(fish, lakeToInteract!!, positionToInteract)
+                    },
                     onBack = { viewModel.navigateTo(Screen.POSITION_SELECTION) },
                     onViewJournal = { viewModel.navigateTo(Screen.JOURNAL) },
                     onFishDetail = { fish ->
@@ -166,22 +201,8 @@ fun FishingRF4App() {
                     }
                 )
             }
-            Screen.TOP_FIVE -> {
-                // on récupère à l’ouverture (et si le "jour" change)
-                LaunchedEffect(startOfDay) {
-                    viewModel.fetchTop5SpeciesCountsToday { topSpecies = it }
-                    viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
-                    viewModel.fetchTop5LakesOfDay(startOfDay)   { topLakes   = it }
-                }
 
-                TopFiveScreen(   // ← l’écran en onglets
-                    speciesTop5 = topSpecies,
-                    playersTop5 = topPlayers,
-                    lakesTop5   = topLakes,
-                    onBack      = { viewModel.navigateTo(Screen.PLAYER_PROFILE) }
-                )
-            }
-
+            // Autres écrans à gérer
             Screen.FISH_SEARCH -> {
                 FishSearchScreen(
                     allLakes = uiState.allLakes,
@@ -195,6 +216,7 @@ fun FishingRF4App() {
                     }
                 )
             }
+
             Screen.LAKE_EDIT -> {
                 LakeEditScreen(
                     lake = lakeToInteract!!,
@@ -203,6 +225,7 @@ fun FishingRF4App() {
                     onSaveLake = viewModel::updateLake
                 )
             }
+
             Screen.FISH_DETAIL -> {
                 FishInfoScreen(
                     fish = fishToInteract!!,
@@ -210,6 +233,7 @@ fun FishingRF4App() {
                     onBack = { viewModel.navigateTo(previousScreen) }
                 )
             }
+
             Screen.JOURNAL -> {
                 JournalScreen(
                     entries = uiState.fishingEntries,
@@ -227,6 +251,7 @@ fun FishingRF4App() {
                     onOpenTop5 = { viewModel.navigateTo(Screen.TOP_FIVE) }
                 )
             }
+
             Screen.SETTINGS -> {
                 SettingsScreen(
                     viewModel = viewModel,
@@ -240,6 +265,7 @@ fun FishingRF4App() {
     }
 }
 
+// Confirmation de la sauvegarde
 @Composable
 fun SaveConfirmationDialog(onDismiss: () -> Unit) {
     AlertDialog(
@@ -249,6 +275,8 @@ fun SaveConfirmationDialog(onDismiss: () -> Unit) {
         confirmButton = { Button(onClick = onDismiss) { Text("OK") } }
     )
 }
+
+// Badge de statut de connexion
 @Composable
 private fun AuthStatusBadge(user: FirebaseUser?) {
     val bg = if (user != null) Color(0xFF065F46) else Color(0xFF7C2D12) // vert / brun

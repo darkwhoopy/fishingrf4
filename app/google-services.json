@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "908932428291",
+    "project_id": "rf4-assistant",
+    "storage_bucket": "rf4-assistant.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908932428291:android:76757ff358073559e49436",
+        "android_client_info": {
+          "package_name": "com.rf4.fishingrf4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "908932428291-88fh9gtvque6ksr6flan2ei61r4oaud1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rf4.fishingrf4",
+            "certificate_hash": "3fe43ab99a7a5a7d8e69bd84ff7f325d64f2914f"
+          }
+        },
+        {
+          "client_id": "908932428291-75sbfttt018n6dc9lq40mboak5kg3tep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXe1Q1I-FTo00DiK5n7PU54BcFF-p6NF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "908932428291-75sbfttt018n6dc9lq40mboak5kg3tep.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -20,10 +20,11 @@ fun TopFiveScreen(
     speciesTop5: List<SpeciesCount>,
     playersTop5: List<Pair<String, Long>>,
     lakesTop5: List<Pair<String, Long>>,
+    communityTop5: List<Pair<String, Long>>, // Liste des votes communautaires
     onBack: () -> Unit
 ) {
     var tabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("Espèces", "Joueurs", "Lacs")
+    val tabs = listOf("Espèces", "Joueurs", "Lacs", "Appâts communautaires")
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -45,10 +46,12 @@ fun TopFiveScreen(
 
         Spacer(Modifier.height(12.dp))
 
+        // Affichage en fonction de l'onglet sélectionné
         when (tabIndex) {
             0 -> Top5List(speciesTop5.map { it.species to it.count })
             1 -> Top5List(playersTop5)
             2 -> Top5List(lakesTop5)
+            3 -> Top5List(communityTop5) // Affichage des votes communautaires
         }
     }
 }
@@ -61,6 +64,7 @@ private fun Top5List(data: List<Pair<String, Long>>) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
+            // Affichage de chaque élément de la liste
             data.forEachIndexed { index, (label, value) ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -72,21 +76,21 @@ private fun Top5List(data: List<Pair<String, Long>>) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Affichage du rang et du label (nom de l'espèce, joueur, lac, etc.)
                         Text("${index + 1}. $label", color = Color.White)
+                        // Affichage du nombre de votes ou captures
                         AssistChip(
-                            onClick = { },
+                            onClick = { /* Action lors du clic sur le nombre (optionnel) */ },
                             label = { Text("$value", color = Color.White) },
                             colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF3B82F6))
                         )
                     }
                 }
             }
+            // Si la liste est vide, on affiche un message
             if (data.isEmpty()) {
                 Text("Aucune donnée pour aujourd’hui.", color = Color(0xFFE5E7EB))
             }
         }
     }
 }
-
-
-

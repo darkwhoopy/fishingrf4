@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -157,7 +156,7 @@ fun FishInfoScreen(
 
                 // --- Communauté ---
                 Spacer(modifier = Modifier.height(18.dp))
-                HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color(0x334B5563))
+                Divider(color = Color(0x334B5563))
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(

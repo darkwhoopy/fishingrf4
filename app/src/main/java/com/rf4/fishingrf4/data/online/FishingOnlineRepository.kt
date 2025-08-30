@@ -163,18 +163,24 @@ class FishingOnlineRepository(
 
     /** Ajoute/vote un appât communautaire pour un poisson */
     suspend fun addCommunityBaitForFish(fishId: String, bait: String) {
-        if (bait.isBlank()) return
-        val docRef = baitsVotes.document(fishId).collection("votes").document(bait.lowercase())
-        // On incrémente un compteur simple (sans limiter à 1 vote par user pour l’instant)
+        if (bait.isBlank()) return  // Assurez-vous que l'appât n'est pas vide
+        val docRef = baitsVotes.document(fishId).collection("votes").document(bait.lowercase()) // Référence Firestore pour l'appât
+
+        // Vérifier l'existence actuelle du document de l'appât
         val cur = docRef.get().await()
-        val newCount = (cur.getLong("count") ?: 0L) + 1L
+        val newCount = (cur.getLong("count") ?: 0L) + 1L  // Incrémenter le compteur de l'appât
+        val voters = cur.get("voters") as? Map<String, Boolean> ?: emptyMap() // Si aucun "voters" n'existe, initialiser comme une carte vide
+
+        // Mettre à jour les données : ajouter le voter et incrémenter le compteur
         val payload = hashMapOf(
             "bait" to bait,
             "count" to newCount,
+            "voters" to voters.plus(Pair(uid(), true)), // Ajouter l'utilisateur actuel aux votants
             "lastVoteAt" to Timestamp.now()
         )
-        docRef.set(payload).await()
+        docRef.set(payload).await() // Mettre à jour le document Firestore
     }
+
     // Récupérer le Top N appâts d'un poisson pour la journée
     suspend fun getTopCommunityBaitsToday(fishId: String, limit: Int = 5): List<Pair<String, Long>> {
         val todayId = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE) // ex: 20250301
@@ -204,6 +210,7 @@ class FishingOnlineRepository(
             .get().await()
         return snap.toObjects(OnlineEntry::class.java)
     }
+
 
     /** Top 5 par espèce (par poids) */
     suspend fun getTop5BySpecies(species: String): List<OnlineEntry> {
