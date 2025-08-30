@@ -1,5 +1,6 @@
 package com.rf4.fishingrf4.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,8 +25,6 @@ import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.data.models.UserSpot
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
-// ✅ L'IMPORT MANQUANT EST ICI
-import androidx.compose.foundation.BorderStroke
 
 @Composable
 fun PositionSelectionScreen(
@@ -44,8 +43,16 @@ fun PositionSelectionScreen(
     }
 
     val completePosition = if (selectedLetter != null && selectedNumber != null) {
-        "$selectedLetter$selectedNumber"
+        "${selectedLetter}${selectedNumber}"
     } else null
+
+    // Top zones du jour (en ligne) pour ce lac
+    var topZones by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    LaunchedEffect(lake.id) {
+        viewModel.fetchTop5PositionsForLakeToday(lake.id) { zones ->
+            topZones = zones
+        }
+    }
 
     if (showAddSpotDialog) {
         AddSpotDialog(
@@ -58,7 +65,10 @@ fun PositionSelectionScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0D1B2A))
+            .padding(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -74,11 +84,15 @@ fun PositionSelectionScreen(
 
         if (completePosition != null) {
             Card(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF10B981))
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -93,8 +107,10 @@ fun PositionSelectionScreen(
         }
 
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
+            // Lettres
             item {
                 Text("🔤 Sélectionnez une lettre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -104,12 +120,15 @@ fun PositionSelectionScreen(
                         GridButton(
                             text = letter,
                             isSelected = selectedLetter == letter,
-                            onClick = { selectedLetter = if (selectedLetter == letter) null else letter }
+                            onClick = {
+                                selectedLetter = if (selectedLetter == letter) null else letter
+                            }
                         )
                     }
                 }
             }
 
+            // Chiffres
             item {
                 Text("🔢 Sélectionnez un chiffre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -119,15 +138,56 @@ fun PositionSelectionScreen(
                         GridButton(
                             text = number,
                             isSelected = selectedNumber == number,
-                            onClick = { selectedNumber = if (selectedNumber == number) null else number }
+                            onClick = {
+                                selectedNumber = if (selectedNumber == number) null else number
+                            }
                         )
                     }
                 }
             }
 
+            // Top zones du jour (online)
+            if (topZones.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "🔥 Top zones du jour (communauté)",
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+                items(topZones) { (pos, count) ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 6.dp)
+                            .clickable { onPositionSelected(pos) },
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2455AF)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(pos, color = Color.White)
+                            AssistChip(
+                                onClick = { onPositionSelected(pos) },
+                                label = { Text("$count", color = Color.White) },
+                                colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF3B82F6))
+                            )
+                        }
+                    }
+                }
+            }
+
+            // En-tête “Positions recommandées”
             item {
                 if (lake.coordinates.isNotEmpty() || userSpotsForThisLake.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -141,6 +201,7 @@ fun PositionSelectionScreen(
                 }
             }
 
+            // Spots “built-in”
             items(lake.coordinates.toList()) { (position, description) ->
                 RecommendedPositionCard(
                     position = position,
@@ -149,6 +210,7 @@ fun PositionSelectionScreen(
                 )
             }
 
+            // Spots perso utilisateur
             items(userSpotsForThisLake) { spot ->
                 UserPositionCard(
                     spot = spot,
@@ -163,9 +225,13 @@ fun PositionSelectionScreen(
 @Composable
 fun GridButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.size(50.dp).clickable { onClick() },
+        modifier = Modifier
+            .size(50.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFF3B82F6) else Color(0xFF475569)),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFF3B82F6) else Color(0xFF475569)
+        ),
         border = if (isSelected) BorderStroke(2.dp, Color.White) else null
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -174,11 +240,6 @@ fun GridButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
     }
 }
 
-// ... Les autres composants (RecommendedPositionCard, UserPositionCard, AddSpotDialog) sont inchangés
-
-// ... Les autres composants (RecommendedPositionCard, UserPositionCard, AddSpotDialog) sont inchangés
-
-// ✅ NOUVEAU COMPOSANT : La carte pour un spot personnel
 @Composable
 fun UserPositionCard(
     spot: UserSpot,
@@ -186,15 +247,18 @@ fun UserPositionCard(
     onDelete: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF3B82F6)), // Couleur bleue
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF3B82F6)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // ... (Badge de position, description, etc. comme RecommendedPositionCard)
             Column(modifier = Modifier.weight(1f)) {
                 Text(spot.position, color = Color.White, fontWeight = FontWeight.Bold)
                 Text(spot.comment, color = Color(0xFFE2E8F0), fontSize = 14.sp)
@@ -206,7 +270,6 @@ fun UserPositionCard(
     }
 }
 
-// ✅ NOUVEAU COMPOSANT : Le pop-up d'ajout de spot
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSpotDialog(
@@ -240,78 +303,8 @@ fun AddSpotDialog(
                 enabled = position.isNotBlank() && comment.isNotBlank()
             ) { Text("Ajouter") }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annuler") }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } }
     )
-}
-
-@Composable
-fun LetterCard(
-    letter: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .size(50.dp)
-            .clickable { onClick() }
-            .border(
-                width = if (isSelected) 2.dp else 0.dp,
-                color = if (isSelected) Color.White else Color.Transparent,
-                shape = RoundedCornerShape(8.dp)
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF3B82F6) else Color(0xFF475569)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = letter,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun NumberCard(
-    number: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .size(50.dp)
-            .clickable { onClick() }
-            .border(
-                width = if (isSelected) 2.dp else 0.dp,
-                color = if (isSelected) Color.White else Color.Transparent,
-                shape = RoundedCornerShape(8.dp)
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFEF4444) else Color(0xFF475569)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = number,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-        }
-    }
 }
 
 @Composable
@@ -324,9 +317,7 @@ fun RecommendedPositionCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF059669)
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF059669)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -335,11 +326,8 @@ fun RecommendedPositionCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Badge de position
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
@@ -353,25 +341,11 @@ fun RecommendedPositionCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Description
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = description,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    lineHeight = 18.sp
-                )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = description, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
             }
 
-            // Flèche ou icône
-            Text(
-                text = "→",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "→", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

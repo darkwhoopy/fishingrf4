@@ -49,7 +49,27 @@ class AuthManager(private val activity: Activity) {
         }
     }
 
-    fun signOut() = auth.signOut()
+    // Déconnexion Firebase uniquement (tu l'as déjà)
+    fun signOut() { auth.signOut() }
+
+    // Déconnexion côté GoogleSignIn (fait apparaître le sélecteur au prochain login)
+    fun signOutGoogle(onDone: () -> Unit = {}) {
+        googleClient().signOut()
+            .addOnCompleteListener { onDone() }
+    }
+
+    // Révoquer l'autorisation (oublier le compte pour cette app)
+    fun revokeAccess(
+        onDone: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        googleClient().revokeAccess()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) onDone()
+                else onError(task.exception?.message ?: "Impossible de révoquer l'accès")
+            }
+    }
+
     fun currentUser() = auth.currentUser
 
     companion object {

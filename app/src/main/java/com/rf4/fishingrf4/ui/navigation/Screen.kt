@@ -9,5 +9,7 @@ enum class Screen {
     PLAYER_PROFILE,
     FISH_DETAIL,
     LAKE_EDIT,
-    SETTINGS // ✅ AJOUT
+    SETTINGS,
+    TOP_FIVE
+
 }

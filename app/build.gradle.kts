@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("plugin.serialization") version "2.0.21"
     id("com.google.gms.google-services")
 }
 
@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.text)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,14 +62,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
-    // Import du BOM Firebase pour gérer les versions automatiquement
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
-
-    // Firebase Auth
     implementation("com.google.firebase:firebase-auth-ktx")
-
-    // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(platform(libs.firebase.bom))
 }

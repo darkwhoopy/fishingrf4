@@ -6,6 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +28,8 @@ import com.rf4.fishingrf4.ui.components.BackButton
 fun PlayerProfileScreen(
     playerStats: PlayerStats,
     fishingEntries: List<FishingEntry>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenTop5: () -> Unit
 ) {
     Column {
         Row(
@@ -45,6 +48,15 @@ fun PlayerProfileScreen(
 
             // Tes cartes existantes
             item { PlayerStatsSummaryCard(playerStats) }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Top5Badge(onClick = onOpenTop5)
+                }
+            }
+
             item { LevelCard(playerStats) }
             item { RarityStatsCard(playerStats.rareFishCount) }
             if (playerStats.biggestFish != null) {
@@ -58,18 +70,12 @@ fun PlayerProfileScreen(
 @Composable
 private fun GoogleAccountCard() {
     val context = LocalContext.current
-    val activity = context as? Activity
-    // Si jamais ce composable est pré-visualisé sans Activity, on ne casse rien
-    if (activity == null) {
-        Text("Prévisualisation…")
-        return
-    }
+    val activity = context as? Activity ?: return
 
     val authManager = remember { AuthManager(activity) }
     val firebaseAuth = remember { FirebaseAuth.getInstance() }
     var currentUser by remember { mutableStateOf(firebaseAuth.currentUser) }
 
-    // Écoute les changements d'authentification
     DisposableEffect(Unit) {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             currentUser = auth.currentUser
@@ -78,31 +84,36 @@ private fun GoogleAccountCard() {
         onDispose { firebaseAuth.removeAuthStateListener(listener) }
     }
 
-    // Launcher pour récupérer le résultat de Google Sign-In
     val googleLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         authManager.handleSignInResult(
             data = result.data,
-            onSuccess = { /* currentUser se mettra à jour via l'AuthStateListener */ },
-            onError = { /* TODO: afficher un Snackbar si besoin */ }
+            onSuccess = { /* maj via listener */ },
+            onError = { /* snackbar optionnel */ }
         )
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(), // ✅ n'occupe que la hauteur utile
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+        )
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight() // ✅ idem ici
+                .padding(12.dp)
+        ) {
             Text("Compte Google", style = MaterialTheme.typography.titleMedium, color = Color.White)
 
             if (currentUser == null) {
+                Spacer(Modifier.height(6.dp))
+                Text("Connecte-toi pour sauvegarder en ligne et participer aux Top 5.", color = Color.White)
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    "Connecte-toi pour sauvegarder en ligne et participer aux Top 5.",
-                    color = Color.White
-                )
-                Spacer(Modifier.height(12.dp))
                 Button(onClick = {
                     val intent = authManager.googleClient().signInIntent
                     googleLauncher.launch(intent)
@@ -110,19 +121,50 @@ private fun GoogleAccountCard() {
                     Text("Se connecter avec Google")
                 }
             } else {
-                Spacer(Modifier.height(8.dp))
+                // version compacte
+                Spacer(Modifier.height(4.dp))
                 Text("Connecté en tant que :", color = Color.White)
                 Text(currentUser?.displayName ?: currentUser?.email ?: "Utilisateur", color = Color.White)
-                Spacer(Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(onClick = { authManager.signOut() }) { Text("Se déconnecter") }
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Déconnexion simple
+                    Button(onClick = {
+                        authManager.signOut()
+                        authManager.signOutGoogle()
+                    }) { Text("Se déconnecter") }
+
+                    // Changer de compte (déconnecte + relance le picker)
+                    Button(onClick = {
+                        authManager.signOut()
+                        authManager.signOutGoogle {
+                            val intent = authManager.googleClient().signInIntent
+                            googleLauncher.launch(intent)
+                        }
+                    }) { Text("Changer de compte") }
                 }
             }
         }
     }
 }
 
+
 // ── TES COMPOSABLES EXISTANTS ──────────────────────────────────────────────────
+@Composable
+fun Top5Badge(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+    ) {
+        Icon(Icons.Default.EmojiEvents, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text("Top 5", style = MaterialTheme.typography.labelLarge)
+    }
+}
+
 
 @Composable
 private fun PlayerStatsSummaryCard(playerStats: PlayerStats) {

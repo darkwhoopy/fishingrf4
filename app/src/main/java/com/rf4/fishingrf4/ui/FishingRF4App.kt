@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-
+import com.rf4.fishingrf4.data.online.SpeciesCount
 
 
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -52,6 +52,13 @@ fun FishingRF4App() {
 
     val uiState by viewModel.uiState.collectAsState()
     val saveCompleted by viewModel.saveCompleted.collectAsState()
+// début "jour de jeu" (déjà calculé par ton VM)
+    val startOfDay by viewModel.startOfCurrentGameDayTimestamp.collectAsState()
+
+// états locaux pour l’écran Top 5
+    var topSpecies by remember { mutableStateOf<List<SpeciesCount>>(emptyList()) }
+    var topPlayers by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    var topLakes   by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
 
     var favoritesOnly by remember { mutableStateOf(false) }
     var lakeToInteract by remember { mutableStateOf<Lake?>(null) }
@@ -159,6 +166,22 @@ fun FishingRF4App() {
                     }
                 )
             }
+            Screen.TOP_FIVE -> {
+                // on récupère à l’ouverture (et si le "jour" change)
+                LaunchedEffect(startOfDay) {
+                    viewModel.fetchTop5SpeciesCountsToday { topSpecies = it }
+                    viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
+                    viewModel.fetchTop5LakesOfDay(startOfDay)   { topLakes   = it }
+                }
+
+                TopFiveScreen(   // ← l’écran en onglets
+                    speciesTop5 = topSpecies,
+                    playersTop5 = topPlayers,
+                    lakesTop5   = topLakes,
+                    onBack      = { viewModel.navigateTo(Screen.PLAYER_PROFILE) }
+                )
+            }
+
             Screen.FISH_SEARCH -> {
                 FishSearchScreen(
                     allLakes = uiState.allLakes,
@@ -195,11 +218,13 @@ fun FishingRF4App() {
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
             }
+
             Screen.PLAYER_PROFILE -> {
                 PlayerProfileScreen(
                     playerStats = uiState.playerStats,
                     fishingEntries = uiState.fishingEntries,
-                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
+                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) },
+                    onOpenTop5 = { viewModel.navigateTo(Screen.TOP_FIVE) }
                 )
             }
             Screen.SETTINGS -> {
