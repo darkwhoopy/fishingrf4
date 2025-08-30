@@ -159,21 +159,22 @@ class FishingViewModel(context: Context) : ViewModel() {
     // --- Online: Appâts communautaires ---
     fun fetchTopCommunityBaits(
         fishId: String,
-        limit: Int = 5,
-        todayOnly: Boolean = true,
         onResult: (List<Pair<String, Long>>) -> Unit
     ) {
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
-                try {
-                    if (todayOnly) onlineRepo.getTopBaitsForFishToday(fishId, limit)
-                    else onlineRepo.getTopBaitsForFish(fishId, limit)
-                } catch (_: Exception) { emptyList() }
+                try { onlineRepo.getTopCommunityBaitsToday(fishId) }
+                catch (_: Exception) { emptyList() }
             }
             onResult(list)
         }
     }
-
+    fun getCaptureStatsByTimeOfDay(fishId: String): Map<String, Int> {
+        return repository.fishingEntries.value
+            .filter { it.fish.id == fishId && it.timeOfDay != null }
+            .groupBy { it.timeOfDay!! }
+            .mapValues { it.value.size }
+    }
     fun addCommunityBaitForFish(
         fishId: String,
         bait: String,

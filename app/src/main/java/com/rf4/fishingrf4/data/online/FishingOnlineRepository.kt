@@ -175,6 +175,22 @@ class FishingOnlineRepository(
         )
         docRef.set(payload).await()
     }
+    // Récupérer le Top N appâts d'un poisson pour la journée
+    suspend fun getTopCommunityBaitsToday(fishId: String, limit: Int = 5): List<Pair<String, Long>> {
+        val todayId = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE) // ex: 20250301
+        val snap = db.collection("fish_bait_votes")
+            .document(fishId)
+            .collection("votes")
+            .get()
+            .await()
+
+        return snap.documents.map { doc ->
+            val count = (doc.get("days.$todayId.count") as? Long) ?: 0L
+            doc.id to count
+        }
+            .sortedByDescending { it.second }
+            .take(limit)
+    }
 
     // -----------------------
     // Anciennes API (poids)
