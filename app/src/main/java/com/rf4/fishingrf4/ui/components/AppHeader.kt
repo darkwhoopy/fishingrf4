@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.navigation.Screen
 import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.auth.FirebaseAuth
 import com.rf4.fishingrf4.R
 
 
@@ -31,40 +32,24 @@ fun AppHeader(
 ) {
     Column {
 // ========== BULLE DU HAUT (TITRE + NIVEAU) - INCHANGÉE ==========
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFF1E40AF), Color(0xFF3B82F6), Color(0xFF06B6D4))
-                        )
-                    )
-                    .padding(20.dp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
+                shape = CircleShape
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
-                            shape = CircleShape
-                        ) {
-                            Text(text = "🎣", fontSize = 24.sp, modifier = Modifier.padding(8.dp))
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
-                        }
-                    }
-                    LevelSelector(level = playerStats.level, onLevelChange = onLevelChange)
+                Text(text = "🎣", fontSize = 24.sp, modifier = Modifier.padding(8.dp))
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Badge de connexion compact
+                    Text(
+                        text = if (FirebaseAuth.getInstance().currentUser != null) "✅" else "⚠️",
+                        fontSize = 12.sp
+                    )
                 }
             }
         }

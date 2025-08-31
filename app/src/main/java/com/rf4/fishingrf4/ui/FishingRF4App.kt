@@ -125,12 +125,6 @@ fun FishingRF4App() {
 
             // Badge de statut de connexion
             Spacer(Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                AuthStatusBadge(currentUser)
-            }
 
             // Espacement avant le contenu principal
             Spacer(Modifier.height(12.dp))
