@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.FishingEntry
-import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.components.BackButton
 import java.time.Instant
 import java.time.ZoneId
@@ -31,7 +31,6 @@ import java.util.*
 @Composable
 fun JournalScreen(
     entries: List<FishingEntry>,
-    playerStats: PlayerStats,
     onDeleteEntry: (String) -> Unit,
     onBack: () -> Unit
 ) {
@@ -64,7 +63,7 @@ fun JournalScreen(
                     item(key = date) {
                         DayHeader(
                             date = date,
-                            entryCount = entriesForDay.size,
+                            entriesForDay = entriesForDay, // ✅ Nouveau : on passe toutes les entrées
                             isExpanded = date in expandedDays,
                             onClick = {
                                 expandedDays = if (date in expandedDays) expandedDays - date else expandedDays + date
@@ -85,7 +84,150 @@ fun JournalScreen(
     }
 }
 
-// ✅ CARTE DE CAPTURE SIMPLIFIÉE
+// ✅ EN-TÊTE AMÉLIORÉE AVEC STATISTIQUES
+@Composable
+fun DayHeader(
+    date: java.time.LocalDate,
+    entriesForDay: List<FishingEntry>, // Nouveau : on passe toutes les entrées
+    isExpanded: Boolean,
+    onClick: () -> Unit
+) {
+    val formatter = remember { DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH) }
+    val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
+
+    // Calculs des statistiques du jour
+    val totalCatches = entriesForDay.size
+    val uniqueSpecies = entriesForDay.map { it.fish.name }.distinct().size
+    val totalPoints = entriesForDay.sumOf { it.fish.rarity.points }
+    val topLake = entriesForDay.groupBy { it.lake.name }.maxByOrNull { it.value.size }?.key
+    val rarityBreakdown = entriesForDay.groupBy { it.fish.rarity }.mapValues { it.value.size }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Ligne principale avec date et flèche
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = date.format(formatter).replaceFirstChar { it.titlecase(Locale.FRENCH) },
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.ExpandMore,
+                    contentDescription = "Déplier",
+                    tint = Color.White,
+                    modifier = Modifier.rotate(rotationAngle)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Statistiques principales
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                StatisticItem(
+                    label = "Prises",
+                    value = totalCatches.toString(),
+                    icon = "🎣",
+                    color = Color(0xFF10B981)
+                )
+                StatisticItem(
+                    label = "Espèces",
+                    value = uniqueSpecies.toString(),
+                    icon = "🐟",
+                    color = Color(0xFF3B82F6)
+                )
+                StatisticItem(
+                    label = "Points",
+                    value = totalPoints.toString(),
+                    icon = "⭐",
+                    color = Color(0xFFFFC107)
+                )
+            }
+
+            if (topLake != null && totalCatches > 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Lac productif : $topLake",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
+
+            // Badges de rareté si il y a des prises intéressantes
+            if (rarityBreakdown.any { it.key.points > 1 }) {
+                Spacer(modifier = Modifier.height(8.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    items(rarityBreakdown.entries.sortedByDescending { it.key.points }) { (rarity, count) ->
+                        if (count > 0) {
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = Color(rarity.colorValue)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "${rarity.displayName.take(1)}×$count",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StatisticItem(
+    label: String,
+    value: String,
+    icon: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = icon, fontSize = 14.sp)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = value,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        }
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            color = Color.Gray
+        )
+    }
+}
+
+// ✅ CARTE DE CAPTURE (inchangée)
 @Composable
 fun JournalEntryCard(entry: FishingEntry, onDelete: () -> Unit) {
     Card(
@@ -118,49 +260,6 @@ fun JournalEntryCard(entry: FishingEntry, onDelete: () -> Unit) {
         }
     }
 }
-
-@Composable
-fun DayHeader(
-    date: java.time.LocalDate,
-    entryCount: Int,
-    isExpanded: Boolean,
-    onClick: () -> Unit
-) {
-    val formatter = remember { DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH) }
-    val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = date.format(formatter).replaceFirstChar { it.titlecase(Locale.FRENCH) },
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.weight(1f)
-            )
-            Text(
-                text = "$entryCount prises",
-                color = Color.Gray,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Icon(
-                imageVector = Icons.Default.ExpandMore,
-                contentDescription = "Déplier",
-                tint = Color.White,
-                modifier = Modifier.rotate(rotationAngle)
-            )
-        }
-    }
-}
-
 
 @Composable
 fun InfoBadge(

@@ -85,7 +85,7 @@ fun FishingRF4App() {
         viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
         viewModel.fetchTop5LakesOfDay(startOfDay) { topLakes = it }
         // Récupère les votes communautaires
-        viewModel.fetchTopCommunityBaits("fishIdHere") { communityTop = it }
+
     }
 
 // Structure principale de la colonne avec l'UI
@@ -232,7 +232,6 @@ fun FishingRF4App() {
             Screen.JOURNAL -> {
                 JournalScreen(
                     entries = uiState.fishingEntries,
-                    playerStats = uiState.playerStats,
                     onDeleteEntry = viewModel::removeEntry,
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
@@ -254,6 +253,12 @@ fun FishingRF4App() {
                     onResetData = { selectedOptions ->
                         viewModel.resetData(selectedOptions)
                     }
+                )
+            }
+            Screen.COMMUNITY -> {
+                CommunityScreen(
+                    viewModel = viewModel,
+                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
             }
         }

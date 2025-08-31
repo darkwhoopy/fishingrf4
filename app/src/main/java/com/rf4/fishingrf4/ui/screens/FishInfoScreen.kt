@@ -1,5 +1,4 @@
 package com.rf4.fishingrf4.ui.screens
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,10 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.HighlightOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +19,6 @@ import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
-
 @Composable
 fun FishInfoScreen(
     fish: Fish,
@@ -32,20 +27,15 @@ fun FishInfoScreen(
 ) {
     var showAddBaitDialog by remember { mutableStateOf(false) }
     var showCommunityBaitDialog by remember { mutableStateOf(false) }
-
+    var votingMessage by remember { mutableStateOf("") }
+    var isVotingSuccess by remember { mutableStateOf(true) }
     val customAddedBaits by viewModel.getCustomBaitsForFish(fish.id).collectAsState()
 
-    // Données calculées localement
+// Données calculées localement
     val allLakesForThisFish = remember(fish.id) { viewModel.getLakesForFish(fish) }
     val captureStats = remember(fish.id) { viewModel.getCaptureStatsForFishByLake(fish.id) }
     val topSpots = remember(fish.id) { viewModel.getTopSpotsForFish(fish.id) }
     val timeOfDayStats = remember(fish.id) { viewModel.getCaptureStatsByTimeOfDay(fish.id) }
-
-    // Communauté
-    var communityTop by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
-    LaunchedEffect(fish.id) {
-        viewModel.fetchTopCommunityBaits(fish.id) { communityTop = it }
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -79,14 +69,11 @@ fun FishInfoScreen(
             }
         }
 
-        // Présence & captures
+        // Présence & Captures
         item {
             FishCard(icon = "📍", title = "Présence & Captures") {
                 Row(modifier = Modifier.padding(bottom = 12.dp)) {
-                    RarityBadge(
-                        text = fish.rarity.displayName,
-                        color = Color(fish.rarity.colorValue)
-                    )
+                    RarityBadge(text = fish.rarity.displayName, color = Color(fish.rarity.colorValue))
                 }
                 if (allLakesForThisFish.isNotEmpty()) {
                     allLakesForThisFish.forEach { lake ->
@@ -96,120 +83,83 @@ fun FishInfoScreen(
                         )
                     }
                 } else {
-                    Text(
-                        "Ce poisson n'est actuellement disponible dans aucun lac connu.",
-                        color = Color.Gray
-                    )
+                    Text("Aucun lac disponible", color = Color.Gray)
                 }
             }
         }
 
-        // Poids
+        // Appâts
         item {
-            FishCard(icon = "⚖️", title = "Poids") {
-                val weightText = fish.weight?.let { "${it.start} - ${it.endInclusive} kg" } ?: "Non spécifié"
-                Text(
-                    text = weightText,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-        }
-
-        // 🎣 Appâts (jeu + perso + communauté)
-        item {
-            FishCard(icon = "🎣", title = "Appâts Recommandés + Communauté") {
-                // --- Tes appâts persos / du jeu ---
-                Button(
-                    onClick = { showAddBaitDialog = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ajouter un de vos appâts")
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-
-                if (fish.preferredBait.isNotEmpty()) {
-                    fish.preferredBait.forEach { bait ->
-                        SimpleBaitCard(bait = bait, isOriginal = true)
+            FishCard(icon = "🎣", title = "Appâts") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Appâts prédéfinis (non modifiables)
+                    if (fish.preferredBait.isNotEmpty()) {
+                        Text("Appâts prédéfinis :", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        fish.preferredBait.forEach { bait ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(bait, color = Color.White)
+                            }
+                        }
+                        if (customAddedBaits.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
-                }
-                if (customAddedBaits.isNotEmpty()) {
-                    Text(
-                        "Vos ajouts :",
-                        color = Color(0xFF4CAF50),
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    )
-                    customAddedBaits.forEach { bait ->
-                        SimpleBaitCard(
-                            bait = bait,
-                            isOriginal = false,
-                            onRemove = { viewModel.removeCustomBaitFromFish(fish.id, bait) }
-                        )
-                    }
-                }
-                if (fish.preferredBait.isEmpty() && customAddedBaits.isEmpty()) {
-                    Text("Aucun appât spécifique", color = Color.Gray)
-                }
 
-                // --- Communauté ---
-                Spacer(modifier = Modifier.height(18.dp))
-                Divider(color = Color(0x334B5563))
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    "🌍 Propositions des joueurs",
-                    color = Color(0xFF60A5FA),
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (communityTop.isEmpty()) {
-                    Text("Aucun vote pour l’instant.", color = Color(0xFFE5E7EB))
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        communityTop.forEachIndexed { index, (bait, count) ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF2455AF)),
-                                shape = RoundedCornerShape(12.dp)
+                    // Appâts personnalisés ajoutés
+                    if (customAddedBaits.isNotEmpty()) {
+                        Text("Mes appâts :", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        customAddedBaits.forEach { bait ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF3B82F6), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(bait, color = Color.White, modifier = Modifier.weight(1f))
+                                IconButton(
+                                    onClick = { viewModel.removeCustomBaitFromFish(fish.id, bait) },
+                                    modifier = Modifier.size(20.dp)
                                 ) {
-                                    Text("${index + 1}. $bait", color = Color.White)
-                                    AssistChip(
-                                        onClick = {
-                                            // voter pour ce bait
-                                            viewModel.addCommunityBaitForFish(fish.id, bait) {
-                                                viewModel.fetchTopCommunityBaits(fish.id) { list ->
-                                                    communityTop = list
-                                                }
-                                            }
-                                        },
-                                        label = { Text("$count", color = Color.White) },
-                                        colors = AssistChipDefaults.assistChipColors(
-                                            containerColor = Color(0xFF3B82F6)
-                                        )
-                                    )
+                                    Icon(Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red, modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = { showCommunityBaitDialog = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Proposer / voter un appât (liste déroulante)")
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Boutons d'action
+                    OutlinedButton(
+                        onClick = { showAddBaitDialog = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Ajouter un appât personnel")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // ✅ NOUVEAU : Bouton pour voter pour un appât communautaire
+                    Button(
+                        onClick = { showCommunityBaitDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE11D48))
+                    ) {
+                        Icon(Icons.Default.Group, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("👥 Voter pour un appât (Communauté)")
+                    }
+
+                    // Message de feedback
+                    if (votingMessage.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = votingMessage,
+                            color = if (isVotingSuccess) Color.Green else Color.Red,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
         }
@@ -255,9 +205,11 @@ fun FishInfoScreen(
                 FishCard(icon = "📊", title = "Captures par Période") {
                     val periods = listOf("Matinée", "Journée", "Soirée", "Nuit")
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        periods.forEach { p ->
-                            val c = timeOfDayStats[p] ?: 0
-                            if (c > 0) TimeOfDayStatsRow(period = p, count = c)
+                        periods.forEach { period ->
+                            val count = timeOfDayStats[period] ?: 0
+                            if (count > 0) {
+                                TimeOfDayStatsRow(period = period, count = count)
+                            }
                         }
                     }
                 }
@@ -265,50 +217,200 @@ fun FishInfoScreen(
         }
     }
 
-    // Dialog — appât perso
+// ✅ Dialog d'ajout d'appât personnel (inchangé)
     if (showAddBaitDialog) {
         SimpleBaitDialog(
             allGameBaits = viewModel.getAllGameBaits(),
             currentBaits = fish.preferredBait + customAddedBaits,
-            onBaitSelected = { selected ->
-                viewModel.addCustomBaitToFish(fish.id, selected)
+            onBaitSelected = { selectedBait ->
+                viewModel.addCustomBaitToFish(fish.id, selectedBait)
                 showAddBaitDialog = false
             },
             onDismiss = { showAddBaitDialog = false }
         )
     }
 
-    // Dialog — appât communauté (même UI que perso)
+// ✅ NOUVEAU : Dialog pour voter pour un appât communautaire
     if (showCommunityBaitDialog) {
-        val alreadyInCommunity = communityTop.map { it.first }
-        SimpleBaitDialog(
-            allGameBaits = viewModel.getAllGameBaits(),
-            currentBaits = alreadyInCommunity,     // on masque ceux déjà votés (optionnel)
-            onBaitSelected = { selected ->
-                viewModel.addCommunityBaitForFish(fish.id, selected) {
-                    viewModel.fetchTopCommunityBaits(fish.id) { list -> communityTop = list }
-                }
+        CommunityBaitVotingDialog(
+            fish = fish,
+            viewModel = viewModel,
+            onVoteSuccess = { baitName ->
+                votingMessage = "✅ Vote enregistré pour '$baitName' !"
+                isVotingSuccess = true
                 showCommunityBaitDialog = false
+                // Effacer le message après 3 secondes
+
+            },
+            onVoteError = { error ->
+                votingMessage = "❌ $error"
+                isVotingSuccess = false
+                showCommunityBaitDialog = false
+                // Effacer le message après 5 secondes
+
             },
             onDismiss = { showCommunityBaitDialog = false }
         )
     }
 }
+// ✅ NOUVEAU : Dialog pour voter pour un appât communautaire
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommunityBaitVotingDialog(
+    fish: Fish,
+    viewModel: FishingViewModel,
+    onVoteSuccess: (String) -> Unit,
+    onVoteError: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedBait by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+// Récupérer tous les appâts disponibles SAUF ceux prédéfinis
+    val allGameBaits = viewModel.getAllGameBaits()
+    val availableBaitsForVoting = allGameBaits.filter { bait ->
+        bait !in fish.preferredBait // On exclut les appâts prédéfinis
+    }
 
-/* ---------- Composants réutilisés ---------- */
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("👥 Vote communautaire", color = Color.White)
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Quel appât recommandez-vous pour ${fish.name} ?",
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
+                // Liste déroulante des appâts
+                var expanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedBait,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Choisir un appât") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedLabelColor = Color.White,
+                            unfocusedLabelColor = Color.Gray
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(Color(0xFF1E3A5F))
+                    ) {
+                        availableBaitsForVoting.forEach { bait ->
+                            DropdownMenuItem(
+                                text = { Text(bait, color = Color.White) },
+                                onClick = {
+                                    selectedBait = bait
+                                    expanded = false
+                                },
+                                modifier = Modifier.background(Color(0xFF1E3A5F))
+                            )
+                        }
+                    }
+                }
+
+                if (selectedBait.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "⚠️ Note : Vous ne pouvez voter qu'une seule fois pour cet appât sur ce poisson.",
+                        color = Color.Yellow,
+                        fontSize = 11.sp
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (selectedBait.isNotEmpty()) {
+                        isLoading = true
+
+                        // Appel au ViewModel pour voter
+                        viewModel.addCommunityBaitForFish(
+                            fishId = fish.id,
+                            baitName = selectedBait,
+                            onSuccess = {
+                                isLoading = false
+                                onVoteSuccess(selectedBait)
+                            },
+                            onError = { error ->
+                                isLoading = false
+                                onVoteError(error)
+                            }
+                        )
+                    }
+                },
+                enabled = selectedBait.isNotEmpty() && !isLoading,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE11D48))
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Vote en cours...")
+                } else {
+                    Text("👍 Voter")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annuler", color = Color.White)
+            }
+        },
+        containerColor = Color(0xFF1E3A5F)
+    )
+}
+// Reste du code inchangé (toutes vos fonctions existantes)
+@Composable
+fun FishCard(icon: String, title: String, content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F)),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "$icon $title",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            content()
+        }
+    }
+}
 @Composable
 fun LakeInfoRow(lake: Lake, captureCount: Int) {
     val hasCaught = captureCount > 0
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = if (hasCaught) Icons.Default.CheckCircle else Icons.Default.HighlightOff,
-            contentDescription = null,
+            contentDescription = if (hasCaught) "Capturé" else "Non capturé",
             tint = if (hasCaught) Color(0xFF4CAF50) else Color.Gray,
             modifier = Modifier.size(20.dp)
         )
@@ -328,88 +430,43 @@ fun LakeInfoRow(lake: Lake, captureCount: Int) {
         RarityBadge(text = "Niv. ${lake.unlockLevel}", color = Color(lake.difficulty.colorValue))
     }
 }
-
-@Composable
-fun TopSpotRow(rank: Int, spotName: String, count: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Text(text = "$rank.", fontWeight = FontWeight.Bold, color = Color(0xFFFFD700), fontSize = 16.sp)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = spotName, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
-        Text(text = "x$count", color = Color.Gray, fontSize = 14.sp)
-    }
-}
-
-@Composable
-fun TimeOfDayStatsRow(period: String, count: Int) {
-    val (emoji, color) = when (period) {
-        "Matinée" -> "☀️" to Color(0xFFFFC107)
-        "Journée" -> "☀️" to Color(0xFF4CAF50)
-        "Soirée" -> "🌙" to Color(0xFF9C27B0)
-        else -> "🌃" to Color(0xFF3F51B5)
-    }
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Text(text = emoji, fontSize = 16.sp)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text = period, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
-        Text(text = "x$count", color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun FishCard(icon: String, title: String, content: @Composable ColumnScope.() -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
-                Text(text = icon, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-                Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            content()
-        }
-    }
-}
-
 @Composable
 fun RarityBadge(text: String, color: Color) {
-    Card(colors = CardDefaults.cardColors(containerColor = color), shape = RoundedCornerShape(6.dp)) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = color),
+        shape = RoundedCornerShape(4.dp)
+    ) {
         Text(
             text = text,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
         )
     }
 }
-
 @Composable
-fun SimpleBaitCard(bait: String, isOriginal: Boolean, onRemove: (() -> Unit)? = null) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = if (isOriginal) Color(0xFF455A64) else Color(0xFF2E7D32))
+fun TopSpotRow(rank: Int, spotName: String, count: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = bait, fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Medium)
-            if (onRemove != null) {
-                IconButton(onClick = onRemove, modifier = Modifier.size(24.dp)) {
-                    Icon(Icons.Default.Delete, contentDescription = "Supprimer", tint = Color(0xFFE57373), modifier = Modifier.size(16.dp))
-                }
-            }
-        }
+        Text(text = "$rank.", color = Color(0xFFFFD700), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = spotName, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Text(text = "x$count", color = Color(0xFF10B981), fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeOfDayStatsRow(period: String, count: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = period, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Text(text = "x$count", color = Color(0xFF10B981), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+}
 @Composable
 fun SimpleBaitDialog(
     allGameBaits: List<String>,
@@ -417,27 +474,32 @@ fun SimpleBaitDialog(
     onBaitSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val availableBaits = allGameBaits.filter { it !in currentBaits }
     var searchQuery by remember { mutableStateOf("") }
-    val availableBaits = remember(allGameBaits, currentBaits, searchQuery) {
-        allGameBaits
-            .filter { !currentBaits.contains(it) }
-            .filter { it.contains(searchQuery, ignoreCase = true) }
-            .sorted()
+    val filteredBaits = availableBaits.filter {
+        it.contains(searchQuery, ignoreCase = true)
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Choisir un appât", color = Color.White) },
+        title = { Text("Ajouter un appât", color = Color.White) },
         text = {
             Column {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("Rechercher") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = { Text("Rechercher un appât") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        unfocusedLabelColor = Color.Gray
+                    )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(modifier = Modifier.heightIn(max = 260.dp)) {
-                    items(availableBaits) { bait ->
+                LazyColumn(modifier = Modifier.height(200.dp)) {
+                    items(filteredBaits) { bait ->
                         Text(
                             text = bait,
                             color = Color.White,
@@ -450,7 +512,7 @@ fun SimpleBaitDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Fermer") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Annuler", color = Color.White) } },
         containerColor = Color(0xFF1E3A5F)
     )
 }

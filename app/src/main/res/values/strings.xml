@@ -1,3 +1,35 @@
 <resources>
     <string name="app_name">Journal RF4</string>
+
+    <!-- Interface principale -->
+    <string name="app_title">RF4 Assistant</string>
+    <string name="app_subtitle">Russian Fishing Helper</string>
+    <string name="level_label">NIVEAU</string>
+
+    <!-- Navigation -->
+    <string name="nav_search">Recherche</string>
+    <string name="nav_profile">Profil</string>
+    <string name="nav_journal">Journal</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_community">Communauté</string>
+    <string name="nav_top5">Top 5</string>
+
+    <!-- Écrans -->
+    <string name="screen_profile_title">Profil du Pêcheur</string>
+    <string name="screen_community_title">Communauté</string>
+    <string name="screen_settings_title">Paramètres</string>
+    <string name="screen_journal_title">Journal</string>
+
+    <!-- Appâts communautaires -->
+    <string name="vote_for_bait">Voter pour un appât (Communauté)</string>
+    <string name="vote_success">Vote enregistré pour \'%s\' !</string>
+    <string name="vote_error_already">Vous avez déjà voté pour cet appât sur ce poisson</string>
+    <string name="vote_error_login">Vous devez être connecté pour voter</string>
+    <string name="vote_in_progress">Vote en cours...</string>
+    <string name="vote_button">Voter</string>
+
+    <!-- Paramètres langue -->
+    <string name="language_setting">Langue</string>
+    <string name="language_french">Français</string>
+    <string name="language_english">English</string>
 </resources>

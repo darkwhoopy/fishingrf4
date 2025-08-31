@@ -149,7 +149,10 @@ class FishingOnlineRepository(
     // -------------------------------------------------
     // Tops “appâts communautaires” (votes par poisson)
     // -------------------------------------------------
-
+    suspend fun getTopCommunityBaitsThisMonth(fishId: String, limit: Int = 5): List<Pair<String, Long>> {
+        val monthStartMs = thisMonthStartMs()
+        return getTopBaitsForFishInternal(fishId, limit, monthStartMs)
+    }
     /** Top appâts du jour pour un poisson (par compte) */
     suspend fun getTopBaitsForFishToday(fishId: String, limit: Int): List<Pair<String, Long>> {
         val dayStart = todayStartMs()
@@ -160,42 +163,47 @@ class FishingOnlineRepository(
     suspend fun getTopBaitsForFish(fishId: String, limit: Int): List<Pair<String, Long>> {
         return getTopBaitsForFishInternal(fishId, limit, null)
     }
-
+    private fun thisMonthStartMs(): Long {
+        val now = java.time.LocalDateTime.now()
+        val monthStart = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        return monthStart.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
     /** Ajoute/vote un appât communautaire pour un poisson */
     suspend fun addCommunityBaitForFish(fishId: String, bait: String) {
-        if (bait.isBlank()) return  // Assurez-vous que l'appât n'est pas vide
-        val docRef = baitsVotes.document(fishId).collection("votes").document(bait.lowercase()) // Référence Firestore pour l'appât
+        if (bait.isBlank()) throw IllegalArgumentException("L'appât ne peut pas être vide")
 
-        // Vérifier l'existence actuelle du document de l'appât
-        val cur = docRef.get().await()
-        val newCount = (cur.getLong("count") ?: 0L) + 1L  // Incrémenter le compteur de l'appât
-        val voters = cur.get("voters") as? Map<String, Boolean> ?: emptyMap() // Si aucun "voters" n'existe, initialiser comme une carte vide
+        val currentUserId = uid()
+        if (currentUserId.isBlank()) throw IllegalArgumentException("Vous devez être connecté pour voter")
 
-        // Mettre à jour les données : ajouter le voter et incrémenter le compteur
+        val docRef = baitsVotes.document(fishId).collection("votes").document(bait.lowercase())
+
+        // Vérifier si l'utilisateur a déjà voté pour cet appât sur ce poisson
+        val currentDoc = docRef.get().await()
+        val currentVoters = currentDoc.get("voters") as? Map<String, Boolean> ?: emptyMap()
+
+        // ✅ VÉRIFICATION DU DOUBLE VOTE
+        if (currentVoters.containsKey(currentUserId)) {
+            throw IllegalArgumentException("Vous avez déjà voté pour cet appât sur ce poisson")
+        }
+
+        // Incrémenter le compteur et ajouter le votant
+        val newCount = (currentDoc.getLong("count") ?: 0L) + 1L
+        val newVoters = currentVoters.plus(Pair(currentUserId, true))
+
         val payload = hashMapOf(
             "bait" to bait,
             "count" to newCount,
-            "voters" to voters.plus(Pair(uid(), true)), // Ajouter l'utilisateur actuel aux votants
-            "lastVoteAt" to Timestamp.now()
+            "voters" to newVoters,
+            "lastVoteAt" to com.google.firebase.Timestamp.now()
         )
-        docRef.set(payload).await() // Mettre à jour le document Firestore
+
+        docRef.set(payload).await()
     }
 
     // Récupérer le Top N appâts d'un poisson pour la journée
     suspend fun getTopCommunityBaitsToday(fishId: String, limit: Int = 5): List<Pair<String, Long>> {
-        val todayId = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE) // ex: 20250301
-        val snap = db.collection("fish_bait_votes")
-            .document(fishId)
-            .collection("votes")
-            .get()
-            .await()
-
-        return snap.documents.map { doc ->
-            val count = (doc.get("days.$todayId.count") as? Long) ?: 0L
-            doc.id to count
-        }
-            .sortedByDescending { it.second }
-            .take(limit)
+        val dayStartMs = todayStartMs()
+        return getTopBaitsForFishInternal(fishId, limit, dayStartMs)
     }
 
     // -----------------------
@@ -229,22 +237,23 @@ class FishingOnlineRepository(
     private suspend fun getTopBaitsForFishInternal(
         fishId: String,
         limit: Int,
-        startOfDayMs: Long?
+        startOfPeriodMs: Long?
     ): List<Pair<String, Long>> {
-        // Structure: baits_votes/{fishId}/votes/{bait} => { bait, count, lastVoteAt }
-        var q = baitsVotes.document(fishId).collection("votes").orderBy("count", Query.Direction.DESCENDING)
-        // Si tu veux filtrer “du jour”, on peut lire tout et filtrer sur lastVoteAt >= startOfDay
-        val snap = q.get().await()
+        val snap = baitsVotes.document(fishId).collection("votes")
+            .orderBy("count", Query.Direction.DESCENDING)
+            .get()
+            .await()
 
-        val all = snap.documents.mapNotNull { d ->
-            val bait = d.getString("bait") ?: return@mapNotNull null
-            val count = d.getLong("count") ?: 0L
-            val lastAt = d.getTimestamp("lastVoteAt")?.toDate()?.time ?: 0L
-            Triple(bait, count, lastAt)
+        val all = snap.documents.mapNotNull { doc ->
+            val bait = doc.getString("bait") ?: return@mapNotNull null
+            val count = doc.getLong("count") ?: 0L
+            val lastVoteAt = doc.getTimestamp("lastVoteAt")?.toDate()?.time ?: 0L
+            Triple(bait, count, lastVoteAt)
         }
 
-        val filtered = if (startOfDayMs != null) {
-            all.filter { it.third >= startOfDayMs }
+        val filtered = if (startOfPeriodMs != null) {
+            // Filtrer par période (jour ou mois)
+            all.filter { it.third >= startOfPeriodMs }
         } else {
             all
         }

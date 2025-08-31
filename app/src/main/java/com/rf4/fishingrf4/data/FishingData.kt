@@ -7,6 +7,88 @@ import com.rf4.fishingrf4.data.models.*
 
 object FishingData {
 
+    val allGameBaits = listOf(
+        // Appâts naturels
+        "Ver de terre",
+        "Ver rouge",
+        "Ver de vase",
+        "Asticot",
+        "Crevette",
+        "Crevette géante",
+
+        // Appâts végétaux
+        "Pain",
+        "Maïs",
+        "Maïs géant",
+        "Blé",
+        "Pâte",
+        "Fromage",
+        "Pomme de terre",
+        "Herbe",
+        "Algue",
+        "Pâte l'ail",
+
+        // Appâts spécialisés
+        "Bouillette",
+        "Bouillette géante",
+        "Bouillette speciale",
+        "Tiger nuts",
+        "Pellets",
+        "Bloodworm",
+        "Chènevis",
+        "Pois",
+        "Miel",
+
+        // Vifs et leurres
+        "Vif",
+        "Gros vif",
+        "Vif géant",
+        "Petit poisson",
+        "Poisson mort",
+        "Gros poisson mort",
+        "Poisson géant",
+        "Poisson mort spécial",
+
+        // Leurres artificiels
+        "Cuillère",
+        "Cuillère oscillante",
+        "Cuillère marine",
+        "Wobbler",
+        "Gros wobbler",
+        "Jig",
+        "Gros jig",
+        "Shad",
+        "Jerkbait",
+        "Spinnerbait",
+        "Leurre marin",
+        "Petit leurre",
+        "Gros leurre",
+        "Leurre légendaire",
+
+        // Appâts marins
+        "Ver marin",
+        "Calmar",
+        "Calmar géant",
+        "Mollusque",
+        "Hareng",
+        "Maquereau",
+
+        // Appâts spéciaux
+        "Mouche",
+        "Mouche géante",
+        "Teigne",
+        "Criquet",
+        "Insecte",
+        "Petit ver",
+        "Ver géant",
+        "Caviar",
+        "Caviar géant",
+        "Escargot",
+        "Moule",
+        "Plancton",
+        "Appât mystère"
+    ).sorted()
+
     // POISSONS COMMUNS
     private val commonFresh = listOf(
         Fish(

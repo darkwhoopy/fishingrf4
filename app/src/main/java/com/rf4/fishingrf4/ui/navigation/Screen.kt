@@ -10,6 +10,9 @@ enum class Screen {
     FISH_DETAIL,
     LAKE_EDIT,
     SETTINGS,
-    TOP_FIVE
+    TOP_FIVE,
+
+    COMMUNITY
+
 
 }

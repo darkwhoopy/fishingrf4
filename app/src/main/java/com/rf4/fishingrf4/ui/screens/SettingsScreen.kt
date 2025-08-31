@@ -20,6 +20,10 @@ import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.ui.platform.LocalContext
+import com.rf4.fishingrf4.R
+import com.rf4.fishingrf4.data.utils.LanguageManager
 
 @Composable
 fun SettingsScreen(
@@ -80,6 +84,72 @@ fun SettingsScreen(
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
+
+        val context = LocalContext.current
+        var currentLanguage by remember { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
+        var showLanguageDialog by remember { mutableStateOf(false) }
+
+        Card(
+            modifier = Modifier.fillMaxWidth().clickable { showLanguageDialog = true },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
+        ) {
+            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Language, contentDescription = "Langue", tint = Color(0xFF10B981))
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(context.getString(R.string.language_setting), fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Choisir la langue de l'application", fontSize = 12.sp, color = Color.Gray)
+                }
+                Text(
+                    text = currentLanguage.displayName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+
+// Dialog de sélection de langue
+        if (showLanguageDialog) {
+            AlertDialog(
+                onDismissRequest = { showLanguageDialog = false },
+                title = { Text(context.getString(R.string.language_setting), color = Color.White) },
+                text = {
+                    Column {
+                        LanguageManager.Language.values().forEach { language ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        currentLanguage = language
+                                        LanguageManager.setAppLanguage(context, language)
+                                        showLanguageDialog = false
+                                        // Redémarrer l'activité pour appliquer la langue
+                                        (context as? android.app.Activity)?.recreate()
+                                    }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = currentLanguage == language,
+                                    onClick = null
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(language.displayName, color = Color.White)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showLanguageDialog = false }) {
+                        Text("Fermer", color = Color.White)
+                    }
+                },
+                containerColor = Color(0xFF1E3A5F)
+            )
+        }
+
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()

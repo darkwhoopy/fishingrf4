@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.navigation.Screen
+import androidx.compose.ui.platform.LocalContext
+import com.rf4.fishingrf4.R
 
 
 @Composable
@@ -58,8 +60,8 @@ fun AppHeader(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text("RF4 Assistant", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text("Russian Fishing Helper", fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
+                            Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
                         }
                     }
                     LevelSelector(level = playerStats.level, onLevelChange = onLevelChange)
@@ -123,8 +125,7 @@ fun AppHeader(
                 color = Color(0xFFE11D48),
                 modifier = Modifier.weight(1f)
             ) {
-                // TODO: Ajouter la navigation vers l'écran communauté quand il sera créé
-                // onNavigate(Screen.COMMUNITY)
+                onNavigate(Screen.COMMUNITY) // ✅ Maintenant ça fonctionne !
             }
 
             NavButton(
@@ -148,7 +149,7 @@ private fun LevelSelector(level: Int, onLevelChange: (Int) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
         ) {
-            Text("NIVEAU", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White.copy(alpha = 0.8f))
+            Text(LocalContext.current.getString(R.string.level_label), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White.copy(alpha = 0.8f))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 LevelChangeButton(icon = Icons.Default.Remove, enabled = level > 1) { onLevelChange(level - 1) }
                 Text(text = "$level", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(horizontal = 12.dp))

@@ -164,12 +164,12 @@ class FishingViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.getTopCommunityBaitsToday(fishId) // On récupère les top appâts du jour
+                    onlineRepo.getTopCommunityBaitsToday(fishId, 5) // Top 5 du jour
                 } catch (_: Exception) {
-                    emptyList() // Retourne une liste vide en cas d'erreur
+                    emptyList<Pair<String, Long>>()
                 }
             }
-            onResult(list) // Passe les résultats à l'UI
+            onResult(list)
         }
     }
 
@@ -192,7 +192,62 @@ class FishingViewModel(context: Context) : ViewModel() {
             onDone?.invoke()
         }
     }
+    // ========== NOUVELLES FONCTIONS COMMUNAUTÉ ==========
 
+    /**
+     * Récupère le top des appâts communautaires pour un poisson sur le mois actuel
+     */
+    fun fetchTopCommunityBaitsThisMonth(
+        fishId: String,
+        onResult: (List<Pair<String, Long>>) -> Unit
+    ) {
+        viewModelScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    onlineRepo.getTopCommunityBaitsThisMonth(fishId, 3) // Top 3 du mois
+                } catch (_: Exception) {
+                    emptyList<Pair<String, Long>>()
+                }
+            }
+            onResult(list)
+        }
+    }
+
+    /**
+     * Récupère tous les poissons du jeu
+     */
+    fun getAllFish(): List<Fish> {
+        return FishingData.getAllLakes().flatMap { lake -> lake.availableFish } // ✅ Correction : availableFish au lieu de fish
+    }
+
+    /**
+     * Vote pour un appât communautaire avec gestion d'erreur
+     */
+    fun addCommunityBaitForFish(
+        fishId: String,
+        baitName: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    onlineRepo.addCommunityBaitForFish(fishId, baitName)
+                }
+                onSuccess()
+            } catch (e: Exception) {
+                val errorMessage = when {
+                    e.message?.contains("already voted", ignoreCase = true) == true ->
+                        "Vous avez déjà voté pour cet appât sur ce poisson"
+                    e.message?.contains("permission", ignoreCase = true) == true ->
+                        "Vous devez être connecté pour voter"
+                    else ->
+                        "Erreur lors du vote : ${e.message}"
+                }
+                onError(errorMessage)
+            }
+        }
+    }
     // --- Enregistrement d’une prise (local + push online) ---
     fun catchFish(fish: Fish, lake: Lake, position: String) {
         val currentTime = GameTimeManager.gameTime.value
@@ -289,8 +344,9 @@ class FishingViewModel(context: Context) : ViewModel() {
     fun getAllAvailableFish(): List<Fish> =
         getAllLakes().flatMap { it.availableFish }.distinctBy { it.name }.sortedBy { it.name }
 
-    fun getAllGameBaits(): List<String> =
-        getAllLakes().flatMap { it.availableFish }.flatMap { it.preferredBait }.distinct().sorted()
+    fun getAllGameBaits(): List<String> {
+        return FishingData.allGameBaits
+    }
 
     fun getLakesForFish(fish: Fish): List<Lake> =
         getAllLakes().filter { lake -> lake.availableFish.any { it.id == fish.id } }
