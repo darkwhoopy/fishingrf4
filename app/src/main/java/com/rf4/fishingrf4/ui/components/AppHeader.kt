@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.* // ✅ On importe TOUTES les icônes par simplicité
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.navigation.Screen
 
+
 @Composable
 fun AppHeader(
     playerStats: PlayerStats,
@@ -27,6 +28,7 @@ fun AppHeader(
     onLevelChange: (Int) -> Unit
 ) {
     Column {
+// ========== BULLE DU HAUT (TITRE + NIVEAU) - INCHANGÉE ==========
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -65,23 +67,77 @@ fun AppHeader(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // ========== PREMIÈRE LIGNE (3 BULLES) ==========
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NavButton(text = "Recherche", icon = Icons.Default.Search, color = Color(0xFF10B981), modifier = Modifier.weight(1f)) { onNavigate(Screen.FISH_SEARCH) }
-            NavButton(text = "Profil", icon = Icons.Default.Person, color = Color(0xFF8B5CF6), modifier = Modifier.weight(1f)) { onNavigate(Screen.PLAYER_PROFILE) }
-            NavButton(text = "Journal", icon = Icons.Default.Book, color = Color(0xFF0EA5E9), modifier = Modifier.weight(1f)) { onNavigate(Screen.JOURNAL) }
-            IconButton(
-                onClick = onSettingsClick,
-                modifier = Modifier.sizeIn(minWidth = 60.dp, minHeight = 60.dp).background(Color(0xFF6B7280), RoundedCornerShape(12.dp)),
+            NavButton(
+                text = "Recherche",
+                icon = Icons.Default.Search,
+                color = Color(0xFF10B981),
+                modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.Settings, contentDescription = "Paramètres", tint = Color.White)
+                onNavigate(Screen.FISH_SEARCH)
+            }
+
+            NavButton(
+                text = "Profil",
+                icon = Icons.Default.Person,
+                color = Color(0xFF8B5CF6),
+                modifier = Modifier.weight(1f)
+            ) {
+                onNavigate(Screen.PLAYER_PROFILE)
+            }
+
+            NavButton(
+                text = "Journal",
+                icon = Icons.Default.Book,
+                color = Color(0xFF0EA5E9),
+                modifier = Modifier.weight(1f)
+            ) {
+                onNavigate(Screen.JOURNAL)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // ========== DEUXIÈME LIGNE (3 BULLES) ==========
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            NavButton(
+                text = "Paramètres",
+                icon = Icons.Default.Settings,
+                color = Color(0xFF6B7280),
+                modifier = Modifier.weight(1f)
+            ) {
+                onSettingsClick()
+            }
+
+            NavButton(
+                text = "Communauté",
+                icon = Icons.Default.Group,
+                color = Color(0xFFE11D48),
+                modifier = Modifier.weight(1f)
+            ) {
+                // TODO: Ajouter la navigation vers l'écran communauté quand il sera créé
+                // onNavigate(Screen.COMMUNITY)
+            }
+
+            NavButton(
+                text = "Top 5",
+                icon = Icons.Default.EmojiEvents,
+                color = Color(0xFFFFB74D),
+                modifier = Modifier.weight(1f)
+            ) {
+                onNavigate(Screen.TOP_FIVE)
             }
         }
     }
 }
-
 @Composable
 private fun LevelSelector(level: Int, onLevelChange: (Int) -> Unit) {
     Card(
@@ -101,14 +157,12 @@ private fun LevelSelector(level: Int, onLevelChange: (Int) -> Unit) {
         }
     }
 }
-
 @Composable
 private fun LevelChangeButton(icon: ImageVector, enabled: Boolean, onClick: () -> Unit) {
     IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(28.dp)) {
         Icon(icon, contentDescription = null, tint = if (enabled) Color.White else Color.Gray)
     }
 }
-
 @Composable
 fun NavButton(text: String, icon: ImageVector, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
@@ -124,3 +178,4 @@ fun NavButton(text: String, icon: ImageVector, color: Color, modifier: Modifier 
         }
     }
 }
+

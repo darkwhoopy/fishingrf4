@@ -26,8 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
-
-
 // Vue modèle pour la création de FishingViewModel
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -38,16 +36,14 @@ class FishingViewModelFactory(private val context: Context) : ViewModelProvider.
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
 @Composable
 fun FishingRF4App() {
     val context = LocalContext.current
     val viewModel: FishingViewModel = viewModel(factory = FishingViewModelFactory(context))
-
-    // État de l'utilisateur Firebase
+// État de l'utilisateur Firebase
     var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
 
-    // Écouteur pour l'état d'authentification
+// Écouteur pour l'état d'authentification
     DisposableEffect(Unit) {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             currentUser = auth.currentUser
@@ -56,34 +52,34 @@ fun FishingRF4App() {
         onDispose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
     }
 
-    // Collecte de l'état de l'UI et des données
+// Collecte de l'état de l'UI et des données
     val uiState by viewModel.uiState.collectAsState()
     val saveCompleted by viewModel.saveCompleted.collectAsState()
 
-    // Calcul du début du jour de jeu (timestamp réel)
+// Calcul du début du jour de jeu (timestamp réel)
     val startOfDay by viewModel.startOfCurrentGameDayTimestamp.collectAsState()
 
-    // États pour les données de Top 5
+// États pour les données de Top 5
     var topSpecies by rememberSaveable { mutableStateOf<List<SpeciesCount>>(emptyList()) }
     var topPlayers by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
     var topLakes by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
     var communityTop by rememberSaveable { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
 
-    // Autres états pour l'interaction avec les écrans
+// Autres états pour l'interaction avec les écrans
     var favoritesOnly by remember { mutableStateOf(false) }
     var lakeToInteract by remember { mutableStateOf<Lake?>(null) }
     var fishToInteract by remember { mutableStateOf<Fish?>(null) }
     var positionToInteract by remember { mutableStateOf("") }
     var previousScreen by remember { mutableStateOf(Screen.LAKE_SELECTION) }
 
-    // Affichage des lacs filtrés selon les favoris
+// Affichage des lacs filtrés selon les favoris
     val displayedLakes = if (favoritesOnly) {
         uiState.availableLakes.filter { uiState.favoriteLakeIds.contains(it.id) }
     } else {
         uiState.availableLakes
     }
 
-    // Récupération des données (Top 5) et votes communautaires
+// Récupération des données (Top 5) et votes communautaires
     LaunchedEffect(startOfDay) {
         viewModel.fetchTop5SpeciesCountsToday { topSpecies = it }
         viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
@@ -92,7 +88,7 @@ fun FishingRF4App() {
         viewModel.fetchTopCommunityBaits("fishIdHere") { communityTop = it }
     }
 
-    // Structure principale de la colonne avec l'UI
+// Structure principale de la colonne avec l'UI
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,7 +115,7 @@ fun FishingRF4App() {
 
         // Affichage de l'en-tête si l'écran appartient aux écrans avec en-tête
         if (uiState.currentScreen in mainScreensWithHeader) {
-            // 1) Affiche l'en-tête
+            // ✅ CORRECTION ICI : AppHeader avec les bons paramètres
             AppHeader(
                 playerStats = uiState.playerStats,
                 onNavigate = viewModel::navigateTo,
@@ -127,7 +123,7 @@ fun FishingRF4App() {
                 onLevelChange = viewModel::setPlayerLevel
             )
 
-            // 2) Affiche le badge de statut de connexion
+            // Badge de statut de connexion
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -136,7 +132,7 @@ fun FishingRF4App() {
                 AuthStatusBadge(currentUser)
             }
 
-            // 3) Espacement avant le contenu principal
+            // Espacement avant le contenu principal
             Spacer(Modifier.height(12.dp))
         }
 
@@ -147,7 +143,7 @@ fun FishingRF4App() {
                     speciesTop5 = topSpecies,
                     playersTop5 = topPlayers,
                     lakesTop5 = topLakes,
-                    communityTop5 = communityTop, // Passez les votes communautaires ici
+                    communityTop5 = communityTop,
                     onBack = { viewModel.navigateTo(Screen.PLAYER_PROFILE) }
                 )
             }
@@ -202,7 +198,6 @@ fun FishingRF4App() {
                 )
             }
 
-            // Autres écrans à gérer
             Screen.FISH_SEARCH -> {
                 FishSearchScreen(
                     allLakes = uiState.allLakes,
@@ -264,7 +259,6 @@ fun FishingRF4App() {
         }
     }
 }
-
 // Confirmation de la sauvegarde
 @Composable
 fun SaveConfirmationDialog(onDismiss: () -> Unit) {
@@ -275,14 +269,12 @@ fun SaveConfirmationDialog(onDismiss: () -> Unit) {
         confirmButton = { Button(onClick = onDismiss) { Text("OK") } }
     )
 }
-
 // Badge de statut de connexion
 @Composable
 private fun AuthStatusBadge(user: FirebaseUser?) {
-    val bg = if (user != null) Color(0xFF065F46) else Color(0xFF7C2D12) // vert / brun
+    val bg = if (user != null) Color(0xFF065F46) else Color(0xFF7C2D12)
     val text = if (user != null) "Connecté" else "Hors ligne"
     val sub = user?.email ?: ""
-
     Card(
         colors = CardDefaults.cardColors(containerColor = bg.copy(alpha = 0.9f))
     ) {
