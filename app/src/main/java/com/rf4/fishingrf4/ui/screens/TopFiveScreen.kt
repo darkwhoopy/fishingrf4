@@ -11,21 +11,17 @@ import androidx.compose.ui.graphics.Color
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.ui.components.BackButton
 
-private val BlueCard = Color(0xFF1F4690)      // fond carte
-private val BlueCardAlt = Color(0xFF2455AF)   // variante légère
-private val BlueChip = Color(0xFF3B82F6)      // chip compteur
-
 @Composable
 fun TopFiveScreen(
     speciesTop5: List<SpeciesCount>,
     playersTop5: List<Pair<String, Long>>,
     lakesTop5: List<Pair<String, Long>>,
-    communityTop5: List<Pair<String, Long>>, // Liste des votes communautaires
+    communityTop5: List<Pair<String, Long>>, // On garde le paramètre pour éviter les erreurs
     onBack: () -> Unit
 ) {
     var tabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("Espèces", "Joueurs", "Lacs", "Appâts communautaires")
-
+// ✅ MODIFIÉ : Seulement 3 onglets maintenant
+    val tabs = listOf("Espèces", "Joueurs", "Lacs")
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BackButton(onClick = onBack)
@@ -46,16 +42,15 @@ fun TopFiveScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Affichage en fonction de l'onglet sélectionné
+        // ✅ MODIFIÉ : Seulement 3 cas maintenant
         when (tabIndex) {
             0 -> Top5List(speciesTop5.map { it.species to it.count })
             1 -> Top5List(playersTop5)
             2 -> Top5List(lakesTop5)
-            3 -> Top5List(communityTop5) // Affichage des votes communautaires
+            // ❌ SUPPRIMÉ : Le cas 3 pour les appâts communautaires
         }
     }
 }
-
 @Composable
 private fun Top5List(data: List<Pair<String, Long>>) {
     Card(
@@ -64,7 +59,7 @@ private fun Top5List(data: List<Pair<String, Long>>) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            // Affichage de chaque élément de la liste
+// Affichage de chaque élément de la liste
             data.forEachIndexed { index, (label, value) ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -76,9 +71,9 @@ private fun Top5List(data: List<Pair<String, Long>>) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Affichage du rang et du label (nom de l'espèce, joueur, lac, etc.)
+// Affichage du rang et du label (nom de l'espèce, joueur, lac)
                         Text("${index + 1}. $label", color = Color.White)
-                        // Affichage du nombre de votes ou captures
+// Affichage du nombre de captures
                         AssistChip(
                             onClick = { /* Action lors du clic sur le nombre (optionnel) */ },
                             label = { Text("$value", color = Color.White) },
@@ -87,9 +82,9 @@ private fun Top5List(data: List<Pair<String, Long>>) {
                     }
                 }
             }
-            // Si la liste est vide, on affiche un message
+// Si la liste est vide, on affiche un message
             if (data.isEmpty()) {
-                Text("Aucune donnée pour aujourd’hui.", color = Color(0xFFE5E7EB))
+                Text("Aucune donnée pour aujourd'hui.", color = Color(0xFFE5E7EB))
             }
         }
     }
