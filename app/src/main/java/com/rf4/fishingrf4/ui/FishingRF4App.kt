@@ -230,7 +230,25 @@ fun FishingRF4App() {
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
             }
+            Screen.COMMUNITY -> {
+                CommunityScreen(
+                    viewModel = viewModel,
+                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
+                )
+            }
 
+            Screen.BUG_REPORT -> {
+                BugReportScreen(
+                    onBack = { viewModel.navigateTo(Screen.COMMUNITY) }
+                )
+            }
+
+            Screen.FISH_SUGGESTION -> {
+                FishSuggestionScreen(
+                    viewModel = viewModel,
+                    onBack = { viewModel.navigateTo(Screen.COMMUNITY) }
+                )
+            }
             Screen.PLAYER_PROFILE -> {
                 PlayerProfileScreen(
                     playerStats = uiState.playerStats,

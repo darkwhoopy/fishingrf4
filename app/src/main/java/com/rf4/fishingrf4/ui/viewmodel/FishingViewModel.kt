@@ -449,6 +449,11 @@ class FishingViewModel(context: Context) : ViewModel() {
     fun onDialogDismissed() {
         _saveCompleted.value = false
     }
+// ✅ NOUVEAU : Dans votre FishingViewModel.kt, ajouter cette fonction
+
+    /**
+     * Récupère tous les appâts disponibles dans le jeu
+     */
 
     fun resetData(options: Set<ResetOption>) {
         viewModelScope.launch {

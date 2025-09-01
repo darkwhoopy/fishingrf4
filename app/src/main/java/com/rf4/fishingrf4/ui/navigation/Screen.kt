@@ -12,7 +12,9 @@ enum class Screen {
     SETTINGS,
     TOP_FIVE,
 
-    COMMUNITY
+    COMMUNITY,
+    BUG_REPORT,
+    FISH_SUGGESTION
 
 
 }
