@@ -76,8 +76,11 @@ class CommunityRepository(
      */
     // ✅ CORRECTION dans CommunityRepository.kt pour getMyBugReports
 
+    // ✅ AJOUT DE LOGS pour déboguer les bugs
     suspend fun getMyBugReports(): List<BugReport> {
         val userId = uid()
+        android.util.Log.d("CommunityRepo", "getMyBugReports - userId: $userId")
+
         if (userId.isBlank()) {
             android.util.Log.w("CommunityRepo", "Utilisateur non connecté")
             return emptyList()
@@ -94,9 +97,17 @@ class CommunityRepository(
 
             android.util.Log.d("CommunityRepo", "Nombre de bugs trouvés: ${snapshot.documents.size}")
 
+            // Log détaillé de chaque document
+            snapshot.documents.forEach { doc ->
+                android.util.Log.d("CommunityRepo", "Bug document: ${doc.id} - data: ${doc.data}")
+            }
+
             val reports = snapshot.documents.mapNotNull { doc ->
                 try {
                     doc.data?.let { data ->
+                        android.util.Log.d("CommunityRepo", "Traitement bug: ${doc.id}")
+                        val adminNotes = data["adminNotes"] as? String ?: ""
+                        android.util.Log.d("CommunityRepo", "Bug ${doc.id} - adminNotes: '$adminNotes' - length: ${adminNotes.length}")
                         BugReport(
                             id = doc.id,
                             userId = data["userId"] as? String ?: "",
@@ -135,7 +146,7 @@ class CommunityRepository(
                 }
             }
 
-            android.util.Log.d("CommunityRepo", "Bugs récupérés: ${reports.size}")
+            android.util.Log.d("CommunityRepo", "Bugs récupérés avec succès: ${reports.size}")
             return reports
 
         } catch (e: Exception) {

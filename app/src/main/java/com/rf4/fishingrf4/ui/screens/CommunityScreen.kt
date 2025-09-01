@@ -446,6 +446,10 @@ fun FishSuggestionsTab(
 // ✅ NOUVEAU : Carte d'affichage d'un signalement de bug
 @Composable
 fun BugReportCard(bugReport: BugReport) {
+    android.util.Log.d("BugReportCard", "Rendu bug ${bugReport.id}")
+    android.util.Log.d("BugReportCard", "- status: ${bugReport.status}")
+    android.util.Log.d("BugReportCard", "- adminNotes: '${bugReport.adminNotes}' (${bugReport.adminNotes.length} chars)")
+    android.util.Log.d("BugReportCard", "- adminNotes.isBlank(): ${bugReport.adminNotes.isBlank()}")
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)), // Même couleur que vos cartes

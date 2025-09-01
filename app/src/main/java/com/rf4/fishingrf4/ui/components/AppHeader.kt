@@ -32,26 +32,36 @@ fun AppHeader(
 ) {
     Column {
 // ========== BULLE DU HAUT (TITRE + NIVEAU) - INCHANGÉE ==========
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
-                shape = CircleShape
-            ) {
-                Text(text = "🎣", fontSize = 24.sp, modifier = Modifier.padding(8.dp))
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    // Badge de connexion compact
-                    Text(
-                        text = if (FirebaseAuth.getInstance().currentUser != null) "✅" else "⚠️",
-                        fontSize = 12.sp
-                    )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween, // ✅ AJOUTÉ
+            modifier = Modifier.fillMaxWidth() // ✅ AJOUTÉ
+        ) {
+            // Partie gauche (logo + titre)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
+                    shape = CircleShape
+                ) {
+                    Text(text = "🎣", fontSize = 24.sp, modifier = Modifier.padding(8.dp))
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        // Badge de connexion compact
+                        Text(
+                            text = if (FirebaseAuth.getInstance().currentUser != null) "✅" else "⚠️",
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
+
+            // ✅ NOUVEAU : Partie droite (sélecteur de niveau)
+            LevelSelector(level = playerStats.level, onLevelChange = onLevelChange)
         }
         Spacer(modifier = Modifier.height(16.dp))
 

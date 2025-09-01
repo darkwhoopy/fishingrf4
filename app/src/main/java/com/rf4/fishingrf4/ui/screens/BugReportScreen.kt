@@ -363,9 +363,13 @@ fun BugReportScreen(
                     isSubmitting = true
                     errorMessage = ""
 
+                    // Dans BugReportScreen.kt, dans le onClick du bouton d'envoi :
+
                     coroutineScope.launch {
                         try {
-                            communityRepo.submitBugReport(
+                            android.util.Log.d("BugReportScreen", "Envoi du signalement...")
+
+                            val reportId = communityRepo.submitBugReport(
                                 title = title,
                                 description = description,
                                 bugType = selectedBugType,
@@ -375,8 +379,11 @@ fun BugReportScreen(
                                 deviceInfo = deviceInfo,
                                 appVersion = appVersion
                             )
+
+                            android.util.Log.d("BugReportScreen", "Signalement créé avec ID: $reportId")
                             showSuccessDialog = true
                         } catch (e: Exception) {
+                            android.util.Log.e("BugReportScreen", "Erreur envoi: ${e.message}", e)
                             errorMessage = e.message ?: "Erreur lors de l'envoi du signalement"
                         } finally {
                             isSubmitting = false
