@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class FishingViewModel(context: Context) : ViewModel() {
 
     private val repository = FishingRepository(context)
@@ -89,7 +88,9 @@ class FishingViewModel(context: Context) : ViewModel() {
         }
     }
 
-    // --- Horloge ---
+    // ==========================================
+    // GESTION DE L'HORLOGE
+    // ==========================================
     fun adjustInGameTime(newTime: LocalTime) {
         viewModelScope.launch {
             val realTime = LocalTime.now()
@@ -104,27 +105,31 @@ class FishingViewModel(context: Context) : ViewModel() {
         }
     }
 
-    // --- Online: Top 5 (nb captures) ---
+    // ==========================================
+    // FONCTIONS ONLINE
+    // ==========================================
+
     fun fetchTop5SpeciesCountsToday(onResult: (List<SpeciesCount>) -> Unit) {
         viewModelScope.launch {
             val list: List<SpeciesCount> = withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)  // Récupérer le top 5 espèces du jour
+                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)
                 } catch (_: Exception) {
-                    emptyList()  // Si erreur, retourner une liste vide
+                    emptyList()
                 }
             }
-            onResult(list)  // Passer les résultats à l'UI
+            onResult(list)
         }
     }
-
-
 
     fun fetchTop5PlayersOfDay(startOfDay: Long, onResult: (List<Pair<String, Long>>) -> Unit) {
         viewModelScope.launch {
             val list: List<Pair<String, Long>> = withContext(Dispatchers.IO) {
-                try { onlineRepo.getTop5PlayersOfDay(startOfDay) }
-                catch (_: Exception) { emptyList<Pair<String, Long>>() }
+                try {
+                    onlineRepo.getTop5PlayersOfDay(startOfDay)
+                } catch (_: Exception) {
+                    emptyList()
+                }
             }
             onResult(list)
         }
@@ -133,15 +138,16 @@ class FishingViewModel(context: Context) : ViewModel() {
     fun fetchTop5LakesOfDay(startOfDay: Long, onResult: (List<Pair<String, Long>>) -> Unit) {
         viewModelScope.launch {
             val list: List<Pair<String, Long>> = withContext(Dispatchers.IO) {
-                try { onlineRepo.getTop5LakesOfDay(startOfDay) }
-                catch (_: Exception) { emptyList<Pair<String, Long>>() }
+                try {
+                    onlineRepo.getTop5LakesOfDay(startOfDay)
+                } catch (_: Exception) {
+                    emptyList()
+                }
             }
             onResult(list)
         }
     }
 
-
-    // --- Online: Top zones par lac (du jour) ---
     fun fetchTop5PositionsForLakeToday(
         lakeId: String,
         onResult: (List<Pair<String, Long>>) -> Unit
@@ -149,14 +155,16 @@ class FishingViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             val start = startOfCurrentGameDayTimestamp.value
             val list = withContext(Dispatchers.IO) {
-                try { onlineRepo.getTop5PositionsForLakeToday(lakeId, start) }
-                catch (_: Exception) { emptyList() }
+                try {
+                    onlineRepo.getTop5PositionsForLakeToday(lakeId, start)
+                } catch (_: Exception) {
+                    emptyList()
+                }
             }
             onResult(list)
         }
     }
 
-    // --- Online: Appâts communautaires ---
     fun fetchTopCommunityBaits(
         fishId: String,
         onResult: (List<Pair<String, Long>>) -> Unit
@@ -164,39 +172,15 @@ class FishingViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.getTopCommunityBaitsToday(fishId, 5) // Top 5 du jour
+                    onlineRepo.getTopCommunityBaitsToday(fishId, 5)
                 } catch (_: Exception) {
-                    emptyList<Pair<String, Long>>()
+                    emptyList()
                 }
             }
             onResult(list)
         }
     }
 
-
-    fun getCaptureStatsByTimeOfDay(fishId: String): Map<String, Int> {
-        return repository.fishingEntries.value
-            .filter { it.fish.id == fishId && it.timeOfDay != null }
-            .groupBy { it.timeOfDay!! }
-            .mapValues { it.value.size }
-    }
-    fun addCommunityBaitForFish(
-        fishId: String,
-        bait: String,
-        onDone: (() -> Unit)? = null
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try { onlineRepo.addCommunityBaitForFish(fishId, bait) } catch (_: Exception) {}
-            }
-            onDone?.invoke()
-        }
-    }
-    // ========== NOUVELLES FONCTIONS COMMUNAUTÉ ==========
-
-    /**
-     * Récupère le top des appâts communautaires pour un poisson sur le mois actuel
-     */
     fun fetchTopCommunityBaitsThisMonth(
         fishId: String,
         onResult: (List<Pair<String, Long>>) -> Unit
@@ -204,25 +188,15 @@ class FishingViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.getTopCommunityBaitsThisMonth(fishId, 3) // Top 3 du mois
+                    onlineRepo.getTopCommunityBaitsThisMonth(fishId, 3)
                 } catch (_: Exception) {
-                    emptyList<Pair<String, Long>>()
+                    emptyList()
                 }
             }
             onResult(list)
         }
     }
 
-    /**
-     * Récupère tous les poissons du jeu
-     */
-    fun getAllFish(): List<Fish> {
-        return FishingData.getAllLakes().flatMap { lake -> lake.availableFish } // ✅ Correction : availableFish au lieu de fish
-    }
-
-    /**
-     * Vote pour un appât communautaire avec gestion d'erreur
-     */
     fun addCommunityBaitForFish(
         fishId: String,
         baitName: String,
@@ -248,7 +222,26 @@ class FishingViewModel(context: Context) : ViewModel() {
             }
         }
     }
-    // --- Enregistrement d’une prise (local + push online) ---
+
+    fun pushEntryOnline(
+        species: String,
+        weight: Double,
+        spot: String,
+        caughtAtMs: Long
+    ) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    onlineRepo.addEntry(species, weight, spot, caughtAtMs)
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    // ==========================================
+    // GESTION DES CAPTURES
+    // ==========================================
+
     fun catchFish(fish: Fish, lake: Lake, position: String) {
         val currentTime = GameTimeManager.gameTime.value
         val entry = FishingEntry(
@@ -269,112 +262,99 @@ class FishingViewModel(context: Context) : ViewModel() {
         }
     }
 
-    /** push online simple (4 paramètres) */
-    fun pushEntryOnline(
-        species: String,
-        weight: Double,
-        spot: String,
-        caughtAtMs: Long
-    ) {
+    fun removeEntry(entryId: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try { onlineRepo.addEntry(species, weight, spot, caughtAtMs) } catch (_: Exception) {}
-            }
+            repository.removeFishingEntry(entryId)
         }
     }
 
-    // --- Divers (local) ---
-    fun onDialogDismissed() { _saveCompleted.value = false }
+    // ==========================================
+    // GESTION DES DONNÉES (LACS ET POISSONS)
+    // ==========================================
 
-    fun resetData(options: Set<ResetOption>) {
-        viewModelScope.launch {
-            if (ResetOption.ENTRIES_STATS in options) repository.clearEntriesAndStats()
-            if (ResetOption.LAKES in options) repository.clearModifiedLakes()
-            if (ResetOption.BAITS in options) repository.clearAllCustomBaits()
-            if (ResetOption.FAVORITES in options) repository.clearFavoriteLakes()
-            loadAllDataSources()
-        }
-    }
-
-    fun addUserSpot(spot: UserSpot) {
-        viewModelScope.launch {
-            val updated = _userSpots.value + spot
-            _userSpots.value = updated
-            repository.saveUserSpots(updated)
-        }
-    }
-
-    fun deleteUserSpot(spotId: String) {
-        viewModelScope.launch {
-            val updated = _userSpots.value.filterNot { it.id == spotId }
-            _userSpots.value = updated
-            repository.saveUserSpots(updated)
-        }
-    }
-
-    fun updateLake(updatedLake: Lake) {
-        val current = _modifiedLakes.value.toMutableMap()
-        current[updatedLake.id] = updatedLake
-        _modifiedLakes.value = current
-        viewModelScope.launch {
-            repository.saveModifiedLakes(current)
-            _saveCompleted.value = true
-        }
-    }
-
-    fun toggleFavoriteLake(lakeId: String) {
-        viewModelScope.launch {
-            val current = _favoriteLakeIds.value.toMutableList()
-            if (current.contains(lakeId)) current.remove(lakeId) else current.add(lakeId)
-            repository.saveFavoriteLakes(current)
-            _favoriteLakeIds.value = current
-        }
-    }
-
-    fun setPlayerLevel(level: Int) {
-        viewModelScope.launch { repository.setPlayerLevel(level) }
-    }
-
+    /**
+     * ✅ CORRIGÉ : Retourne tous les lacs (original + modifications)
+     */
     fun getAllLakes(): List<Lake> {
-        val original = FishingData.getAllLakes()
-        val modified = _modifiedLakes.value
-        return original.map { lake -> modified[lake.id] ?: lake }
+        val originalLakes = FishingData.lakes // ✅ Accès direct à la liste des lacs
+        val modifiedLakes = _modifiedLakes.value
+        return originalLakes.map { originalLake ->
+            modifiedLakes[originalLake.id] ?: originalLake
+        }
     }
 
-    fun getAllAvailableFish(): List<Fish> =
-        getAllLakes().flatMap { it.availableFish }.distinctBy { it.name }.sortedBy { it.name }
+    /**
+     * ✅ CORRIGÉ : Retourne tous les poissons disponibles
+     */
+    fun getAllAvailableFish(): List<Fish> {
+        return FishingData.getAllFish() // ✅ Utilise la fonction FishingData
+            .distinctBy { it.name }
+            .sortedBy { it.name }
+    }
 
+    /**
+     * ✅ NOUVEAU : Alias pour compatibilité avec les écrans existants
+     */
+    fun getAllFish(): List<Fish> {
+        return getAllAvailableFish()
+    }
+
+    /**
+     * ✅ CORRIGÉ : Retourne tous les appâts du jeu
+     */
     fun getAllGameBaits(): List<String> {
-        return FishingData.allGameBaits
+        return getAllLakes()
+            .flatMap { it.availableFish }
+            .flatMap { it.preferredBait }
+            .distinct()
+            .sorted()
     }
 
-    fun getLakesForFish(fish: Fish): List<Lake> =
-        getAllLakes().filter { lake -> lake.availableFish.any { it.id == fish.id } }
+    /**
+     * ✅ CORRIGÉ : Trouve les lacs où un poisson peut être pêché
+     */
+    fun getLakesForFish(fish: Fish): List<Lake> {
+        return getAllLakes().filter { lake ->
+            lake.availableFish.any { it.id == fish.id }
+        }
+    }
 
-    fun getCaptureStatsForFishByLake(fishId: String): Map<String, Int> =
-        repository.fishingEntries.value
+    // ==========================================
+    // STATISTIQUES DES CAPTURES
+    // ==========================================
+
+    fun getCaptureStatsForFishByLake(fishId: String): Map<String, Int> {
+        return repository.fishingEntries.value
             .filter { it.fish.id == fishId }
             .groupBy { it.lake.id }
             .mapValues { (_, entries) -> entries.size }
+    }
 
-    fun getTopSpotsForFish(fishId: String): List<Pair<String, Int>> =
-        repository.fishingEntries.value
+    fun getTopSpotsForFish(fishId: String): List<Pair<String, Int>> {
+        return repository.fishingEntries.value
             .filter { it.fish.id == fishId }
             .groupBy { "${it.lake.name} - ${it.position}" }
             .map { (spot, entries) -> spot to entries.size }
             .sortedByDescending { it.second }
             .take(5)
-
-    fun navigateTo(screen: Screen) { _currentScreen.value = screen }
-
-    fun removeEntry(entryId: String) {
-        viewModelScope.launch { repository.removeFishingEntry(entryId) }
     }
 
-    fun getCustomBaitsForFish(fishId: String): StateFlow<List<String>> =
-        _customBaits
+    fun getCaptureStatsByTimeOfDay(fishId: String): Map<String, Int> {
+        return repository.fishingEntries.value
+            .filter { it.fish.id == fishId && it.timeOfDay != null }
+            .groupBy { it.timeOfDay!! }
+            .mapValues { it.value.size }
+    }
+
+    // ==========================================
+    // GESTION DES APPÂTS PERSONNALISÉS
+    // ==========================================
+
+    fun getCustomBaitsForFish(fishId: String): StateFlow<List<String>> {
+        return _customBaits
             .map { it[fishId] ?: emptyList() }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }
 
     fun addCustomBaitToFish(fishId: String, bait: String) {
         viewModelScope.launch {
@@ -400,8 +380,90 @@ class FishingViewModel(context: Context) : ViewModel() {
             }
         }
     }
+
+    // ==========================================
+    // GESTION DES LACS (FAVORIS ET MODIFICATIONS)
+    // ==========================================
+
+    fun updateLake(updatedLake: Lake) {
+        val current = _modifiedLakes.value.toMutableMap()
+        current[updatedLake.id] = updatedLake
+        _modifiedLakes.value = current
+        viewModelScope.launch {
+            repository.saveModifiedLakes(current)
+            _saveCompleted.value = true
+        }
+    }
+
+    fun toggleFavoriteLake(lakeId: String) {
+        viewModelScope.launch {
+            val current = _favoriteLakeIds.value.toMutableList()
+            if (current.contains(lakeId)) {
+                current.remove(lakeId)
+            } else {
+                current.add(lakeId)
+            }
+            repository.saveFavoriteLakes(current)
+            _favoriteLakeIds.value = current
+        }
+    }
+
+    // ==========================================
+    // GESTION DES SPOTS PERSONNALISÉS
+    // ==========================================
+
+    fun addUserSpot(spot: UserSpot) {
+        viewModelScope.launch {
+            val updated = _userSpots.value + spot
+            _userSpots.value = updated
+            repository.saveUserSpots(updated)
+        }
+    }
+
+    fun deleteUserSpot(spotId: String) {
+        viewModelScope.launch {
+            val updated = _userSpots.value.filterNot { it.id == spotId }
+            _userSpots.value = updated
+            repository.saveUserSpots(updated)
+        }
+    }
+
+    // ==========================================
+    // GESTION DU PROFIL JOUEUR
+    // ==========================================
+
+    fun setPlayerLevel(level: Int) {
+        viewModelScope.launch {
+            repository.setPlayerLevel(level)
+        }
+    }
+
+    // ==========================================
+    // NAVIGATION ET UTILITAIRES
+    // ==========================================
+
+    fun navigateTo(screen: Screen) {
+        _currentScreen.value = screen
+    }
+
+    fun onDialogDismissed() {
+        _saveCompleted.value = false
+    }
+
+    fun resetData(options: Set<ResetOption>) {
+        viewModelScope.launch {
+            if (ResetOption.ENTRIES_STATS in options) repository.clearEntriesAndStats()
+            if (ResetOption.LAKES in options) repository.clearModifiedLakes()
+            if (ResetOption.BAITS in options) repository.clearAllCustomBaits()
+            if (ResetOption.FAVORITES in options) repository.clearFavoriteLakes()
+            loadAllDataSources()
+        }
+    }
 }
 
+// ==========================================
+// DATA CLASS UI STATE
+// ==========================================
 data class FishingUiState(
     val currentScreen: Screen = Screen.LAKE_SELECTION,
     val fishingEntries: List<FishingEntry> = emptyList(),
