@@ -23,6 +23,12 @@ class FishingRepository(private val context: Context? = null) {
     private val _playerStats = MutableStateFlow(PlayerStats())
     val playerStats: StateFlow<PlayerStats> = _playerStats.asStateFlow()
 
+    companion object {
+        private const val RECENT_BAITS_KEY = "recent_baits_ordered"
+        private const val MAX_RECENT_BAITS = 3
+        private const val BAIT_SEPARATOR = "|BAIT|" // Séparateur unique
+    }
+
     init {
         loadAllData()
     }
@@ -31,11 +37,18 @@ class FishingRepository(private val context: Context? = null) {
         try {
             prefs?.getString("fishing_entries", null)?.let { _fishingEntries.value = json.decodeFromString(it) }
             prefs?.getString("player_stats", null)?.let { _playerStats.value = json.decodeFromString(it) }
-        } catch (e: Exception) { println("ERROR: Erreur chargement données: ${e.message}") }
+        } catch (e: Exception) {
+            println("ERROR: Erreur chargement données: ${e.message}")
+        }
     }
 
-    private suspend fun saveFishingEntries() = withContext(Dispatchers.IO) { prefs?.edit()?.putString("fishing_entries", json.encodeToString(_fishingEntries.value))?.apply() }
-    private suspend fun savePlayerStats() = withContext(Dispatchers.IO) { prefs?.edit()?.putString("player_stats", json.encodeToString(_playerStats.value))?.apply() }
+    private suspend fun saveFishingEntries() = withContext(Dispatchers.IO) {
+        prefs?.edit()?.putString("fishing_entries", json.encodeToString(_fishingEntries.value))?.apply()
+    }
+
+    private suspend fun savePlayerStats() = withContext(Dispatchers.IO) {
+        prefs?.edit()?.putString("player_stats", json.encodeToString(_playerStats.value))?.apply()
+    }
 
     suspend fun addFishingEntry(entry: FishingEntry) {
         _fishingEntries.value += entry
@@ -69,7 +82,9 @@ class FishingRepository(private val context: Context? = null) {
     }
 
     suspend fun saveCustomBaitsForFish(fishId: String, baits: List<String>) {
-        withContext(Dispatchers.IO) { customBaitsPrefs?.edit()?.putString("baits_$fishId", baits.joinToString("|"))?.apply() }
+        withContext(Dispatchers.IO) {
+            customBaitsPrefs?.edit()?.putString("baits_$fishId", baits.joinToString("|"))?.apply()
+        }
     }
 
     suspend fun loadAllCustomBaits(): Map<String, List<String>> {
@@ -89,7 +104,9 @@ class FishingRepository(private val context: Context? = null) {
     }
 
     suspend fun saveModifiedLakes(lakes: Map<String, Lake>) {
-        withContext(Dispatchers.IO) { prefs?.edit()?.putString("modified_lakes", json.encodeToString(lakes))?.apply() }
+        withContext(Dispatchers.IO) {
+            prefs?.edit()?.putString("modified_lakes", json.encodeToString(lakes))?.apply()
+        }
     }
 
     fun loadFavoriteLakes(): List<String> {
@@ -99,18 +116,30 @@ class FishingRepository(private val context: Context? = null) {
     }
 
     suspend fun saveFavoriteLakes(favoriteIds: List<String>) {
-        withContext(Dispatchers.IO) { prefs?.edit()?.putString("favorite_lakes_ids", favoriteIds.joinToString(","))?.apply() }
+        withContext(Dispatchers.IO) {
+            prefs?.edit()?.putString("favorite_lakes_ids", favoriteIds.joinToString(","))?.apply()
+        }
     }
 
     suspend fun clearEntriesAndStats() {
         _fishingEntries.value = emptyList()
         _playerStats.value = PlayerStats()
-        withContext(Dispatchers.IO) { prefs?.edit()?.remove("fishing_entries")?.remove("player_stats")?.apply() }
+        withContext(Dispatchers.IO) {
+            prefs?.edit()?.remove("fishing_entries")?.remove("player_stats")?.apply()
+        }
     }
 
-    suspend fun clearModifiedLakes() = withContext(Dispatchers.IO) { prefs?.edit()?.remove("modified_lakes")?.apply() }
-    suspend fun clearFavoriteLakes() = withContext(Dispatchers.IO) { prefs?.edit()?.remove("favorite_lakes_ids")?.apply() }
-    suspend fun clearAllCustomBaits() = withContext(Dispatchers.IO) { customBaitsPrefs?.edit()?.clear()?.apply() }
+    suspend fun clearModifiedLakes() = withContext(Dispatchers.IO) {
+        prefs?.edit()?.remove("modified_lakes")?.apply()
+    }
+
+    suspend fun clearFavoriteLakes() = withContext(Dispatchers.IO) {
+        prefs?.edit()?.remove("favorite_lakes_ids")?.apply()
+    }
+
+    suspend fun clearAllCustomBaits() = withContext(Dispatchers.IO) {
+        customBaitsPrefs?.edit()?.clear()?.apply()
+    }
 
     fun loadUserSpots(): List<UserSpot> {
         return try {
@@ -132,5 +161,110 @@ class FishingRepository(private val context: Context? = null) {
         withContext(Dispatchers.IO) {
             prefs?.edit()?.putLong("time_offset_seconds", offsetInSeconds)?.apply()
         }
+    }
+
+    // ============================================================================
+    // MÉTHODES POUR LES APPÂTS RÉCENTS
+    // ============================================================================
+
+    /**
+     * Sauvegarde les 3 derniers appâts utilisés
+     */
+    suspend fun saveRecentBait(bait: String) = withContext(Dispatchers.IO) {
+        if (bait.isBlank()) return@withContext
+
+        val currentBaits = getRecentBaits().toMutableList()
+
+        // Retirer l'appât s'il existe déjà pour le remettre en première position
+        currentBaits.remove(bait)
+
+        // Ajouter en première position
+        currentBaits.add(0, bait)
+
+        // Garder seulement les 3 derniers
+        val recentBaits = currentBaits.take(MAX_RECENT_BAITS)
+
+        // ✅ CORRECTION : Sauvegarder comme String ordonnée au lieu d'un Set
+        val orderedString = recentBaits.joinToString(BAIT_SEPARATOR)
+        prefs?.edit()?.putString(RECENT_BAITS_KEY, orderedString)?.apply()
+    }
+
+    /**
+     * Récupère les 3 derniers appâts utilisés
+     */
+    fun getRecentBaits(): List<String> {
+        val orderedString = prefs?.getString(RECENT_BAITS_KEY, "") ?: ""
+        return if (orderedString.isBlank()) {
+            emptyList()
+        } else {
+            orderedString.split(BAIT_SEPARATOR).filter { it.isNotBlank() }
+        }
+    }
+
+    // ============================================================================
+    // MÉTHODES POUR LES STATISTIQUES D'APPÂTS LOCALES
+    // ============================================================================
+
+    /**
+     * Récupère le top 5 des appâts utilisés pour un poisson donné aujourd'hui
+     * Basé sur vos propres captures locales
+     */
+    fun getTopBaitsForFishToday(fishName: String, startOfDayTimestamp: Long): List<Pair<String, Int>> {
+        return _fishingEntries.value
+            .filter {
+                it.fish.name == fishName &&
+                        it.timestamp >= startOfDayTimestamp &&
+                        it.bait.isNotBlank()
+            }
+            .groupBy { it.bait }
+            .map { (bait, entries) -> bait to entries.size }
+            .sortedByDescending { it.second }
+            .take(5)
+    }
+
+    /**
+     * Récupère le top 5 des appâts utilisés pour un poisson donné (tout temps)
+     * Basé sur vos propres captures locales
+     */
+    fun getTopBaitsForFishAllTime(fishName: String): List<Pair<String, Int>> {
+        return _fishingEntries.value
+            .filter {
+                it.fish.name == fishName &&
+                        it.bait.isNotBlank()
+            }
+            .groupBy { it.bait }
+            .map { (bait, entries) -> bait to entries.size }
+            .sortedByDescending { it.second }
+            .take(5)
+    }
+
+    /**
+     * Récupère les statistiques générales d'appâts aujourd'hui
+     * Retourne le top 10 des appâts les plus utilisés (tous poissons confondus)
+     */
+    fun getTopBaitsOverallToday(startOfDayTimestamp: Long): List<Triple<String, String, Int>> {
+        return _fishingEntries.value
+            .filter {
+                it.timestamp >= startOfDayTimestamp &&
+                        it.bait.isNotBlank()
+            }
+            .groupBy { "${it.fish.name}-${it.bait}" }
+            .map { (key, entries) ->
+                val parts = key.split("-", limit = 2)
+                Triple(parts[0], parts[1], entries.size) // (poisson, appât, nombre)
+            }
+            .sortedByDescending { it.third }
+            .take(10)
+    }
+
+    /**
+     * Récupère le nombre total de poissons capturés par espèce aujourd'hui
+     * Pour afficher "35 gardons pris aujourd'hui"
+     */
+    fun getFishCountsToday(startOfDayTimestamp: Long): Map<String, Int> {
+        return _fishingEntries.value
+            .filter { it.timestamp >= startOfDayTimestamp }
+            .groupBy { it.fish.name }
+            .mapValues { (_, entries) -> entries.size }
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
+import com.rf4.fishingrf4.ui.screens.TopFiveScreen
 // Vue modèle pour la création de FishingViewModel
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -134,11 +135,8 @@ fun FishingRF4App() {
         when (uiState.currentScreen) {
             Screen.TOP_FIVE -> {
                 TopFiveScreen(
-                    speciesTop5 = topSpecies,
-                    playersTop5 = topPlayers,
-                    lakesTop5 = topLakes,
-                    communityTop5 = communityTop,
-                    onBack = { viewModel.navigateTo(Screen.PLAYER_PROFILE) }
+                    viewModel = viewModel,
+                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
                 )
             }
 
@@ -179,9 +177,6 @@ fun FishingRF4App() {
                     position = positionToInteract,
                     fishingEntries = uiState.fishingEntries,
                     viewModel = viewModel,
-                    onFishSelected = { fish ->
-                        viewModel.catchFish(fish, lakeToInteract!!, positionToInteract)
-                    },
                     onBack = { viewModel.navigateTo(Screen.POSITION_SELECTION) },
                     onViewJournal = { viewModel.navigateTo(Screen.JOURNAL) },
                     onFishDetail = { fish ->

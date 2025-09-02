@@ -14,7 +14,8 @@ data class FishingEntry(
     val length: Double? = null,
     val hour: Int? = null,
     val timeOfDay: String? = null,
-    val notes: String = ""
+    val notes: String = "",
+    val bait: String = ""
 ) {
     // ✅ On supprime complètement la logique de calcul complexe.
     // Chaque prise vaut maintenant 0 point, ce qui évite le crash.

@@ -4,26 +4,37 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rf4.fishingrf4.data.FishingData
-import com.rf4.fishingrf4.data.models.*
+import com.rf4.fishingrf4.data.models.Fish
+import com.rf4.fishingrf4.data.models.FishingEntry
+import com.rf4.fishingrf4.data.models.Lake
+import com.rf4.fishingrf4.data.models.PlayerStats
+import com.rf4.fishingrf4.data.models.ResetOption
+import com.rf4.fishingrf4.data.models.UserSpot
 import com.rf4.fishingrf4.data.online.FishingOnlineRepository
-import com.rf4.fishingrf4.data.online.OnlineEntry
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.data.repository.FishingRepository
 import com.rf4.fishingrf4.data.utils.GameTimeManager
 import com.rf4.fishingrf4.ui.navigation.Screen
-import java.time.Duration
-import java.time.LocalTime
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Duration
+import java.time.LocalTime
 
 class FishingViewModel(context: Context) : ViewModel() {
 
-    private val repository = FishingRepository(context)
+    // ✅ CORRECTION: Repository public pour accès depuis TopFiveScreen
+    val repository = FishingRepository(context)
     private val onlineRepo = FishingOnlineRepository()
 
-    // --- State interne ---
+    // --- État interne ---
     private val _currentScreen = MutableStateFlow(Screen.LAKE_SELECTION)
     private val _modifiedLakes = MutableStateFlow<Map<String, Lake>>(emptyMap())
     private val _customBaits = MutableStateFlow<Map<String, List<String>>>(emptyMap())
@@ -31,7 +42,11 @@ class FishingViewModel(context: Context) : ViewModel() {
     private val _saveCompleted = MutableStateFlow(false)
     private val _userSpots = MutableStateFlow<List<UserSpot>>(emptyList())
 
-    // --- State exposé ---
+    // ✅ NOUVEAU: État pour les appâts récents
+    private val _recentBaits = MutableStateFlow<List<String>>(emptyList())
+    val recentBaits: StateFlow<List<String>> = _recentBaits.asStateFlow()
+
+    // --- État exposé ---
     val saveCompleted: StateFlow<Boolean> = _saveCompleted.asStateFlow()
     val userSpots: StateFlow<List<UserSpot>> = _userSpots.asStateFlow()
     val gameTime: StateFlow<LocalTime> = GameTimeManager.gameTime
@@ -73,6 +88,12 @@ class FishingViewModel(context: Context) : ViewModel() {
     init {
         loadAllDataSources()
         viewModelScope.launch { GameTimeManager.start() }
+        loadRecentBaits() // ✅ NOUVEAU: Charger les appâts récents
+    }
+
+    // ✅ NOUVEAU: Méthode pour charger les appâts récents
+    private fun loadRecentBaits() {
+        _recentBaits.value = repository.getRecentBaits()
     }
 
     private fun loadAllDataSources() {
@@ -109,20 +130,7 @@ class FishingViewModel(context: Context) : ViewModel() {
     // FONCTIONS ONLINE
     // ==========================================
 
-    fun fetchTop5SpeciesCountsToday(onResult: (List<SpeciesCount>) -> Unit) {
-        viewModelScope.launch {
-            val list: List<SpeciesCount> = withContext(Dispatchers.IO) {
-                try {
-                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)
-                } catch (_: Exception) {
-                    emptyList()
-                }
-            }
-            onResult(list)
-        }
-    }
-
-    fun fetchTop5PlayersOfDay(startOfDay: Long, onResult: (List<Pair<String, Long>>) -> Unit) {
+       fun fetchTop5PlayersOfDay(startOfDay: Long, onResult: (List<Pair<String, Long>>) -> Unit) {
         viewModelScope.launch {
             val list: List<Pair<String, Long>> = withContext(Dispatchers.IO) {
                 try {
@@ -222,26 +230,43 @@ class FishingViewModel(context: Context) : ViewModel() {
             }
         }
     }
+    fun fetchSpeciesWithBaitStats(onResult: (Map<String, Pair<Long, List<Pair<String, Long>>>>) -> Unit) {
+        viewModelScope.launch {
+            val stats = withContext(Dispatchers.IO) {
+                try {
+                    onlineRepo.getSpeciesWithBaitStats(startOfCurrentGameDayTimestamp.value)
+                } catch (_: Exception) {
+                    emptyMap()
+                }
+            }
+            onResult(stats)
+        }
+    }
 
     fun pushEntryOnline(
         species: String,
         weight: Double,
         spot: String,
-        caughtAtMs: Long
+        caughtAtMs: Long,
+        bait: String = ""  // ✅ AJOUTER ce paramètre
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    onlineRepo.addEntry(species, weight, spot, caughtAtMs)
+                    onlineRepo.addEntryWithBait(species, weight, spot, caughtAtMs, bait) // ✅ NOUVELLE méthode
                 } catch (_: Exception) {}
             }
         }
     }
 
+
     // ==========================================
     // GESTION DES CAPTURES
     // ==========================================
 
+    /**
+     * Ancienne méthode de capture (sans appât)
+     */
     fun catchFish(fish: Fish, lake: Lake, position: String) {
         val currentTime = GameTimeManager.gameTime.value
         val entry = FishingEntry(
@@ -262,12 +287,67 @@ class FishingViewModel(context: Context) : ViewModel() {
         }
     }
 
+    /**
+     * ✅ NOUVELLE MÉTHODE: Capture un poisson avec l'appât spécifié
+     * Avec correction pour remonter au Top 5 communautaire
+     */
+    fun catchFishWithBait(fish: Fish, lake: Lake, position: String?, bait: String) {
+        viewModelScope.launch {
+            try {
+                val currentTime = GameTimeManager.gameTime.value
+                val entry = FishingEntry(
+                    id = java.util.UUID.randomUUID().toString(),
+                    fish = fish,
+                    lake = lake,
+                    position = position ?: "",
+                    timestamp = System.currentTimeMillis(),
+                    weight = fish.weight?.start?.plus((fish.weight!!.endInclusive - fish.weight!!.start) * Math.random()),
+                    hour = currentTime.hour,
+                    timeOfDay = GameTimeManager.getTimeOfDay(currentTime),
+                    bait = bait // ✅ NOUVEAU: stocker l'appât
+                )
+
+                repository.addFishingEntry(entry)
+
+                // ✅ CORRECTION PRINCIPALE: Ajouter pushEntryOnline pour remonter au Top 5
+                pushEntryOnline(
+                    species = fish.name,
+                    weight = entry.weight ?: 0.0,
+                    spot = "${lake.name} - $position",
+                    caughtAtMs = System.currentTimeMillis(),
+                    bait = bait  // ✅ AJOUTER cette ligne
+                )
+
+                // Sauvegarder l'appât dans les récents
+                if (bait.isNotBlank()) {
+                    repository.saveRecentBait(bait)
+                    loadRecentBaits() // Recharger la liste
+                }
+
+            } catch (e: Exception) {
+                // Gestion d'erreur simple sans crash
+                println("Erreur lors de la capture: ${e.message}")
+            }
+        }
+    }
+
     fun removeEntry(entryId: String) {
         viewModelScope.launch {
             repository.removeFishingEntry(entryId)
         }
     }
-
+    fun fetchTop5SpeciesCountsToday(onResult: (List<SpeciesCount>) -> Unit) {
+        viewModelScope.launch {
+            val list: List<SpeciesCount> = withContext(Dispatchers.IO) {
+                try {
+                    onlineRepo.getTop5SpeciesCountsToday(startOfCurrentGameDayTimestamp.value)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+            }
+            onResult(list)
+        }
+    }
     // ==========================================
     // GESTION DES DONNÉES (LACS ET POISSONS)
     // ==========================================
@@ -449,11 +529,6 @@ class FishingViewModel(context: Context) : ViewModel() {
     fun onDialogDismissed() {
         _saveCompleted.value = false
     }
-// ✅ NOUVEAU : Dans votre FishingViewModel.kt, ajouter cette fonction
-
-    /**
-     * Récupère tous les appâts disponibles dans le jeu
-     */
 
     fun resetData(options: Set<ResetOption>) {
         viewModelScope.launch {

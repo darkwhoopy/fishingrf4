@@ -39,23 +39,99 @@ fun AppHeader(
         ) {
             // Partie gauche (logo + titre)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
-                    shape = CircleShape
-                ) {
-                    Text(text = "🎣", fontSize = 24.sp, modifier = Modifier.padding(8.dp))
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(LocalContext.current.getString(R.string.app_title), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(LocalContext.current.getString(R.string.app_subtitle), fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        // Badge de connexion compact
-                        Text(
-                            text = if (FirebaseAuth.getInstance().currentUser != null) "✅" else "⚠️",
-                            fontSize = 12.sp
+                // ✅ NOUVEAU : Logo stylisé avec gradient
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color(0xFFFFD700), // Or
+                                    Color(0xFFFF8C00), // Orange doré
+                                    Color(0xFFFF4500)  // Rouge orangé
+                                ),
+                                radius = 50f
+                            ),
+                            shape = CircleShape
                         )
+                        .padding(2.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color(0xFF1E40AF),
+                                        Color(0xFF3B82F6)
+                                    )
+                                ),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "🎣",
+                            fontSize = 24.sp,
+                            modifier = Modifier.offset(y = (-1).dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // ✅ NOUVEAU : Titre stylisé avec effets
+                Column {
+                    // Titre principal avec gradient
+                    Text(
+                        text = "RF4 ASSISTANT",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        letterSpacing = 1.2.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Sous-titre avec badge de connexion intégré
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Sous-titre avec style
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        // ✅ BADGE DE CONNEXION STYLISÉ
+                        val user = FirebaseAuth.getInstance().currentUser
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (user != null) Color(0xFF10B981) else Color(0xFFF59E0B)
+                            ),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.height(24.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            color = Color.White,
+                                            shape = CircleShape
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (user != null) "ONLINE" else "OFFLINE",
+                                    fontSize = 8.sp,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -97,6 +173,8 @@ fun AppHeader(
                 onNavigate(Screen.JOURNAL)
             }
         }
+
+
 
         Spacer(modifier = Modifier.height(8.dp))
 

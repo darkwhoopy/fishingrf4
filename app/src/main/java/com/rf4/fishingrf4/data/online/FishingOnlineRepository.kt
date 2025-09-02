@@ -263,7 +263,70 @@ class FishingOnlineRepository(
             .take(limit)
             .map { it.first to it.second }
     }
+    suspend fun addEntryWithBait(
+        species: String,
+        weight: Double,
+        spot: String,
+        caughtAtMs: Long,
+        bait: String,
+        lakeId: String? = null
+    ) {
+        val u = uid()
+        if (u.isBlank()) return
 
+        val doc = hashMapOf(
+            "userId" to u,
+            "userName" to displayName(),
+            "species" to species,
+            "weight" to weight,
+            "spot" to spot,
+            "lakeId" to lakeId,
+            "bait" to bait,  // ✅ Le champ appât sera maintenant rempli
+            "caughtAt" to Timestamp(caughtAtMs / 1000, 0)
+        )
+        entries.add(doc).await()
+    }
+
+    // ✅ NOUVELLE méthode pour récupérer les vrais appâts utilisés :
+    suspend fun getTopBaitsUsedToday(species: String, startOfDayMs: Long, limit: Int = 5): List<Pair<String, Long>> {
+        val snap = entries
+            .whereEqualTo("species", species)
+            .whereGreaterThanOrEqualTo("caughtAt", Timestamp(startOfDayMs / 1000, 0))
+            .get().await()
+
+        return snap.documents
+            .mapNotNull { it.getString("bait") }
+            .filter { it.isNotBlank() }
+            .groupBy { it }
+            .map { (bait, docs) -> bait to docs.size.toLong() }
+            .sortedByDescending { it.second }
+            .take(limit)
+    }
+
+    // ✅ NOUVELLE méthode pour récupérer les stats par espèce avec appâts :
+
+    suspend fun getSpeciesWithBaitStats(startOfDayMs: Long): Map<String, Pair<Long, List<Pair<String, Long>>>> {
+        val snap = entries
+            .whereGreaterThanOrEqualTo("caughtAt", Timestamp(startOfDayMs / 1000, 0))
+            .get().await()
+
+        val speciesData = snap.documents
+            .groupBy { it.getString("species") ?: "?" }
+            .mapValues { (species, docs) ->
+                val totalCount = docs.size.toLong()
+                val baitStats = docs
+                    .mapNotNull { it.getString("bait") }
+                    .filter { it.isNotBlank() } // Filtrer les appâts vides
+                    .groupBy { it }
+                    .map { (bait, baitDocs) -> bait to baitDocs.size.toLong() }
+                    .sortedByDescending { it.second }
+                    .take(5)
+
+                totalCount to baitStats
+            }
+
+        return speciesData
+    }
     private fun todayStartMs(): Long {
         // “Aujourd’hui” côté réel (pas “in-game”!)
         val nowMs = System.currentTimeMillis()
