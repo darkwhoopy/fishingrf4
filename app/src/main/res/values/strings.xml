@@ -1,12 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Journal RF4</string>
-
-    <!-- Interface principale -->
+    <!-- ==========================================
+         INFORMATIONS GÉNÉRALES DE L'APPLICATION
+         ========================================== -->
+    <string name="app_name">RF4 Assistant</string>
     <string name="app_title">RF4 Assistant</string>
     <string name="app_subtitle">Russian Fishing Helper</string>
     <string name="level_label">NIVEAU</string>
 
-    <!-- Navigation -->
+    <!-- ==========================================
+         NAVIGATION PRINCIPALE
+         ========================================== -->
     <string name="nav_search">Recherche</string>
     <string name="nav_profile">Profil</string>
     <string name="nav_journal">Journal</string>
@@ -14,22 +18,314 @@
     <string name="nav_community">Communauté</string>
     <string name="nav_top5">Top 5</string>
 
-    <!-- Écrans -->
+    <!-- ==========================================
+         TITRES DES ÉCRANS
+         ========================================== -->
     <string name="screen_profile_title">Profil du Pêcheur</string>
-    <string name="screen_community_title">Communauté</string>
-    <string name="screen_settings_title">Paramètres</string>
-    <string name="screen_journal_title">Journal</string>
+    <string name="screen_community_title">👥 Communauté</string>
+    <string name="screen_settings_title">⚙️ Paramètres</string>
+    <string name="screen_journal_title">📖 Journal des captures</string>
+    <string name="screen_lake_selection_title">Lake Selection</string>
+    <string name="screen_fish_selection_title">🎣 Sélectionnez votre poisson</string>
+    <string name="screen_fish_search_title">🔍 Recherche avancée</string>
+    <string name="screen_bug_report_title">🐛 Signaler un problème</string>
+    <string name="screen_fish_suggestion_title">🐠 Suggérer un poisson</string>
+    <string name="screen_top5_title">🏆 Top 5</string>
 
-    <!-- Appâts communautaires -->
-    <string name="vote_for_bait">Voter pour un appât (Communauté)</string>
-    <string name="vote_success">Vote enregistré pour \'%s\' !</string>
-    <string name="vote_error_already">Vous avez déjà voté pour cet appât sur ce poisson</string>
-    <string name="vote_error_login">Vous devez être connecté pour voter</string>
-    <string name="vote_in_progress">Vote en cours...</string>
-    <string name="vote_button">Voter</string>
+
+    <!-- ==========================================
+         JOURNAL DES CAPTURES
+         ========================================== -->
+    <string name="journal_title">📖 Journal des captures</string>
+    <string name="journal_empty">Aucune capture enregistrée.</string>
+    <string name="journal_captures_count">%d captures</string>
+    <string name="journal_species_count">%d espèces</string>
+    <string name="journal_expand">Développer</string>
+    <string name="journal_collapse">Réduire</string>
+    <string name="journal_details">Détails</string>
+    <string name="journal_delete">Supprimer</string>
+    <string name="journal_close">Fermer</string>
+
+
+    <!-- Créneaux horaires -->
+    <string name="time_morning">🌅 Matin</string>
+    <string name="time_day">☀️ Journée</string>
+    <string name="time_evening">🌇 Soirée</string>
+    <string name="time_night">🌙 Nuit</string>
+
+    <!-- Statistiques du journal -->
+    <string name="stat_captures">Captures</string>
+    <string name="stat_species">Espèces</string>
+    <string name="stat_locations">Lieux</string>
+    <string name="stat_best_spot">Meilleur spot : %s</string>
+
+    <!-- ==========================================
+         SÉLECTION DE LAC
+         ========================================== -->
+    <string name="lake_selection_subtitle">Choisissez votre destination</string>
+    <string name="lake_difficulty_beginner">Débutant</string>
+    <string name="lake_difficulty_intermediate">Intermédiaire</string>
+    <string name="lake_difficulty_advanced">Avancé</string>
+    <string name="lake_difficulty_expert">Expert</string>
+    <string name="lake_unlock_level">Niveau %d requis</string>
+    <string name="lake_species_count">%d espèces</string>
+    <string name="lake_favorite">Favoris</string>
+    <string name="lake_add_favorite">Ajouter aux favoris</string>
+    <string name="lake_remove_favorite">Retirer des favoris</string>
+
+    <!-- ==========================================
+         SÉLECTION DE POISSON
+         ========================================== -->
+    <string name="fish_selection_subtitle">🎣 Sélectionnez votre poisson</string>
+    <string name="fish_position_format">%s - Position %s</string>
+    <string name="fish_stats_total_species">%d espèces au total</string>
+    <string name="fish_stats_caught_species">%d espèces capturées</string>
+    <string name="fish_stats_total_caught">%d captures aujourd\'hui</string>
+    <string name="fish_stats_game_time">Heure du jeu : %s</string>
+    <string name="fish_new_badge">NEW</string>
+    <string name="fish_count_format">×%d</string>
+    <string name="Species">Espèce : %s</string>
+
+    <!-- ==========================================
+         RECHERCHE DE POISSON
+         ========================================== -->
+    <string name="fish_search_title">🔍 Recherche avancée</string>
+    <string name="fish_search_placeholder">Rechercher un poisson</string>
+    <string name="fish_search_filters">Filtres</string>
+    <string name="fish_search_close_filters">Fermer filtres</string>
+    <string name="fish_search_clear_all">Effacer</string>
+    <string name="fish_search_apply_filters">Appliquer les filtres</string>
+    <string name="fish_filter_lake">Lac</string>
+    <string name="fish_filter_rarity">Rareté</string>
+    <string name="fish_filter_caught_only">Déjà capturés</string>
+    <string name="fish_sort_name">Nom</string>
+    <string name="fish_sort_rarity">Rareté</string>
+    <string name="fish_sort_level">Niveau</string>
+    <string name="fish_sort_captures">Captures</string>
+
+    <!-- ==========================================
+         SÉLECTION D'APPÂT
+         ========================================== -->
+    <string name="bait_selection_title">Choisir un appât</string>
+    <string name="bait_recommended">Recommandés</string>
+    <string name="bait_recent">Récents</string>
+    <string name="bait_other">Autres</string>
+    <string name="bait_custom">Appât personnalisé</string>
+    <string name="bait_add_custom">Ajouter un appât</string>
+    <string name="bait_placeholder">Nom de l\'appât</string>
+    <string name="bait_cancel">Annuler</string>
+    <string name="bait_confirm">Confirmer</string>
+    <string name="bait_use">Utiliser</string>
+
+    <!-- ==========================================
+         PARAMÈTRES
+         ========================================== -->
+    <string name="settings_title">⚙️ Paramètres</string>
+    <string name="settings_game_time">Heure du jeu</string>
+    <string name="settings_game_time_desc">Synchroniser avec l\'heure réelle du jeu</string>
+    <string name="settings_set_time">Régler l\'heure du jeu</string>
+    <string name="settings_language">Langue</string>
+        <string name="settings_reset_data">Réinitialiser les données</string>
+    <string name="settings_reset_data_desc">Effacer toutes les données sauvegardées</string>
+    <string name="settings_reset_confirm_title">Réinitialiser les données</string>
+    <string name="settings_reset_confirm_message">Quelles données souhaitez-vous effacer ?</string>
+    <string name="settings_reset_journal">Journal des captures</string>
+    <string name="settings_reset_stats">Statistiques du joueur</string>
+    <string name="settings_reset_settings">Paramètres de l\'application</string>
+    <string name="settings_reset_custom_content">Contenu personnalisé</string>
+
+    <!-- ==========================================
+         GESTION DU TEMPS
+         ========================================== -->
+    <string name="time_picker_title">Régler l\'heure du jeu</string>
+    <string name="time_hour">Heure : %d</string>
+    <string name="time_minute">Minute : %d</string>
+    <string name="time_confirm">Confirmer</string>
+    <string name="time_cancel">Annuler</string>
+
+    <!-- ==========================================
+         LANGUES
+         ========================================== -->
+    <string name="language_french">Français</string>
+    <string name="language_english">English</string>
+
+    <!-- ==========================================
+         RARETÉ DES POISSONS
+         ========================================== -->
+    <string name="rarity_common">Commun</string>
+    <string name="rarity_uncommon">Peu commun</string>
+    <string name="rarity_rare">Rare</string>
+    <string name="rarity_epic">Épique</string>
+    <string name="rarity_legendary">Légendaire</string>
+
+    <!-- ==========================================
+         CONDITIONS MÉTÉOROLOGIQUES
+         ========================================== -->
+    <string name="weather_sunny">Ensoleillé</string>
+    <string name="weather_cloudy">Nuageux</string>
+    <string name="weather_overcast">Couvert</string>
+    <string name="weather_light_rain">Pluie légère</string>
+    <string name="weather_rain">Pluie</string>
+    <string name="weather_fog">Brouillard</string>
+    <string name="weather_wind">Venteux</string>
+    <string name="weather_any">Toutes conditions</string>
+
+    <!-- ==========================================
+         COMMUNAUTÉ
+         ========================================== -->
+    <string name="community_title">👥 Communauté</string>
+    <string name="community_subtitle">Appâts, bugs et suggestions</string>
+    <string name="community_report_bug">Signaler un bug</string>
+    <string name="community_suggest_fish">Suggérer un poisson</string>
+    <string name="community_fish_suggestions">Suggestions de poissons</string>
+    <string name="community_my_reports">Mes signalements</string>
+    <string name="community_vote_up">Voter pour</string>
+    <string name="community_vote_down">Voter contre</string>
+    <string name="community_votes_count">%d votes</string>
+    <string name="community_by_author">Par %s</string>
+
+    <!-- ==========================================
+         SIGNALEMENT DE BUGS
+         ========================================== -->
+    <string name="bug_report_title">🐛 Signaler un problème</string>
+    <string name="bug_report_subtitle">Aidez-nous à améliorer l\'application</string>
+    <string name="bug_title_label">Titre du problème *</string>
+    <string name="bug_title_placeholder">Ex: L\'application plante au démarrage</string>
+    <string name="bug_description_label">Description *</string>
+    <string name="bug_description_placeholder">Décrivez le problème en détail...</string>
+    <string name="bug_type_label">Type de problème</string>
+    <string name="bug_reproduction_label">Étapes pour reproduire</string>
+    <string name="bug_reproduction_placeholder">1. Ouvrir l\'application\n2. Aller dans...\n3. Cliquer sur...</string>
+    <string name="bug_expected_label">Comportement attendu</string>
+    <string name="bug_expected_placeholder">Que devrait-il se passer normalement ?</string>
+    <string name="bug_actual_label">Comportement observé</string>
+    <string name="bug_actual_placeholder">Décrivez ce qui se passe actuellement...</string>
+    <string name="bug_device_info">Informations techniques</string>
+    <string name="bug_device_format">Appareil: %s</string>
+    <string name="bug_version_format">Version: %s</string>
+    <string name="bug_send">Envoyer le signalement</string>
+    <string name="bug_sending">Envoi en cours...</string>
+    <string name="bug_success_title">Signalement envoyé !</string>
+    <string name="bug_success_message">Merci pour votre signalement ! Notre équipe va examiner le problème et vous contacter si besoin. Vous pouvez suivre l\'état de votre signalement dans la section communauté.</string>
+    <string name="bug_error_title">Erreur</string>
+    <string name="bug_error_message">Erreur lors de l\'envoi du signalement</string>
+
+    <!-- Types de bugs -->
+    <string name="bug_type_crash">Plantage</string>
+    <string name="bug_type_ui">Interface</string>
+    <string name="bug_type_data">Données</string>
+    <string name="bug_type_performance">Performance</string>
+    <string name="bug_type_feature">Fonctionnalité</string>
+    <string name="bug_type_other">Autre</string>
+
+    <!-- ==========================================
+         SUGGESTION DE POISSONS
+         ========================================== -->
+    <string name="fish_suggestion_title">🐠 Suggérer un poisson</string>
+    <string name="fish_suggestion_subtitle">Proposez de nouveaux poissons à ajouter</string>
+    <string name="fish_suggestion_help">Aidez-nous à enrichir la base de données en proposant de nouveaux poissons. Toutes les suggestions sont examinées par notre équipe.</string>
+
+    <!-- Informations générales -->
+    <string name="fish_info_general">📝 Informations générales</string>
+    <string name="fish_name_french_label">Nom français *</string>
+    <string name="fish_name_french_placeholder">Ex: Truite fario</string>
+    <string name="fish_name_scientific_label">Nom scientifique</string>
+    <string name="fish_name_scientific_placeholder">Ex: Salmo trutta</string>
+    <string name="fish_description_label">Description *</string>
+    <string name="fish_description_placeholder">Ex: Ce poisson est présent dans les eaux françaises et très apprécié des pêcheurs...</string>
+    <string name="fish_source_label">Source d\'information (optionnel)</string>
+    <string name="fish_source_placeholder">https://...</string>
+
+    <!-- Caractéristiques -->
+    <string name="fish_characteristics">🎯 Caractéristiques</string>
+    <string name="fish_rarity_label">Rareté</string>
+    <string name="fish_weight_min_label">Poids min (kg)</string>
+    <string name="fish_weight_min_placeholder">0.5</string>
+    <string name="fish_weight_max_label">Poids max (kg)</string>
+    <string name="fish_weight_max_placeholder">3.0</string>
+
+    <!-- Habitat -->
+    <string name="fish_habitat">🏞️ Préférences d\'habitat</string>
+    <string name="fish_lakes_label">Lacs où le trouver</string>
+    <string name="fish_lakes_placeholder">Cliquer pour sélectionner</string>
+    <string name="fish_lakes_selected">%d lac(s) sélectionné(s)</string>
+    <string name="fish_baits_label">Appâts recommandés</string>
+    <string name="fish_baits_placeholder">Cliquer pour sélectionner</string>
+    <string name="fish_baits_selected">%d appât(s) sélectionné(s)</string>
+
+    <!-- Conditions -->
+    <string name="fish_conditions">⏰ Conditions de pêche</string>
+    <string name="fish_hours_label">Meilleures heures</string>
+    <string name="fish_hours_placeholder">Cliquer pour sélectionner</string>
+    <string name="fish_hours_selected">%d heure(s) sélectionnée(s)</string>
+    <string name="fish_weather_label">Météo favorable</string>
+    <string name="fish_weather_placeholder">Cliquer pour sélectionner</string>
+    <string name="fish_weather_selected">%d condition(s) sélectionnée(s)</string>
+
+    <!-- Justification -->
+    <string name="fish_justification">💭 Justification</string>
+    <string name="fish_justification_label">Pourquoi ajouter ce poisson ? *</string>
+    <string name="fish_justification_placeholder">Expliquez pourquoi ce poisson devrait être ajouté à RF4...</string>
+
+    <!-- Actions -->
+    <string name="fish_suggestion_send">Envoyer la suggestion</string>
+    <string name="fish_suggestion_sending">Envoi en cours...</string>
+    <string name="fish_suggestion_success_title">Suggestion envoyée !</string>
+    <string name="fish_suggestion_success_message">Merci pour votre suggestion ! Notre équipe va l\'examiner. Vous pourrez suivre son statut dans la section communauté.</string>
+
+    <!-- ==========================================
+         APPÂTS COMMUNAUTAIRES
+         ========================================== -->
+    <string name="community_bait_vote">Voter pour un appât (Communauté)</string>
+    <string name="community_bait_vote_success">Vote enregistré pour \'%s\' !</string>
+    <string name="community_bait_vote_error_already">Vous avez déjà voté pour cet appât sur ce poisson</string>
+    <string name="community_bait_vote_error_login">Vous devez être connecté pour voter</string>
+    <string name="community_bait_vote_in_progress">Vote en cours...</string>
+    <string name="community_bait_vote_button">Voter</string>
+
+    <!-- ==========================================
+         TOP 5
+         ========================================== -->
+    <string name="top5_title">🏆 Top 5</string>
+    <string name="top5_species_today">Espèces du jour</string>
+    <string name="top5_players_today">Pêcheurs du jour</string>
+    <string name="top5_lakes_today">Lacs populaires</string>
+    <string name="top5_no_data">Aucune donnée disponible</string>
+    <string name="top5_catches_count">%d captures</string>
+
+    <!-- ==========================================
+         MESSAGES GÉNÉRAUX
+         ========================================== -->
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="confirm">Confirmer</string>
+    <string name="close">Fermer</string>
+    <string name="back">Retour</string>
+    <string name="save">Sauvegarder</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="loading">Chargement...</string>
+    <string name="error">Erreur</string>
+    <string name="success">Succès</string>
+    <string name="required_field">Champ obligatoire</string>
+    <string name="optional_field">Optionnel</string>
+
+    <!-- ==========================================
+         MESSAGES D'ÉTAT
+         ========================================== -->
+    <string name="no_internet">Pas de connexion Internet</string>
+    <string name="loading_data">Chargement des données...</string>
+    <string name="sync_success">Synchronisation réussie</string>
+    <string name="sync_error">Erreur de synchronisation</string>
+    <string name="login_required">Connexion requise</string>
+    <string name="save_success">Sauvegarde réussie</string>
+    <string name="save_error">Erreur de sauvegarde</string>
 
     <!-- Paramètres langue -->
     <string name="language_setting">Langue</string>
-    <string name="language_french">Français</string>
-    <string name="language_english">English</string>
+    <string name="settings_language_desc">Choisir la langue de l\'application</string>
+
+    <!-- Fish selection -->
+    <string name="game_time_label">Heure en jeu</string>
+
 </resources>

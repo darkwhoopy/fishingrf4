@@ -152,7 +152,7 @@ fun FishingRF4App() {
                         lakeToInteract = lake
                         viewModel.navigateTo(Screen.LAKE_EDIT)
                     },
-                    favoriteLakeIds = uiState.favoriteLakeIds,
+                    favoriteLakeIds = uiState.favoriteLakeIds.toSet(),
                     onToggleFavorite = viewModel::toggleFavoriteLake,
                     isFavoritesFilterActive = favoritesOnly,
                     onToggleFavoritesFilter = { favoritesOnly = !favoritesOnly }

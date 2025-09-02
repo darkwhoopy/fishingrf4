@@ -15,10 +15,9 @@ data class FishingEntry(
     val hour: Int? = null,
     val timeOfDay: String? = null,
     val notes: String = "",
-    val bait: String = ""
+    val bait: String = "" // ✅ Champ ajouté pour l'appât utilisé
 ) {
-    // ✅ On supprime complètement la logique de calcul complexe.
-    // Chaque prise vaut maintenant 0 point, ce qui évite le crash.
+    // ✅ Points simplifiés pour éviter les crashs
     val points: Int = 0
 }
 

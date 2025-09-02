@@ -2,6 +2,7 @@ package com.rf4.fishingrf4.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,21 +13,48 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.ui.components.BackButton
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+
+// Classe pour organiser les captures par moment de la journée
+data class TimeSlot(
+    val nameResId: Int, // ID de ressource pour la traduction
+    val hourRange: IntRange,
+    val icon: String,
+    val color: Color
+)
+
+// Classe pour regrouper les captures par poisson
+data class FishGroup(
+    val fish: com.rf4.fishingrf4.data.models.Fish,
+    val entries: List<FishingEntry>,
+    val count: Int,
+    val bestWeight: Double?,
+    val bestLocation: String
+)
 
 @Composable
 fun JournalScreen(
@@ -34,6 +62,39 @@ fun JournalScreen(
     onDeleteEntry: (String) -> Unit,
     onBack: () -> Unit
 ) {
+    // Context pour accéder aux ressources de traduction
+    val context = LocalContext.current
+
+    // État pour la popup de détails
+    var selectedFishGroup by remember { mutableStateOf<FishGroup?>(null) }
+    val haptic = LocalHapticFeedback.current
+
+    // Créneaux horaires pour organiser les captures (avec traductions)
+    val timeSlots = listOf(
+        TimeSlot(R.string.time_morning, 5..10, "🌅", Color(0xFF10B981)),
+        TimeSlot(R.string.time_day, 11..16, "☀️", Color(0xFFF59E0B)),
+        TimeSlot(R.string.time_evening, 17..21, "🌇", Color(0xFFEF4444)),
+        TimeSlot(R.string.time_night, 22..4, "🌙", Color(0xFF8B5CF6))
+    )
+
+    // Fonction pour déterminer le créneau d'une capture
+    fun getTimeSlot(entry: FishingEntry): TimeSlot {
+        val hour = entry.hour ?: LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(entry.timestamp),
+            ZoneId.systemDefault()
+        ).hour
+
+        return timeSlots.find { timeSlot ->
+            when {
+                timeSlot.hourRange.first <= timeSlot.hourRange.last ->
+                    hour in timeSlot.hourRange
+                else -> // Cas de la nuit (22-4)
+                    hour >= timeSlot.hourRange.first || hour <= timeSlot.hourRange.last
+            }
+        } ?: timeSlots[1] // Par défaut : journée
+    }
+
+    // Regroupement des entrées par jour
     val groupedEntries = remember(entries) {
         entries.sortedByDescending { it.timestamp }
             .groupBy {
@@ -50,145 +111,374 @@ fun JournalScreen(
         ) {
             BackButton(onClick = onBack)
             Spacer(modifier = Modifier.width(16.dp))
-            Text("📖 Journal des captures", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(
+                text = stringResource(R.string.journal_title),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
 
         if (entries.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Aucune capture enregistrée.", color = Color.Gray)
+                Text(
+                    text = stringResource(R.string.journal_empty),
+                    color = Color.Gray,
+                    fontSize = 16.sp
+                )
             }
-        } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                groupedEntries.forEach { (date, entriesForDay) ->
-                    item(key = date) {
-                        DayHeader(
-                            date = date,
-                            entriesForDay = entriesForDay, // ✅ Nouveau : on passe toutes les entrées
-                            isExpanded = date in expandedDays,
-                            onClick = {
-                                expandedDays = if (date in expandedDays) expandedDays - date else expandedDays + date
-                            }
-                        )
-                    }
+            return
+        }
 
-                    items(entriesForDay, key = { it.id }) { entry ->
-                        AnimatedVisibility(visible = date in expandedDays) {
-                            Box(modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 8.dp)) {
-                                JournalEntryCard(entry = entry, onDelete = { onDeleteEntry(entry.id) })
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            groupedEntries.forEach { (date, dayEntries) ->
+                item {
+                    val isExpanded = date in expandedDays
+                    val rotation by animateFloatAsState(
+                        targetValue = if (isExpanded) 180f else 0f,
+                        label = "rotation"
+                    )
+
+                    // En-tête du jour
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                expandedDays = if (isExpanded) {
+                                    expandedDays - date
+                                } else {
+                                    expandedDays + date
+                                }
+                            },
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF334155)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = date.format(DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.getDefault())),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "${stringResource(R.string.journal_captures_count, dayEntries.size)} • ${stringResource(R.string.journal_species_count, dayEntries.distinctBy { it.fish.name }.size)}",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFFE2E8F0)
+                                )
                             }
+
+                            Icon(
+                                Icons.Default.ExpandMore,
+                                contentDescription = stringResource(R.string.journal_expand),
+                                tint = Color.White,
+                                modifier = Modifier.rotate(rotation)
+                            )
+                        }
+                    }
+                }
+
+                if (date in expandedDays) {
+                    // Regroupement par créneau horaire
+                    val entriesByTimeSlot = dayEntries.groupBy { getTimeSlot(it) }
+
+                    entriesByTimeSlot.forEach { (timeSlot, timeEntries) ->
+                        item {
+                            // En-tête du créneau horaire
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = timeSlot.color.copy(alpha = 0.1f)
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(timeSlot.nameResId),
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = timeSlot.color
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.journal_captures_count, timeEntries.size),
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
+                        }
+
+                        // Regroupement par poisson dans ce créneau
+                        val fishGroups = timeEntries
+                            .groupBy { it.fish.name }
+                            .map { (fishName, fishEntries) ->
+                                FishGroup(
+                                    fish = fishEntries.first().fish,
+                                    entries = fishEntries,
+                                    count = fishEntries.size,
+                                    bestWeight = null, // Poids désactivé
+                                    bestLocation = fishEntries
+                                        .groupBy { "${it.lake.name} - ${it.position}" }
+                                        .maxByOrNull { it.value.size }?.key ?: "Position inconnue"
+                                )
+                            }
+                            .sortedByDescending { it.count }
+
+                        items(fishGroups) { fishGroup ->
+                            FishGroupCard(
+                                fishGroup = fishGroup,
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    selectedFishGroup = fishGroup
+                                },
+                                onDeleteEntry = onDeleteEntry
+                            )
                         }
                     }
                 }
             }
         }
     }
+
+    // Popup de détails pour un groupe de poissons
+    selectedFishGroup?.let { fishGroup ->
+        FishDetailDialog(
+            fishGroup = fishGroup,
+            onDismiss = { selectedFishGroup = null },
+            onDeleteEntry = { entryId ->
+                onDeleteEntry(entryId)
+                selectedFishGroup = null
+            }
+        )
+    }
 }
 
-// ✅ EN-TÊTE AMÉLIORÉE AVEC STATISTIQUES
 @Composable
-fun DayHeader(
-    date: java.time.LocalDate,
-    entriesForDay: List<FishingEntry>, // Nouveau : on passe toutes les entrées
-    isExpanded: Boolean,
-    onClick: () -> Unit
+fun FishGroupCard(
+    fishGroup: FishGroup,
+    onClick: () -> Unit,
+    onDeleteEntry: (String) -> Unit
 ) {
-    val formatter = remember { DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH) }
-    val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
-
-    // Calculs des statistiques du jour
-    val totalCatches = entriesForDay.size
-    val uniqueSpecies = entriesForDay.map { it.fish.name }.distinct().size
-    val totalPoints = entriesForDay.sumOf { it.fish.rarity.points }
-    val topLake = entriesForDay.groupBy { it.lake.name }.maxByOrNull { it.value.size }?.key
-    val rarityBreakdown = entriesForDay.groupBy { it.fish.rarity }.mapValues { it.value.size }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
+            .padding(start = 32.dp, end = 8.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF475569).copy(alpha = 0.6f)
+        ),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Ligne principale avec date et flèche
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = date.format(formatter).replaceFirstChar { it.titlecase(Locale.FRENCH) },
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.ExpandMore,
-                    contentDescription = "Déplier",
-                    tint = Color.White,
-                    modifier = Modifier.rotate(rotationAngle)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Statistiques principales
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                StatisticItem(
-                    label = "Prises",
-                    value = totalCatches.toString(),
-                    icon = "🎣",
-                    color = Color(0xFF10B981)
-                )
-                StatisticItem(
-                    label = "Espèces",
-                    value = uniqueSpecies.toString(),
-                    icon = "🐟",
-                    color = Color(0xFF3B82F6)
-                )
-                StatisticItem(
-                    label = "Points",
-                    value = totalPoints.toString(),
-                    icon = "⭐",
-                    color = Color(0xFFFFC107)
-                )
-            }
-
-            if (topLake != null && totalCatches > 1) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Lac productif : $topLake",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
-
-            // Badges de rareté si il y a des prises intéressantes
-            if (rarityBreakdown.any { it.key.points > 1 }) {
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                // Badge de rareté
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(fishGroup.fish.rarity.colorValue)
+                    ),
+                    shape = RoundedCornerShape(4.dp)
                 ) {
-                    items(rarityBreakdown.entries.sortedByDescending { it.key.points }) { (rarity, count) ->
-                        if (count > 0) {
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = Color(rarity.colorValue)),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text(
-                                    text = "${rarity.displayName.take(1)}×$count",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
+                    Text(
+                        text = stringResource(
+                            when(fishGroup.fish.rarity) {
+                                com.rf4.fishingrf4.data.models.FishRarity.COMMON -> R.string.rarity_common
+                                com.rf4.fishingrf4.data.models.FishRarity.UNCOMMON -> R.string.rarity_uncommon
+                                com.rf4.fishingrf4.data.models.FishRarity.RARE -> R.string.rarity_rare
+                                com.rf4.fishingrf4.data.models.FishRarity.EPIC -> R.string.rarity_epic
+                                com.rf4.fishingrf4.data.models.FishRarity.LEGENDARY -> R.string.rarity_legendary
                             }
-                        }
+                        ).take(1),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = fishGroup.fish.name,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = stringResource(R.string.fish_count_format, fishGroup.count),
+                        fontSize = 12.sp,
+                        color = Color(0xFFFFD700),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Bouton info pour plus de détails
+            IconButton(onClick = onClick) {
+                Icon(
+                    Icons.Default.Info,
+                    contentDescription = stringResource(R.string.journal_details),
+                    tint = Color(0xFF64B5F6),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FishDetailDialog(
+    fishGroup: FishGroup,
+    onDismiss: () -> Unit,
+    onDeleteEntry: (String) -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                // En-tête avec le nom du poisson
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = fishGroup.fish.name,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = fishGroup.fish.species,
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
                     }
+
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(fishGroup.fish.rarity.colorValue)
+                        ),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                when(fishGroup.fish.rarity) {
+                                    com.rf4.fishingrf4.data.models.FishRarity.COMMON -> R.string.rarity_common
+                                    com.rf4.fishingrf4.data.models.FishRarity.UNCOMMON -> R.string.rarity_uncommon
+                                    com.rf4.fishingrf4.data.models.FishRarity.RARE -> R.string.rarity_rare
+                                    com.rf4.fishingrf4.data.models.FishRarity.EPIC -> R.string.rarity_epic
+                                    com.rf4.fishingrf4.data.models.FishRarity.LEGENDARY -> R.string.rarity_legendary
+                                }
+                            ),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Statistiques du groupe
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    FishStatItem(stringResource(R.string.stat_captures), fishGroup.count.toString(), "🎣")
+                    FishStatItem(stringResource(R.string.stat_species), "1", "🐠")
+                    FishStatItem(stringResource(R.string.stat_locations), fishGroup.entries.distinctBy { "${it.lake.name}-${it.position}" }.size.toString(), "📍")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Meilleur spot
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        contentDescription = stringResource(R.string.stat_locations),
+                        tint = Color(0xFF10B981),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.stat_best_spot, fishGroup.bestLocation),
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Liste des captures détaillées
+                Text(
+                    text = stringResource(R.string.journal_details) + " :",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(
+                    modifier = Modifier.height(200.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(fishGroup.entries.sortedByDescending { it.timestamp }) { entry ->
+                        FishDetailItem(
+                            entry = entry,
+                            onDelete = { onDeleteEntry(entry.id) }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Bouton fermer
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                ) {
+                    Text(stringResource(R.string.journal_close), color = Color.White)
                 }
             }
         }
@@ -196,86 +486,106 @@ fun DayHeader(
 }
 
 @Composable
-fun StatisticItem(
-    label: String,
-    value: String,
-    icon: String,
-    color: Color
-) {
+fun FishStatItem(label: String, value: String, icon: String) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 8.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = icon, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = value,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = color
-            )
-        }
+        Text(
+            text = icon,
+            fontSize = 16.sp
+        )
+        Text(
+            text = value,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
         Text(
             text = label,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             color = Color.Gray
         )
     }
 }
 
-// ✅ CARTE DE CAPTURE (inchangée)
 @Composable
-fun JournalEntryCard(entry: FishingEntry, onDelete: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
-            .border(1.dp, Color(entry.fish.rarity.colorValue).copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(entry.fish.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
-                Text("${entry.lake.name} (${entry.position})", fontSize = 12.sp, color = Color.Gray)
-            }
-
-            entry.timeOfDay?.let {
-                val (emoji, color) = when(it) {
-                    "Matinée" -> "☀️" to Color(0xFFFFC107)
-                    "Journée" -> "☀️" to Color(0xFF4CAF50)
-                    "Soirée" -> "🌙" to Color(0xFF9C27B0)
-                    else -> "🌃" to Color(0xFF3F51B5)
-                }
-                InfoBadge(text = "$emoji $it", color = color)
-            }
-
-            IconButton(onClick = onDelete, modifier = Modifier.size(24.dp)) {
-                Icon(Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Gray)
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoBadge(
-    text: String,
-    color: Color
+fun FishDetailItem(
+    entry: FishingEntry,
+    onDelete: () -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = color),
-        shape = RoundedCornerShape(4.dp)
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF334155).copy(alpha = 0.6f)
+        ),
+        shape = RoundedCornerShape(6.dp)
     ) {
-        Text(
-            text = text,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.AccessTime,
+                        contentDescription = stringResource(R.string.time_hour, 0),
+                        tint = Color.Gray,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = DateTimeFormatter.ofPattern("HH:mm")
+                            .format(LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(entry.timestamp),
+                                ZoneId.systemDefault()
+                            )),
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        contentDescription = stringResource(R.string.stat_locations),
+                        tint = Color.Gray,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${entry.lake.name} - ${entry.position}",
+                        fontSize = 11.sp,
+                        color = Color(0xFFE2E8F0)
+                    )
+                }
+
+                if (entry.bait.isNotEmpty()) {
+                    Text(
+                        text = "🎯 ${entry.bait}",
+                        fontSize = 11.sp,
+                        color = Color(0xFF64B5F6)
+                    )
+                }
+            }
+
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.journal_delete),
+                    tint = Color(0xFFEF4444),
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+        }
     }
 }

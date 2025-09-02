@@ -12,12 +12,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +27,8 @@ import com.rf4.fishingrf4.data.models.BugType
 import com.rf4.fishingrf4.data.repository.CommunityRepository
 import com.rf4.fishingrf4.ui.components.BackButton
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.rf4.fishingrf4.R
 
 /**
  * Écran de signalement de bugs
@@ -34,6 +38,7 @@ import kotlinx.coroutines.launch
 fun BugReportScreen(
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val communityRepo = remember { CommunityRepository() }
 
@@ -80,13 +85,13 @@ fun BugReportScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "🐛 Signaler un bug",
+                        text = stringResource(R.string.bug_report_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Aidez-nous à améliorer l'application",
+                        text = stringResource(R.string.bug_report_subtitle),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
@@ -137,8 +142,8 @@ fun BugReportScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Titre du problème *", color = Color.Gray) },
-                placeholder = { Text("Ex: L'application plante au lancer", color = Color.Gray) },
+                label = { Text(stringResource(R.string.bug_title_label), color = Color.Gray) },
+                placeholder = { Text(stringResource(R.string.bug_title_placeholder), color = Color.Gray) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -160,7 +165,7 @@ fun BugReportScreen(
                     value = selectedBugType.displayName,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Type de problème *", color = Color.Gray) },
+                    label = { Text(stringResource(R.string.bug_type_label), color = Color.Gray) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showBugTypeDropdown) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -178,7 +183,7 @@ fun BugReportScreen(
                     onDismissRequest = { showBugTypeDropdown = false },
                     modifier = Modifier.background(Color(0xFF1E3A5F))
                 ) {
-                    BugType.values().forEach { bugType ->
+                    BugType.entries.forEach { bugType ->
                         DropdownMenuItem(
                             text = { Text(bugType.displayName, color = Color.White) },
                             onClick = {
@@ -197,10 +202,10 @@ fun BugReportScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description détaillée *", color = Color.Gray) },
+                label = { Text(stringResource(R.string.bug_description_label), color = Color.Gray) },
                 placeholder = {
                     Text(
-                        "Décrivez précisément le problème rencontré...",
+                        stringResource(R.string.bug_description_placeholder),
                         color = Color.Gray
                     )
                 },
@@ -222,10 +227,10 @@ fun BugReportScreen(
             OutlinedTextField(
                 value = reproductionSteps,
                 onValueChange = { reproductionSteps = it },
-                label = { Text("Étapes pour reproduire", color = Color.Gray) },
+                label = { Text(stringResource(R.string.bug_reproduction_label), color = Color.Gray) },
                 placeholder = {
                     Text(
-                        "1. Ouvrir l'application\n2. Aller dans...\n3. Cliquer sur...",
+                        stringResource(R.string.bug_reproduction_placeholder),
                         color = Color.Gray
                     )
                 },
@@ -247,10 +252,10 @@ fun BugReportScreen(
             OutlinedTextField(
                 value = expectedBehavior,
                 onValueChange = { expectedBehavior = it },
-                label = { Text("Que devrait-il se passer ?", color = Color.Gray) },
+                label = { Text(stringResource(R.string.bug_expected_label), color = Color.Gray) },
                 placeholder = {
                     Text(
-                        "Décrivez le comportement normal attendu...",
+                        stringResource(R.string.bug_expected_placeholder),
                         color = Color.Gray
                     )
                 },
@@ -272,10 +277,10 @@ fun BugReportScreen(
             OutlinedTextField(
                 value = actualBehavior,
                 onValueChange = { actualBehavior = it },
-                label = { Text("Que se passe-t-il réellement ?", color = Color.Gray) },
+                label = { Text(stringResource(R.string.bug_actual_label), color = Color.Gray) },
                 placeholder = {
                     Text(
-                        "Décrivez ce qui se passe actuellement...",
+                        stringResource(R.string.bug_actual_placeholder),
                         color = Color.Gray
                     )
                 },
@@ -295,7 +300,7 @@ fun BugReportScreen(
 
             // Informations système (lecture seule)
             Text(
-                text = "Informations techniques",
+                text = stringResource(R.string.bug_device_info),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White,
@@ -356,7 +361,7 @@ fun BugReportScreen(
             Button(
                 onClick = {
                     if (title.isBlank() || description.isBlank()) {
-                        errorMessage = "Veuillez remplir au minimum le titre et la description"
+                        errorMessage = context.getString(R.string.required_field)
                         return@Button
                     }
 
@@ -408,7 +413,7 @@ fun BugReportScreen(
                     )
                 } else {
                     Icon(
-                        Icons.Default.Send,
+                        Icons.AutoMirrored.Filled.Send,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
@@ -439,7 +444,7 @@ fun BugReportScreen(
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Signalement envoyé !", color = Color.White)
+                    Text(stringResource(R.string.bug_success_title), color = Color.White)
                 }
             },
             text = {

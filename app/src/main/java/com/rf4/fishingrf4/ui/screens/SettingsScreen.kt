@@ -22,8 +22,9 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.rf4.fishingrf4.utils.LanguageManager
 import com.rf4.fishingrf4.R
-import com.rf4.fishingrf4.data.utils.LanguageManager
 
 @Composable
 fun SettingsScreen(

@@ -1,8 +1,3 @@
-// ============================================================================
-// FICHIER: ui/screens/FishSelectionScreen.kt (VERSION AMÉLIORÉE)
-// Remplacer votre fonction FishSelectionScreen existante par cette version
-// ============================================================================
-
 package com.rf4.fishingrf4.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,9 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.Lake
@@ -50,7 +47,7 @@ fun FishSelectionScreen(
     var showBaitDialog by remember { mutableStateOf(false) }
     var selectedFishForBait by remember { mutableStateOf<Fish?>(null) }
 
-    // ✅ RESTAURATION : Calcul des statistiques de capture comme avant
+    // Calcul des statistiques de capture
     val fishCaptureStats = remember(fishingEntries, lake.id, position, startOfGameDayTimestamp) {
         fishingEntries
             .filter { it.lake.id == lake.id && it.position == position && it.timestamp >= startOfGameDayTimestamp }
@@ -60,7 +57,7 @@ fun FishSelectionScreen(
             }
     }
 
-    // ✅ RESTAURATION : Tri par nombre de captures PUIS par rareté comme avant
+    // Tri par nombre de captures PUIS par rareté
     val sortedFish = remember(lake.availableFish, fishCaptureStats) {
         lake.availableFish.sortedWith(
             compareByDescending<Fish> { fishCaptureStats[it.name]?.totalCaught ?: 0 }
@@ -75,7 +72,6 @@ fun FishSelectionScreen(
             fish = selectedFishForBait!!,
             recentBaits = recentBaits,
             onBaitSelected = { bait ->
-                // Capturer le poisson avec l'appât sélectionné
                 viewModel.catchFishWithBait(
                     selectedFishForBait!!,
                     lake,
@@ -97,7 +93,7 @@ fun FishSelectionScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // ✅ RESTAURATION : En-tête comme avant
+        // En-tête
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -106,13 +102,13 @@ fun FishSelectionScreen(
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${lake.name} - Position $position",
+                    text = stringResource(R.string.fish_position_format, lake.name, position),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 Text(
-                    text = "🎣 Sélectionnez votre poisson",
+                    text = stringResource(R.string.fish_selection_subtitle),
                     fontSize = 14.sp,
                     color = Color(0xFFE2E8F0)
                 )
@@ -120,13 +116,13 @@ fun FishSelectionScreen(
             IconButton(onClick = onViewJournal) {
                 Icon(
                     Icons.Default.Info,
-                    contentDescription = "Journal",
+                    contentDescription = stringResource(R.string.nav_journal),
                     tint = Color(0xFFFFB74D)
                 )
             }
         }
 
-        // ✅ RESTAURATION : Carte de statistiques avec comptage correct
+        // Carte de statistiques
         FishingStatsCard(
             totalSpecies = lake.availableFish.size,
             caughtSpecies = fishCaptureStats.size,
@@ -136,7 +132,7 @@ fun FishSelectionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ RESTAURATION : Grille avec l'ancienne interface
+        // Grille des poissons
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -149,7 +145,6 @@ fun FishSelectionScreen(
                     fish = fish,
                     stats = stats,
                     onClick = {
-                        // Ouvrir le dialog d'appât
                         selectedFishForBait = fish
                         showBaitDialog = true
                     },
@@ -160,7 +155,6 @@ fun FishSelectionScreen(
     }
 }
 
-// ✅ RESTAURATION : Carte de statistiques comme avant MAIS avec heure du jeu
 @Composable
 fun FishingStatsCard(
     totalSpecies: Int,
@@ -182,17 +176,17 @@ fun FishingStatsCard(
             StatItem(
                 icon = "🐟",
                 value = "$caughtSpecies/$totalSpecies",
-                label = "Espèces"
+                label = stringResource(R.string.stat_species)
             )
             StatItem(
                 icon = "🎯",
                 value = "$totalCaught",
-                label = "Captures"
+                label = stringResource(R.string.stat_captures)
             )
             StatItem(
                 icon = "🕒",
                 value = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                label = "Heure en jeu"
+                label = stringResource(R.string.game_time_label)
             )
         }
     }
@@ -216,7 +210,6 @@ fun StatItem(icon: String, value: String, label: String) {
     }
 }
 
-// ✅ RESTAURATION : Ancienne interface FishCard avec bordures colorées et meilleure lisibilité
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FishCard(
@@ -246,7 +239,7 @@ fun FishCard(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ✅ Première ligne : Icône + Étoiles (si capturé)
+            // Première ligne : Icône + Étoiles
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -270,7 +263,7 @@ fun FishCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // ✅ Nom du poisson (plus gros pour lisibilité)
+            // Nom du poisson
             Text(
                 text = fish.name,
                 fontSize = 16.sp,
@@ -281,7 +274,7 @@ fun FishCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // ✅ Dernière ligne : Badge de rareté + Compteur de captures
+            // Dernière ligne : Badge de rareté + Compteur
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -295,7 +288,15 @@ fun FishCard(
                     shape = RoundedCornerShape(4.dp)
                 ) {
                     Text(
-                        text = fish.rarity.displayName.take(1),
+                        text = stringResource(
+                            when(fish.rarity) {
+                                com.rf4.fishingrf4.data.models.FishRarity.COMMON -> R.string.rarity_common
+                                com.rf4.fishingrf4.data.models.FishRarity.UNCOMMON -> R.string.rarity_uncommon
+                                com.rf4.fishingrf4.data.models.FishRarity.RARE -> R.string.rarity_rare
+                                com.rf4.fishingrf4.data.models.FishRarity.EPIC -> R.string.rarity_epic
+                                com.rf4.fishingrf4.data.models.FishRarity.LEGENDARY -> R.string.rarity_legendary
+                            }
+                        ).take(1),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -303,17 +304,17 @@ fun FishCard(
                     )
                 }
 
-                // ✅ COMPTEUR DE CAPTURES RESTAURÉ
+                // Compteur de captures
                 if (stats != null && stats.totalCaught > 0) {
                     Text(
-                        text = "×${stats.totalCaught}",
+                        text = stringResource(R.string.fish_count_format, stats.totalCaught),
                         fontSize = 14.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 } else {
                     Text(
-                        text = "NEW",
+                        text = stringResource(R.string.fish_new_badge),
                         fontSize = 10.sp,
                         color = Color(0xFFFFD700),
                         fontWeight = FontWeight.Bold
@@ -324,5 +325,4 @@ fun FishCard(
     }
 }
 
-// ✅ RESTAURATION : Data class pour les statistiques
 data class FishCaptureStats(val totalCaught: Int)
