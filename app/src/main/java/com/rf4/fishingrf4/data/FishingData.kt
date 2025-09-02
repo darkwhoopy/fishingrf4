@@ -8,7 +8,7 @@ import com.rf4.fishingrf4.data.models.*
 
 object FishingData {
 
-    // ==========================================
+    // ==========================================   a
     // POISSONS COMMUNS (EXISTANTS + NOUVEAUX)
     // ==========================================
     private val commonFresh = listOf(
@@ -35,6 +35,11 @@ object FishingData {
         ),
         Fish(
             "Carassin", "Carassius carassius", FishRarity.COMMON,
+            weight = 0.2..1.5, preferredBait = listOf("Ver de terre", "Pain", "Maïs"),
+            bestHours = listOf(6, 7, 8, 18, 19, 20), bestWeather = listOf(WeatherType.ANY)
+        ),
+        Fish(
+            "Carassin argenté", "Carassius Argentus", FishRarity.COMMON,
             weight = 0.2..1.5, preferredBait = listOf("Ver de terre", "Pain", "Maïs"),
             bestHours = listOf(6, 7, 8, 18, 19, 20), bestWeather = listOf(WeatherType.ANY)
         ),
@@ -617,7 +622,7 @@ object FishingData {
                     "Gardon", "Ablette", "Brème", "Rotengle", "Carassin",
                     "Goujon", "Vairon", "Épinoche", "Perche", "Tanche",
                     "Brochet", "Carpe commune", "Carpe miroir",
-                    "Loche d'étang" // ✅ AJOUTÉ selon les sources officielles
+                    "Loche d'étang","Carassin argenté" // ✅ AJOUTÉ selon les sources officielles
                 )
             ),
             description = "Lac idéal pour débuter, avec une grande variété de poissons blancs et quelques carnassiers.",
