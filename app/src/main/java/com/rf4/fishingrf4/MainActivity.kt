@@ -1,14 +1,43 @@
 package com.rf4.fishingrf4
 
+import android.app.Activity
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.rf4.fishingrf4.ui.FishingRF4App
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MaterialTheme { FishingRF4App() } }
+        setContent { MaterialTheme { FishingRF4App() }
+            ScreenLockManager()
+        }
+    }
+}
+@Composable
+fun ScreenLockManager() {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    // Lire les préférences (à adapter selon votre système)
+    var keepScreenOn by remember { mutableStateOf(true) } // Par défaut activé
+
+    LaunchedEffect(keepScreenOn) {
+        activity?.let {
+            if (keepScreenOn) {
+                it.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                it.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
     }
 }

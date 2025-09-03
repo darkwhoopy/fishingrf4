@@ -326,4 +326,10 @@
 
     <string name="game_time_label">Game time</string>
 
+    <!-- OBLIGATOIRE pour Play Store -->
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_of_service">Terms of service</string>
+    <string name="about">about</string>
+    <string name="version">Version %s</string>
+
    </resources>

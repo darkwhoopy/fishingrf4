@@ -8,7 +8,6 @@ import java.time.LocalTime
 
 object GameTimeManager {
 
-    private const val REAL_MINUTES_PER_GAME_DAY = 60.0
     private const val GAME_HOURS_PER_DAY = 24.0
 
     private val _gameTime = MutableStateFlow(LocalTime.of(0, 0))
@@ -22,7 +21,7 @@ object GameTimeManager {
             val realSecondsFromMidnight = realTime.toSecondOfDay().toDouble()
 
             val gameMinutesPerRealMinute = GAME_HOURS_PER_DAY
-            val gameSecondsFromMidnight_base = (realSecondsFromMidnight / 60.0) * (gameMinutesPerRealMinute * 60.0)
+            val gameSecondsFromMidnight_base: Double = (realSecondsFromMidnight / 60.0) * (gameMinutesPerRealMinute * 60.0)
 
             val adjustedTimeInSeconds = (gameSecondsFromMidnight_base + timeOffset.seconds) % (GAME_HOURS_PER_DAY * 3600)
 

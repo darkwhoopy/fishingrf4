@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 
@@ -54,6 +55,7 @@ import com.rf4.fishingrf4.data.models.FishingEntry
  */
 @Composable
 fun BaitSelectionDialog(
+
     fish: Fish,
     recentBaits: List<String>,
     fishingEntries: List<FishingEntry> = emptyList(),
@@ -64,14 +66,7 @@ fun BaitSelectionDialog(
     var showCustomInput by remember { mutableStateOf(false) }
 
     // Liste complète des appâts possibles
-    val allBaits = listOf(
-        "Ver de terre", "Ver rouge", "Ver de vase", "Asticot", "Pain", "Maïs",
-        "Pellets", "Bouillettes", "Fromage", "Pâte", "Épinoche", "Ablette",
-        "Poisson vif", "Ver marin", "Crevette", "Crabe", "Calamar", "Sardine",
-        "Hareng", "Maquereau", "Sprat", "Leurre souple", "Cuiller", "Popper",
-        "Wobbler", "Spinnerbait", "Jig", "Devon", "Mouche sèche", "Nymphe",
-        "Streamer", "Chironome", "Gammare", "Porte-bois", "Autre"
-    )
+    val allBaits = FishingData.ALL_BAITS
 
     // Séparer les appâts : récents + préférés du poisson + autres
     val preferredBaits = fish.preferredBait

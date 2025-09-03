@@ -579,6 +579,49 @@ object FishingData {
             bestHours = listOf(8, 9, 10, 15, 16), bestWeather = listOf(WeatherType.ANY)
         )
     )
+    val ALL_BAITS = listOf(
+        "Ablette",
+        "Asticot",
+        "Bouillettes",
+        "Calamar",
+        "Chironome",
+        "Crabe",
+        "Crevette",
+        "Cuiller", "Devon",
+        "Épinoche",
+        "Fromage",
+        "Gammare",
+        "Graine de mais",
+        "Hareng",
+        "Jig",
+        "Leurre souple",
+        "Maïs",
+        "Maquereau",
+        "Mouche sèche",
+        "Nymphe", "Pain",
+        "Pellets",
+        "Pâte",
+        "Poisson vif",
+        "Popper",
+        "Porte-bois",
+        "Sardine",
+        "Spinnerbait",
+        "Sprat",
+        "Streamer",
+        "Ver de terre",
+        "Ver de vase",
+        "Ver marin",
+        "Ver rouge",
+        "Wobbler",
+        "Pate à l'ail",
+
+        "Autre"
+    )
+
+    // Pour les appâts personnels (sans "Autre")
+    val PERSONAL_BAITS = ALL_BAITS.filter { it != "Autre" }
+
+    // ... reste de votre code existant (lacs, etc.)
 
     // ==========================================
     // FONCTION POUR RÉCUPÉRER TOUS LES POISSONS
@@ -594,17 +637,6 @@ object FishingData {
         val allFish = getAllFish()
         return names.mapNotNull { fishName ->
             allFish.find { it.name.equals(fishName, ignoreCase = true) }
-        }
-    }
-
-    // ==========================================
-    // FONCTION POUR RECHERCHER UN POISSON
-    // ==========================================
-    fun searchFish(query: String): List<Fish> {
-        val allFish = getAllFish()
-        return allFish.filter {
-            it.name.contains(query, ignoreCase = true) ||
-                    it.species.contains(query, ignoreCase = true)
         }
     }
 
@@ -911,11 +943,6 @@ object FishingData {
     // ==========================================
     // FONCTIONS UTILITAIRES CORRIGÉES
     // ==========================================
-
-    /**
-     * Retourne le nombre total de poissons dans la base de données
-     */
-    fun getTotalFishCount(): Int = getAllFish().size
 
     /**
      * Retourne les statistiques par rareté

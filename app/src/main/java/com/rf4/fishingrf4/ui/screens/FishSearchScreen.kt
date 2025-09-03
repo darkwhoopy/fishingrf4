@@ -46,12 +46,113 @@ enum class SortOption(val displayName: String) {
     CAPTURES("Mes captures")
 }
 
+enum class SearchTab(val displayName: String, val emoji: String) {
+    FISH("Poissons", "🐟"),
+    BAITS("Appâts", "🎣")
+}
+
+// Classe de données pour les appâts
+data class BaitInfo(
+    val name: String,
+    val englishName: String,
+    val category: String,
+    val description: String,
+    val effectiveness: String,
+    val targetFish: List<String>,
+    val acquisition: String,
+    val tips: String
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FishSearchScreen(
     allLakes: List<Lake>,
     fishingEntries: List<FishingEntry>,
     onBack: () -> Unit,
+    onFishDetail: (Fish, Lake) -> Unit
+) {
+    var selectedTab by remember { mutableStateOf(SearchTab.FISH) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0F172A))
+    ) {
+        // En-tête avec onglets
+        Column(
+            modifier = Modifier
+                .background(Color(0xFF0F172A))
+                .padding(16.dp)
+        ) {
+            // Bouton retour et titre
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BackButton(onClick = onBack)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "🔍 Recherche avancée",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Onglets Poissons / Appâts
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SearchTab.values().forEach { tab ->
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { selectedTab = tab },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selectedTab == tab)
+                                Color(0xFF10B981) else Color(0xFF374151)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${tab.emoji} ${tab.displayName}",
+                                color = Color.White,
+                                fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Contenu selon l'onglet sélectionné
+        when (selectedTab) {
+            SearchTab.FISH -> {
+                FishSearchContent(
+                    allLakes = allLakes,
+                    fishingEntries = fishingEntries,
+                    onFishDetail = onFishDetail
+                )
+            }
+            SearchTab.BAITS -> {
+                BaitSearchContent()
+            }
+        }
+    }
+}
+
+@Composable
+fun FishSearchContent(
+    allLakes: List<Lake>,
+    fishingEntries: List<FishingEntry>,
     onFishDetail: (Fish, Lake) -> Unit
 ) {
     // États pour les filtres et la recherche
@@ -117,31 +218,13 @@ fun FishSearchScreen(
     // Fonction pour vérifier si des filtres sont actifs
     val hasActiveFilters = selectedLake != null || selectedRarity != null || onlyCaught
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0F172A))
-    ) {
-        // En-tête fixe
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Contenu des filtres et recherche
         Column(
             modifier = Modifier
                 .background(Color(0xFF0F172A))
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
         ) {
-            // Bouton retour et titre
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                BackButton(onClick = onBack)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "🔍 Recherche avancée",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Barre de recherche compacte
             OutlinedTextField(
                 value = searchQuery,
@@ -375,6 +458,279 @@ fun FishSearchScreen(
     }
 }
 
+@Composable
+fun BaitSearchContent() {
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Base de données d'appâts extraite du PDF
+    val baitsDatabase = remember {
+        listOf(
+            BaitInfo(
+                name = "Ver de terre",
+                englishName = "Worm",
+                category = "Appâts naturels",
+                description = "C'est l'appât de base par excellence. Il peut être acheté ou obtenu gratuitement en creusant avec une pelle (un outil indispensable à acquérir rapidement pour environ 38 silvers).",
+                effectiveness = "Particulièrement efficace la nuit (de 20:00 à 6:00) pour attraper une grande variété de poissons de petite et moyenne taille.",
+                targetFish = listOf("Gardon", "Ablette", "Carassin", "Brème"),
+                acquisition = "Achat ou creusage avec pelle",
+                tips = "Appât universel parfait pour débuter"
+            ),
+            BaitInfo(
+                name = "Ver de vase",
+                englishName = "Bloodworm",
+                category = "Appâts naturels",
+                description = "Petite larve rouge, extrêmement efficace.",
+                effectiveness = "L'appât le plus rentable pour gagner de l'expérience de jour (6h-20h).",
+                targetFish = listOf("Gardon", "Ablette", "Carassin"),
+                acquisition = "Achat",
+                tips = "Idéal pour l'expérience et les petits poissons"
+            ),
+            BaitInfo(
+                name = "Casticot",
+                englishName = "Caster",
+                category = "Appâts naturels",
+                description = "Larve de mouche, très attractive.",
+                effectiveness = "Une excellente alternative au ver de vase, particulièrement pour la brème.",
+                targetFish = listOf("Brème", "Gardon", "Ide"),
+                acquisition = "Achat",
+                tips = "Très efficace sur les cyprinidés"
+            ),
+            BaitInfo(
+                name = "Vif",
+                englishName = "Baitfish",
+                category = "Appâts vivants",
+                description = "Petit poisson utilisé comme appât vivant.",
+                effectiveness = "Nécessite un montage spécifique. Un vif légèrement avarié est parfois meilleur.",
+                targetFish = listOf("Brochet", "Silure", "Lotte", "Sandre"),
+                acquisition = "Pêche (Goujon, Ablette, etc.)",
+                tips = "Incontournable pour les gros prédateurs"
+            ),
+            BaitInfo(
+                name = "Boulette de pain",
+                englishName = "Bread",
+                category = "Appâts fabriqués",
+                description = "Le premier appât que l'on apprend à fabriquer. Il suffit d'acheter du pain à l'épicerie et de le transformer via le menu de fabrication (touche N).",
+                effectiveness = "Excellent moyen de faire progresser la compétence au tout début.",
+                targetFish = listOf("Carpe", "Gardon", "Brème"),
+                acquisition = "Fabrication (pain + eau)",
+                tips = "Parfait pour débuter la fabrication d'appâts"
+            ),
+            BaitInfo(
+                name = "Cube de pomme de terre",
+                englishName = "Potato Cubes",
+                category = "Appâts fabriqués",
+                description = "Un des meilleurs appâts pour la carpe. Il se fabrique à partir de pommes de terre crues, qui doivent être achetées spécifiquement au marché fermier du Ruisselet qui Serpente.",
+                effectiveness = "Extrêmement efficace sur les carpes de toutes tailles.",
+                targetFish = listOf("Carpe", "Carpe miroir", "Carpe cuir"),
+                acquisition = "Fabrication (pommes de terre du marché fermier)",
+                tips = "Voyage au Ruisselet qui Serpente nécessaire"
+            ),
+            BaitInfo(
+                name = "Grenouille",
+                englishName = "Frog",
+                category = "Appâts vivants",
+                description = "Appât spécifique pour certains prédateurs.",
+                effectiveness = "Se pêche avec un petit hameçon (taille 20) et une mouche près des nénuphars.",
+                targetFish = listOf("Brochet", "Silure"),
+                acquisition = "Pêche près des nénuphars",
+                tips = "Technique de pêche particulière requise"
+            ),
+            BaitInfo(
+                name = "Ver de nuit ",
+                englishName = "Nightcrawler",
+                category = "Appâts vivants",
+                description = "Appât spécifique pour certains prédateurs.",
+                effectiveness = "Achat, Pelle",
+                targetFish = listOf("Brème, Tanche, Carpe, Carassin"),
+                acquisition = "Pêche près des nénuphars",
+                tips = "À utiliser pour filtrer les petites prises et cibler les beaux spécimens"
+            ),
+            BaitInfo(
+                name = "Orge perlé",
+                englishName = "Pearl Barley",
+                category = "Appâts fabriqués",
+                description = "Très efficace sur la brème et d'autres cyprinidés, cet appât se prépare à partir d'orge perlé acheté à l'épicerie.",
+                effectiveness = "Ne pas confondre avec l'orge perlé vendu comme additif pour amorce.",
+                targetFish = listOf("Brème", "Gardon", "Carassin"),
+                acquisition = "Fabrication (orge perlé de l'épicerie)",
+                tips = "Attention à ne pas acheter l'additif pour amorce"
+            )
+        )
+    }
+
+    val filteredBaits = remember(searchQuery) {
+        if (searchQuery.isBlank()) {
+            baitsDatabase
+        } else {
+            baitsDatabase.filter { bait ->
+                bait.name.contains(searchQuery, ignoreCase = true) ||
+                        bait.englishName.contains(searchQuery, ignoreCase = true) ||
+                        bait.category.contains(searchQuery, ignoreCase = true) ||
+                        bait.targetFish.any { it.contains(searchQuery, ignoreCase = true) }
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Barre de recherche appâts
+        Column(
+            modifier = Modifier
+                .background(Color(0xFF0F172A))
+                .padding(horizontal = 16.dp)
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Rechercher un appât", color = Color.Gray) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher", tint = Color.Gray) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = Color(0xFF10B981),
+                    unfocusedBorderColor = Color.Gray
+                ),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Compteur
+            Text(
+                "${filteredBaits.size} appât(s) trouvé(s)",
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Liste des appâts
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(filteredBaits) { bait ->
+                BaitCard(bait = bait)
+            }
+        }
+    }
+}
+
+// Carte d'information pour un appât
+@Composable
+fun BaitCard(bait: BaitInfo) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // En-tête
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = bait.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "${bait.englishName} • ${bait.category}",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                // Badge d'acquisition
+                Surface(
+                    color = when {
+                        bait.acquisition.contains("Achat") -> Color(0xFF10B981)
+                        bait.acquisition.contains("Fabrication") -> Color(0xFF3B82F6)
+                        bait.acquisition.contains("Pêche") -> Color(0xFFF59E0B)
+                        else -> Color(0xFF6B7280)
+                    },
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Text(
+                        text = bait.acquisition.split(" ")[0], // Premier mot
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Description
+            Text(
+                text = bait.description,
+                fontSize = 14.sp,
+                color = Color.White,
+                lineHeight = 20.sp
+            )
+
+            if (bait.effectiveness.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "💡 ${bait.effectiveness}",
+                    fontSize = 13.sp,
+                    color = Color(0xFF10B981),
+                    lineHeight = 18.sp
+                )
+            }
+
+            // Poissons cibles
+            if (bait.targetFish.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "🎯 Poissons cibles :",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    items(bait.targetFish) { fish ->
+                        Surface(
+                            color = Color(0xFF3B82F6),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = fish,
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Conseil
+            if (bait.tips.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "⭐ ${bait.tips}",
+                    fontSize = 12.sp,
+                    color = Color(0xFFF59E0B),
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                )
+            }
+        }
+    }
+}
+
 // Composable simplifié pour afficher une carte de poisson dans la recherche
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -409,7 +765,7 @@ fun SimpleFishCard(fish: Fish, stats: FishStats?, onClick: () -> Unit) {
                     Text(
                         text = "${stats.totalCaught} capture(s)",
                         fontSize = 11.sp,
-                        color = Color(0xFF4CAF50)
+                                color = Color(0xFF4CAF50)
                     )
                 }
             }

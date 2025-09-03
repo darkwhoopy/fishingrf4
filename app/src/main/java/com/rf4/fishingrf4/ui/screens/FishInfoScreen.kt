@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.ui.components.BackButton
@@ -467,18 +468,26 @@ fun TimeOfDayStatsRow(period: String, count: Int) {
         Text(text = "x$count", color = Color(0xFF10B981), fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun SimpleBaitDialog(
     allGameBaits: List<String>,
     currentBaits: List<String>,
     onBaitSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val availableBaits = allGameBaits.filter { it !in currentBaits }
     var searchQuery by remember { mutableStateOf("") }
-    val filteredBaits = availableBaits.filter {
-        it.contains(searchQuery, ignoreCase = true)
+
+    // ✅ CHANGEMENT : Utiliser la liste de FishingData au lieu du paramètre
+    val availableBaits = remember(currentBaits, searchQuery) {
+        FishingData.PERSONAL_BAITS
+            .filter { !currentBaits.contains(it) }
+            .filter { it.contains(searchQuery, ignoreCase = true) }
+            .sorted()
     }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Ajouter un appât", color = Color.White) },
@@ -487,32 +496,41 @@ fun SimpleBaitDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("Rechercher un appât") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") },
+                    label = { Text("Rechercher") },
+                    placeholder = { Text("Tapez 'graine' pour trouver facilement") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
-                        focusedLabelColor = Color.White,
-                        unfocusedLabelColor = Color.Gray
+                        focusedBorderColor = Color(0xFF3B82F6),
+                        unfocusedBorderColor = Color.Gray
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(modifier = Modifier.height(200.dp)) {
-                    items(filteredBaits) { bait ->
-                        Text(
-                            text = bait,
-                            color = Color.White,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onBaitSelected(bait) }
-                                .padding(vertical = 8.dp)
-                        )
+
+                if (availableBaits.isEmpty()) {
+                    Text(
+                        "Aucun appât trouvé",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                } else {
+                    LazyColumn(modifier = Modifier.heightIn(max = 250.dp)) {
+                        items(availableBaits) { bait ->
+                            Text(
+                                text = bait,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onBaitSelected(bait) }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                            )
+                        }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Annuler", color = Color.White) } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Fermer") } },
         containerColor = Color(0xFF1E3A5F)
     )
 }

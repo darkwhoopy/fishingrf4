@@ -53,12 +53,11 @@ fun PlayerProfileScreen(
             item { RarityStatsCard(playerStats.rareFishCount) }
 
             // ✅ GARDÉ : Plus grosse prise (si elle existe)
-            if (playerStats.biggestFish != null) {
-                item { BiggestFishCard(playerStats.biggestFish) }
+
             }
         }
     }
-}
+
 /** Carte de gestion du compte Google (affichée en haut du Profil) */
 @Composable
 private fun GoogleAccountCard() {
@@ -148,24 +147,7 @@ private fun PlayerStatsSummaryCard(playerStats: PlayerStats) {
         }
     }
 }
-@Composable
-private fun BiggestFishCard(biggestFish: FishingEntry) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "🐟 Plus grosse prise",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            Text("${biggestFish.fish.name} - ${biggestFish.weight ?: "N/A"} kg", color = Color.White)
-        }
-    }
-}
+
 @Composable
 private fun StatColumn(emoji: String, value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -328,4 +328,11 @@
     <!-- Fish selection -->
     <string name="game_time_label">Heure en jeu</string>
 
+
+    <!-- OBLIGATOIRE pour Play Store -->
+    <string name="privacy_policy">Politique de Confidentialité</string>
+    <string name="terms_of_service">Conditions d\'Utilisation</string>
+    <string name="about">À propos</string>
+    <string name="version">Version %s</string>
 </resources>
+

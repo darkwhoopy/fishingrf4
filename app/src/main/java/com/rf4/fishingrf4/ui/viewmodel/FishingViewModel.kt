@@ -383,11 +383,7 @@ class FishingViewModel(context: Context) : ViewModel() {
      * ✅ CORRIGÉ : Retourne tous les appâts du jeu
      */
     fun getAllGameBaits(): List<String> {
-        return getAllLakes()
-            .flatMap { it.availableFish }
-            .flatMap { it.preferredBait }
-            .distinct()
-            .sorted()
+        return FishingData.PERSONAL_BAITS
     }
 
     /**
@@ -530,16 +526,26 @@ class FishingViewModel(context: Context) : ViewModel() {
         _saveCompleted.value = false
     }
 
-    fun resetData(options: Set<ResetOption>) {
+    fun resetUserData() {
         viewModelScope.launch {
-            if (ResetOption.ENTRIES_STATS in options) repository.clearEntriesAndStats()
-            if (ResetOption.LAKES in options) repository.clearModifiedLakes()
-            if (ResetOption.BAITS in options) repository.clearAllCustomBaits()
-            if (ResetOption.FAVORITES in options) repository.clearFavoriteLakes()
-            loadAllDataSources()
+            try {
+                // ✅ CORRECTION 1 : Utiliser repository au lieu de clearAllData()
+                repository.clearEntriesAndStats() // ou repository.resetAllData() selon votre implémentation
+
+                // ✅ CORRECTION 2 : Réinitialiser les states locaux au lieu de _uiState
+                _modifiedLakes.value = emptyMap()
+                _favoriteLakeIds.value = emptyList()
+                _customBaits.value = emptyMap()
+                _userSpots.value = emptyList()
+                _recentBaits.value = emptyList()
+
+                println("Données utilisateur réinitialisées")
+
+            } catch (e: Exception) {
+                println("Erreur lors de la réinitialisation: ${e.message}")
+            }
         }
     }
-}
 
 // ==========================================
 // DATA CLASS UI STATE
@@ -552,3 +558,4 @@ data class FishingUiState(
     val availableLakes: List<Lake> = emptyList(),
     val favoriteLakeIds: List<String> = emptyList()
 )
+}
