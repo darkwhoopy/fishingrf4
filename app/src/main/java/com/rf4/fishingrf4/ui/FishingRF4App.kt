@@ -261,13 +261,6 @@ fun FishingRF4App() {
             Screen.SETTINGS -> {
                 SettingsScreen(
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) },
-                    onLanguageChange = { language ->
-                        // ✅ CORRECTION : Utiliser la variable context
-                        LanguageManager.setAppLanguage(context, language)
-                    },
-                    onResetData = {
-                        viewModel.resetUserData()
-                    },
                     viewModel = viewModel
                 )
             }

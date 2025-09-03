@@ -1,4 +1,3 @@
-
 package com.rf4.fishingrf4.ui.screens
 
 import androidx.compose.foundation.background
@@ -13,10 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.*
 import com.rf4.fishingrf4.data.repository.CommunityRepository
 import com.rf4.fishingrf4.ui.components.BackButton
@@ -26,7 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * ✅ MISE À JOUR : Écran principal de la communauté avec les nouvelles fonctionnalités
+ * ✅ MISE À JOUR : Écran principal de la communauté avec traduction complète
  * Conserve votre système existant d'appâts et ajoute les signalements/suggestions
  */
 @Composable
@@ -46,9 +48,6 @@ fun CommunityScreen(
     var userVotes by remember { mutableStateOf<Set<String>>(emptySet()) }
 
     // ✅ NOUVEAU : Charger les nouvelles données
-    // ✅ CORRECTION dans CommunityScreen.kt
-// Remplacez cette partie :
-
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
@@ -80,7 +79,7 @@ fun CommunityScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // ✅ CONSERVATION : Header existant adapté
+            // ✅ HEADER TRADUIT
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -89,20 +88,20 @@ fun CommunityScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "👥 Communauté",
+                        text = stringResource(R.string.community_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Appâts, bugs et suggestions",
+                        text = stringResource(R.string.community_subtitle),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
                 }
             }
 
-            // ✅ NOUVEAU : Boutons d'actions rapides pour les nouvelles fonctionnalités
+            // ✅ BOUTONS D'ACTIONS RAPIDES TRADUITS
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,11 +119,11 @@ fun CommunityScreen(
                 ) {
                     Icon(
                         Icons.Default.BugReport,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.community_report_bug),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("🐛 Bug", fontSize = 11.sp)
+                    Text(stringResource(R.string.bug_short_label), fontSize = 11.sp)
                 }
 
                 // Bouton suggérer un poisson
@@ -138,25 +137,25 @@ fun CommunityScreen(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.community_suggest_fish),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("🐟 Poisson", fontSize = 11.sp)
+                    Text(stringResource(R.string.fish_short_label), fontSize = 11.sp)
                 }
             }
 
-            // ✅ MODIFICATION : Vos onglets existants + nouveaux onglets
+            // ✅ ONGLETS TRADUITS
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // ✅ CONSERVATION : Votre onglet Appâts existant
+                // ✅ Onglet Appâts traduit
                 CommunityFeatureCard(
-                    title = "🎣 Appâts",
-                    subtitle = "Votes communauté",
+                    title = stringResource(R.string.community_tab_baits_title),
+                    subtitle = stringResource(R.string.community_tab_baits_subtitle),
                     color = Color(0xFFE11D48),
                     isActive = currentTab == 0,
                     modifier = Modifier.weight(1f)
@@ -164,10 +163,10 @@ fun CommunityScreen(
                     currentTab = 0
                 }
 
-                // ✅ CONSERVATION : Votre onglet Lacs existant
+                // ✅ Onglet Lacs traduit
                 CommunityFeatureCard(
-                    title = "🏞️ Lacs",
-                    subtitle = "Spots préférés",
+                    title = stringResource(R.string.community_tab_lakes_title),
+                    subtitle = stringResource(R.string.community_tab_lakes_subtitle),
                     color = Color(0xFF0EA5E9),
                     isActive = currentTab == 1,
                     modifier = Modifier.weight(1f)
@@ -175,10 +174,10 @@ fun CommunityScreen(
                     currentTab = 1
                 }
 
-                // ✅ NOUVEAU : Onglet Mes signalements
+                // ✅ Onglet Bugs traduit
                 CommunityFeatureCard(
-                    title = "🐛 Bugs",
-                    subtitle = "Mes signalements",
+                    title = stringResource(R.string.community_tab_bugs_title),
+                    subtitle = stringResource(R.string.community_tab_bugs_subtitle),
                     color = Color(0xFFEF4444),
                     isActive = currentTab == 2,
                     modifier = Modifier.weight(1f)
@@ -186,10 +185,10 @@ fun CommunityScreen(
                     currentTab = 2
                 }
 
-                // ✅ NOUVEAU : Onglet Suggestions poissons
+                // ✅ Onglet Suggestions traduit
                 CommunityFeatureCard(
-                    title = "🐟 Suggestions",
-                    subtitle = "Nouveaux poissons",
+                    title = stringResource(R.string.community_tab_suggestions_title),
+                    subtitle = stringResource(R.string.community_tab_suggestions_subtitle),
                     color = Color(0xFF10B981),
                     isActive = currentTab == 3,
                     modifier = Modifier.weight(1f)
@@ -198,11 +197,11 @@ fun CommunityScreen(
                 }
             }
 
-            // ✅ MODIFICATION : Contenu selon l'onglet avec vos composants existants
+            // ✅ CONTENU SELON L'ONGLET
             when (currentTab) {
-                0 -> CommunityBaitsTab(viewModel = viewModel) // ✅ CONSERVATION : Votre onglet existant
-                1 -> CommunityLakesTab() // ✅ CONSERVATION : Votre onglet existant
-                2 -> { // ✅ NOUVEAU : Onglet signalements de bugs
+                0 -> CommunityBaitsTab(viewModel = viewModel)
+                1 -> CommunityLakesTab()
+                2 -> { // Onglet signalements de bugs
                     if (isLoadingNewFeatures) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -225,7 +224,7 @@ fun CommunityScreen(
                         )
                     }
                 }
-                3 -> { // ✅ NOUVEAU : Onglet suggestions de poissons
+                3 -> { // Onglet suggestions de poissons
                     if (isLoadingNewFeatures) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -260,7 +259,7 @@ fun CommunityScreen(
     }
 }
 
-// ✅ CONSERVATION : Votre fonction CommunityFeatureCard existante (adaptée pour 4 onglets)
+// ✅ FONCTION COMMUNITYFEATURECARD TRADUITE
 @Composable
 fun CommunityFeatureCard(
     title: String,
@@ -271,7 +270,7 @@ fun CommunityFeatureCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier.height(70.dp), // Réduit la hauteur pour 4 onglets
+        modifier = modifier.height(70.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isActive) color else color.copy(alpha = 0.3f)
@@ -287,14 +286,14 @@ fun CommunityFeatureCard(
         ) {
             Text(
                 text = title,
-                fontSize = 13.sp, // Réduit pour 4 onglets
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 maxLines = 1
             )
             Text(
                 text = subtitle,
-                fontSize = 9.sp, // Réduit pour 4 onglets
+                fontSize = 9.sp,
                 color = Color.White.copy(alpha = 0.8f),
                 maxLines = 1
             )
@@ -302,7 +301,7 @@ fun CommunityFeatureCard(
     }
 }
 
-// ✅ NOUVEAU : Onglet des signalements de bugs
+// ✅ ONGLET DES SIGNALEMENTS DE BUGS TRADUIT
 @Composable
 fun BugReportsTab(
     bugReports: List<BugReport>,
@@ -318,7 +317,7 @@ fun BugReportsTab(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Mes signalements de bugs",
+                text = stringResource(R.string.community_my_bug_reports),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White
@@ -326,14 +325,14 @@ fun BugReportsTab(
             IconButton(onClick = onRefresh) {
                 Icon(
                     Icons.Default.Refresh,
-                    contentDescription = "Actualiser",
+                    contentDescription = stringResource(R.string.action_refresh),
                     tint = Color.Gray
                 )
             }
         }
 
         if (bugReports.isEmpty()) {
-            // État vide - même style que vos cartes existantes
+            // État vide traduit
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -351,16 +350,16 @@ fun BugReportsTab(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Aucun signalement pour le moment",
+                        text = stringResource(R.string.bug_reports_empty_title),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Aidez-nous à améliorer l'application en signalant les bugs !",
+                        text = stringResource(R.string.bug_reports_empty_message),
                         fontSize = 14.sp,
                         color = Color.Gray,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -377,7 +376,7 @@ fun BugReportsTab(
     }
 }
 
-// ✅ NOUVEAU : Onglet des suggestions de poissons
+// ✅ ONGLET DES SUGGESTIONS DE POISSONS TRADUIT
 @Composable
 fun FishSuggestionsTab(
     suggestions: List<FishSuggestion>,
@@ -385,9 +384,9 @@ fun FishSuggestionsTab(
     onVote: (String, VoteType) -> Unit
 ) {
     Column {
-        // Header
+        // Header traduit
         Text(
-            text = "Suggestions de la communauté",
+            text = stringResource(R.string.community_fish_suggestions_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
@@ -395,7 +394,7 @@ fun FishSuggestionsTab(
         )
 
         if (suggestions.isEmpty()) {
-            // État vide - même style que vos cartes existantes
+            // État vide traduit
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -413,16 +412,16 @@ fun FishSuggestionsTab(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Aucune suggestion pour le moment",
+                        text = stringResource(R.string.fish_suggestions_empty_title),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Soyez le premier à suggérer un nouveau poisson !",
+                        text = stringResource(R.string.fish_suggestions_empty_message),
                         fontSize = 14.sp,
                         color = Color.Gray,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -443,16 +442,12 @@ fun FishSuggestionsTab(
     }
 }
 
-// ✅ NOUVEAU : Carte d'affichage d'un signalement de bug
+// ✅ CARTE D'AFFICHAGE D'UN SIGNALEMENT DE BUG TRADUITE
 @Composable
 fun BugReportCard(bugReport: BugReport) {
-    android.util.Log.d("BugReportCard", "Rendu bug ${bugReport.id}")
-    android.util.Log.d("BugReportCard", "- status: ${bugReport.status}")
-    android.util.Log.d("BugReportCard", "- adminNotes: '${bugReport.adminNotes}' (${bugReport.adminNotes.length} chars)")
-    android.util.Log.d("BugReportCard", "- adminNotes.isBlank(): ${bugReport.adminNotes.isBlank()}")
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)), // Même couleur que vos cartes
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -517,7 +512,7 @@ fun BugReportCard(bugReport: BugReport) {
                     ) {
                         Icon(
                             Icons.Default.AdminPanelSettings,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.admin_note_icon_desc),
                             tint = Color(0xFFF59E0B),
                             modifier = Modifier.size(16.dp)
                         )
@@ -534,7 +529,7 @@ fun BugReportCard(bugReport: BugReport) {
     }
 }
 
-// ✅ NOUVEAU : Carte d'affichage d'une suggestion de poisson
+// ✅ CARTE D'AFFICHAGE D'UNE SUGGESTION DE POISSON TRADUITE
 @Composable
 fun FishSuggestionCard(
     suggestion: FishSuggestion,
@@ -543,7 +538,7 @@ fun FishSuggestionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)), // Même couleur que vos cartes
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -600,27 +595,35 @@ fun FishSuggestionCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            // Informations supplémentaires
+            // Informations supplémentaires traduites
             if (suggestion.suggestedLakes.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "🏞️ Lacs: ${suggestion.suggestedLakes.take(3).joinToString(", ")}${if (suggestion.suggestedLakes.size > 3) "..." else ""}",
+                    text = stringResource(
+                        R.string.fish_suggestion_lakes_format,
+                        suggestion.suggestedLakes.take(3).joinToString(", ") +
+                                if (suggestion.suggestedLakes.size > 3) "..." else ""
+                    ),
                     fontSize = 11.sp,
-                    color = Color(0xFF0EA5E9) // Même couleur que votre onglet Lacs
+                    color = Color(0xFF0EA5E9)
                 )
             }
 
             if (suggestion.preferredBaits.isNotEmpty()) {
                 Text(
-                    text = "🎣 Appâts: ${suggestion.preferredBaits.take(3).joinToString(", ")}${if (suggestion.preferredBaits.size > 3) "..." else ""}",
+                    text = stringResource(
+                        R.string.fish_suggestion_baits_format,
+                        suggestion.preferredBaits.take(3).joinToString(", ") +
+                                if (suggestion.preferredBaits.size > 3) "..." else ""
+                    ),
                     fontSize = 11.sp,
-                    color = Color(0xFFE11D48) // Même couleur que votre onglet Appâts
+                    color = Color(0xFFE11D48)
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Footer avec votes et boutons
+            // Footer avec votes et boutons traduits
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -629,7 +632,7 @@ fun FishSuggestionCard(
                 // Informations sur l'auteur et votes
                 Column {
                     Text(
-                        text = "Par ${suggestion.userName}",
+                        text = stringResource(R.string.community_by_author, suggestion.userName),
                         fontSize = 11.sp,
                         color = Color.Gray
                     )
@@ -641,7 +644,7 @@ fun FishSuggestionCard(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "${suggestion.votes} votes",
+                            text = stringResource(R.string.community_votes_count, suggestion.votes),
                             fontSize = 12.sp,
                             color = Color(0xFF10B981),
                             modifier = Modifier.padding(start = 4.dp)
@@ -649,7 +652,7 @@ fun FishSuggestionCard(
                     }
                 }
 
-                // Boutons de vote
+                // Boutons de vote traduits
                 if (!hasVoted && suggestion.status == SuggestionStatus.PENDING) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         IconButton(
@@ -658,7 +661,7 @@ fun FishSuggestionCard(
                         ) {
                             Icon(
                                 Icons.Default.ThumbUp,
-                                contentDescription = "Voter pour",
+                                contentDescription = stringResource(R.string.community_vote_up),
                                 tint = Color(0xFF10B981),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -669,7 +672,7 @@ fun FishSuggestionCard(
                         ) {
                             Icon(
                                 Icons.Default.ThumbDown,
-                                contentDescription = "Voter contre",
+                                contentDescription = stringResource(R.string.community_vote_down),
                                 tint = Color(0xFFEF4444),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -677,7 +680,7 @@ fun FishSuggestionCard(
                     }
                 } else if (hasVoted) {
                     Text(
-                        text = "✅ Voté",
+                        text = stringResource(R.string.community_voted),
                         fontSize = 11.sp,
                         color = Color(0xFF10B981),
                         fontWeight = FontWeight.Bold
@@ -688,7 +691,7 @@ fun FishSuggestionCard(
     }
 }
 
-// ✅ NOUVEAU : Badge de statut réutilisable
+// ✅ BADGE DE STATUT RÉUTILISABLE
 @Composable
 fun StatusBadge(
     status: String,
@@ -708,16 +711,13 @@ fun StatusBadge(
     }
 }
 
-// ✅ NOUVEAU : Formateur de date
+// ✅ FORMATEUR DE DATE
 fun formatDate(timestamp: Long): String {
     val format = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     return format.format(Date(timestamp))
 }
 
-// ✅ CONSERVATION : Vos composants existants restent inchangés
-// CommunityBaitsTab, CommunityLakesTab, FishCommunityBaitCard, etc.
-// Ils continuent de fonctionner exactement comme avant !
-// ✅ Onglet des appâts communautaires
+// ✅ ONGLET DES APPÂTS COMMUNAUTAIRES TRADUIT
 @Composable
 fun CommunityBaitsTab(viewModel: FishingViewModel) {
     var communityBaitsByFish by remember { mutableStateOf<Map<Fish, List<Pair<String, Long>>>>(emptyMap()) }
@@ -736,7 +736,7 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
                 // Trier les poissons par nombre total de votes reçus
                 val sortedBaitData = baitData.toList()
                     .sortedByDescending { (_, baits) ->
-                        baits.sumOf { it.second } // Somme des votes pour ce poisson
+                        baits.sumOf { it.second }
                     }
                     .toMap()
 
@@ -754,14 +754,14 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 Text(
-                    "Poissons classés par popularité (nombre total de votes)",
+                    text = stringResource(R.string.community_baits_ranking_title),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    "Les poissons avec le plus de votes d'appâts apparaissent en premier",
+                    text = stringResource(R.string.community_baits_ranking_subtitle),
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -782,8 +782,15 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
                             modifier = Modifier.padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Aucun vote communautaire pour le moment", color = Color.White)
-                            Text("Soyez le premier à voter pour un appât !", fontSize = 12.sp, color = Color.Gray)
+                            Text(
+                                text = stringResource(R.string.community_baits_empty_title),
+                                color = Color.White
+                            )
+                            Text(
+                                text = stringResource(R.string.community_baits_empty_message),
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
                         }
                     }
                 }
@@ -791,6 +798,7 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
         }
     }
 }
+
 @Composable
 fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
     val totalVotes = topBaits.sumOf { it.second }
@@ -827,7 +835,7 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "$totalVotes votes",
+                            text = stringResource(R.string.community_votes_count, totalVotes.toInt()),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black,
@@ -837,10 +845,13 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
-                RarityBadge(text = fish.rarity.displayName, color = Color(fish.rarity.colorValue))
+                RarityBadge(
+                    text = fish.rarity.displayName,
+                    color = Color(fish.rarity.colorValue)
+                )
             }
 
-            // Top 3 des appâts
+            // Top 3 des appâts traduits
             if (topBaits.isNotEmpty()) {
                 topBaits.forEachIndexed { index, (baitName, voteCount) ->
                     Row(
@@ -865,7 +876,7 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "$voteCount votes",
+                                text = stringResource(R.string.community_votes_count, voteCount.toInt()),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -876,7 +887,7 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                 }
             } else {
                 Text(
-                    text = "Aucun vote pour ce poisson",
+                    text = stringResource(R.string.community_no_votes_fish),
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -885,7 +896,10 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
     }
 }
 
-// ✅ Onglet Lacs (à compléter plus tard)
+// ✅ BADGE DE RARETÉ RÉUTILISABLE (suppression du doublon)
+
+
+// ✅ ONGLET LACS TRADUIT
 @Composable
 fun CommunityLakesTab() {
     Card(
@@ -906,17 +920,17 @@ fun CommunityLakesTab() {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                "🚧 En construction",
+                text = stringResource(R.string.community_lakes_construction_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Les spots préférés de la communauté arriveront bientôt !",
+                text = stringResource(R.string.community_lakes_construction_message),
                 fontSize = 14.sp,
                 color = Color.Gray,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
         }
     }

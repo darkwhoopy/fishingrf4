@@ -23,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Difficulty
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishRarity
@@ -39,16 +41,16 @@ data class FishStats(
     val totalCaught: Int
 )
 
-enum class SortOption(val displayName: String) {
-    NAME("Nom A-Z"),
-    RARITY("Rareté"),
-    LEVEL("Niveau lac"),
-    CAPTURES("Mes captures")
+enum class SortOption(val displayNameRes: Int) {
+    NAME(R.string.search_sort_name),
+    RARITY(R.string.search_sort_rarity),
+    LEVEL(R.string.search_sort_level),
+    CAPTURES(R.string.search_sort_captures)
 }
 
-enum class SearchTab(val displayName: String, val emoji: String) {
-    FISH("Poissons", "🐟"),
-    BAITS("Appâts", "🎣")
+enum class SearchTab(val displayNameRes: Int, val emoji: String) {
+    FISH(R.string.search_tab_fish, "🐟"),
+    BAITS(R.string.search_tab_baits, "🎣")
 }
 
 // Classe de données pour les appâts
@@ -89,7 +91,7 @@ fun FishSearchScreen(
                 BackButton(onClick = onBack)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "🔍 Recherche avancée",
+                    stringResource(R.string.search_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -122,7 +124,7 @@ fun FishSearchScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "${tab.emoji} ${tab.displayName}",
+                                text = "${tab.emoji} ${stringResource(tab.displayNameRes)}",
                                 color = Color.White,
                                 fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 14.sp
@@ -229,13 +231,13 @@ fun FishSearchContent(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Rechercher un poisson", color = Color.Gray) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher", tint = Color.Gray) },
+                placeholder = { Text(stringResource(R.string.fish_search_placeholder), color = Color.Gray) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.desc_search), tint = Color.Gray) },
                 trailingIcon = {
                     IconButton(onClick = { showFilters = !showFilters }) {
                         Icon(
                             if (showFilters) Icons.Default.Close else Icons.Default.Tune,
-                            contentDescription = if (showFilters) "Fermer filtres" else "Filtres",
+                            contentDescription = if (showFilters) stringResource(R.string.search_close_filters) else stringResource(R.string.search_filters),
                             tint = if (hasActiveFilters) Color(0xFF10B981) else Color.Gray
                         )
                     }
@@ -263,7 +265,7 @@ fun FishSearchContent(
                                 onClick = { selectedLake = null },
                                 label = { Text(selectedLake!!.name, fontSize = 11.sp) },
                                 selected = true,
-                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = "Supprimer", modifier = Modifier.size(14.dp)) }
+                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(14.dp)) }
                             )
                         }
                     }
@@ -273,7 +275,7 @@ fun FishSearchContent(
                                 onClick = { selectedRarity = null },
                                 label = { Text(selectedRarity!!.name, fontSize = 11.sp) },
                                 selected = true,
-                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = "Supprimer", modifier = Modifier.size(14.dp)) }
+                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(14.dp)) }
                             )
                         }
                     }
@@ -281,9 +283,9 @@ fun FishSearchContent(
                         item {
                             FilterChip(
                                 onClick = { onlyCaught = false },
-                                label = { Text("Mes captures", fontSize = 11.sp) },
+                                label = { Text(stringResource(R.string.search_my_catches), fontSize = 11.sp) },
                                 selected = true,
-                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = "Supprimer", modifier = Modifier.size(14.dp)) }
+                                trailingIcon = { Icon(Icons.Default.Close, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(14.dp)) }
                             )
                         }
                     }
@@ -298,7 +300,7 @@ fun FishSearchContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "${filteredAndSortedFish.size} poisson(s) trouvé(s)",
+                    stringResource(R.string.fish_results_count, filteredAndSortedFish.size),
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -310,7 +312,7 @@ fun FishSearchContent(
                     items(SortOption.values()) { option ->
                         FilterChip(
                             onClick = { sortOption = option },
-                            label = { Text(option.displayName, fontSize = 10.sp) },
+                            label = { Text(stringResource(option.displayNameRes), fontSize = 10.sp) },
                             selected = sortOption == option,
                             modifier = Modifier.height(28.dp)
                         )
@@ -333,25 +335,25 @@ fun FishSearchContent(
                 shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Filtres avancés", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                    Text(stringResource(R.string.search_advanced_filters), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Sélection du lac (simplifié)
-                    Text("Lac :", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
+                    Text(stringResource(R.string.search_lake_filter), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         item {
                             FilterChip(
                                 onClick = { selectedLake = null },
-                                label = { Text("Tous", fontSize = 12.sp) },
+                                label = { Text(stringResource(R.string.search_all), fontSize = 12.sp) },
                                 selected = selectedLake == null
                             )
                         }
                         items(allLakes) { lake ->
                             FilterChip(
                                 onClick = { selectedLake = if (selectedLake == lake) null else lake },
-                                label = { Text("${lake.name} (Niv.${lake.unlockLevel})", fontSize = 11.sp) },
+                                label = { Text(stringResource(R.string.search_lake_level_format, lake.name, lake.unlockLevel), fontSize = 11.sp) },
                                 selected = selectedLake == lake
                             )
                         }
@@ -360,13 +362,13 @@ fun FishSearchContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Sélection de la rareté
-                    Text("Rareté :", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
+                    Text(stringResource(R.string.search_rarity_filter), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         item {
                             FilterChip(
                                 onClick = { selectedRarity = null },
-                                label = { Text("Toutes", fontSize = 12.sp) },
+                                label = { Text(stringResource(R.string.search_all_rarities), fontSize = 12.sp) },
                                 selected = selectedRarity == null
                             )
                         }
@@ -387,7 +389,7 @@ fun FishSearchContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Seulement mes captures :", color = Color.White, fontSize = 14.sp)
+                        Text(stringResource(R.string.search_only_my_catches), color = Color.White, fontSize = 14.sp)
                         Switch(
                             checked = onlyCaught,
                             onCheckedChange = { onlyCaught = it },
@@ -413,7 +415,7 @@ fun FishSearchContent(
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                         ) {
-                            Text("Effacer", fontSize = 12.sp)
+                            Text(stringResource(R.string.search_clear_all), fontSize = 12.sp)
                         }
 
                         // Bouton "Appliquer"
@@ -422,7 +424,7 @@ fun FishSearchContent(
                             modifier = Modifier.weight(2f),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                         ) {
-                            Text("Appliquer les filtres", fontSize = 12.sp)
+                            Text(stringResource(R.string.search_apply_filters), fontSize = 12.sp)
                         }
                     }
                 }
@@ -462,14 +464,14 @@ fun FishSearchContent(
 fun BaitSearchContent() {
     var searchQuery by remember { mutableStateOf("") }
 
-    // Base de données d'appâts extraite du PDF
+    // Base de données d'appâts
     val baitsDatabase = remember {
         listOf(
             BaitInfo(
                 name = "Ver de terre",
                 englishName = "Worm",
                 category = "Appâts naturels",
-                description = "C'est l'appât de base par excellence. Il peut être acheté ou obtenu gratuitement en creusant avec une pelle (un outil indispensable à acquérir rapidement pour environ 38 silvers).",
+                description = "C'est l'appât de base par excellence. Il peut être acheté ou obtenu gratuitement en creusant avec une pelle.",
                 effectiveness = "Particulièrement efficace la nuit (de 20:00 à 6:00) pour attraper une grande variété de poissons de petite et moyenne taille.",
                 targetFish = listOf("Gardon", "Ablette", "Carassin", "Brème"),
                 acquisition = "Achat ou creusage avec pelle",
@@ -509,7 +511,7 @@ fun BaitSearchContent() {
                 name = "Boulette de pain",
                 englishName = "Bread",
                 category = "Appâts fabriqués",
-                description = "Le premier appât que l'on apprend à fabriquer. Il suffit d'acheter du pain à l'épicerie et de le transformer via le menu de fabrication (touche N).",
+                description = "Le premier appât que l'on apprend à fabriquer.",
                 effectiveness = "Excellent moyen de faire progresser la compétence au tout début.",
                 targetFish = listOf("Carpe", "Gardon", "Brème"),
                 acquisition = "Fabrication (pain + eau)",
@@ -519,7 +521,7 @@ fun BaitSearchContent() {
                 name = "Cube de pomme de terre",
                 englishName = "Potato Cubes",
                 category = "Appâts fabriqués",
-                description = "Un des meilleurs appâts pour la carpe. Il se fabrique à partir de pommes de terre crues, qui doivent être achetées spécifiquement au marché fermier du Ruisselet qui Serpente.",
+                description = "Un des meilleurs appâts pour la carpe.",
                 effectiveness = "Extrêmement efficace sur les carpes de toutes tailles.",
                 targetFish = listOf("Carpe", "Carpe miroir", "Carpe cuir"),
                 acquisition = "Fabrication (pommes de terre du marché fermier)",
@@ -536,20 +538,20 @@ fun BaitSearchContent() {
                 tips = "Technique de pêche particulière requise"
             ),
             BaitInfo(
-                name = "Ver de nuit ",
+                name = "Ver de nuit",
                 englishName = "Nightcrawler",
                 category = "Appâts vivants",
                 description = "Appât spécifique pour certains prédateurs.",
-                effectiveness = "Achat, Pelle",
-                targetFish = listOf("Brème, Tanche, Carpe, Carassin"),
-                acquisition = "Pêche près des nénuphars",
-                tips = "À utiliser pour filtrer les petites prises et cibler les beaux spécimens"
+                effectiveness = "À utiliser pour filtrer les petites prises et cibler les beaux spécimens",
+                targetFish = listOf("Brème", "Tanche", "Carpe", "Carassin"),
+                acquisition = "Achat, Pelle",
+                tips = "Parfait pour les gros spécimens"
             ),
             BaitInfo(
                 name = "Orge perlé",
                 englishName = "Pearl Barley",
                 category = "Appâts fabriqués",
-                description = "Très efficace sur la brème et d'autres cyprinidés, cet appât se prépare à partir d'orge perlé acheté à l'épicerie.",
+                description = "Très efficace sur la brème et d'autres cyprinidés.",
                 effectiveness = "Ne pas confondre avec l'orge perlé vendu comme additif pour amorce.",
                 targetFish = listOf("Brème", "Gardon", "Carassin"),
                 acquisition = "Fabrication (orge perlé de l'épicerie)",
@@ -581,8 +583,8 @@ fun BaitSearchContent() {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Rechercher un appât", color = Color.Gray) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher", tint = Color.Gray) },
+                placeholder = { Text(stringResource(R.string.bait_search_placeholder), color = Color.Gray) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.desc_search), tint = Color.Gray) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -597,7 +599,7 @@ fun BaitSearchContent() {
 
             // Compteur
             Text(
-                "${filteredBaits.size} appât(s) trouvé(s)",
+                stringResource(R.string.bait_results_count, filteredBaits.size),
                 color = Color.Gray,
                 fontSize = 12.sp
             )
@@ -660,7 +662,7 @@ fun BaitCard(bait: BaitInfo) {
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
-                        text = bait.acquisition.split(" ")[0], // Premier mot
+                        text = bait.acquisition.split(" ")[0],
                         color = Color.White,
                         fontSize = 10.sp,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -692,7 +694,7 @@ fun BaitCard(bait: BaitInfo) {
             if (bait.targetFish.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "🎯 Poissons cibles :",
+                    text = stringResource(R.string.bait_target_fish_label),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Gray
@@ -763,9 +765,9 @@ fun SimpleFishCard(fish: Fish, stats: FishStats?, onClick: () -> Unit) {
                 )
                 if (stats != null) {
                     Text(
-                        text = "${stats.totalCaught} capture(s)",
+                        text = stringResource(R.string.search_fish_captures_count, stats.totalCaught),
                         fontSize = 11.sp,
-                                color = Color(0xFF4CAF50)
+                        color = Color(0xFF4CAF50)
                     )
                 }
             }

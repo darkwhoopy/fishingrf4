@@ -1,43 +1,32 @@
 package com.rf4.fishingrf4.ui.screens
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.ScreenLockPortrait
-import androidx.compose.material.icons.filled.ScreenLockRotation
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rf4.fishingrf4.data.models.ResetOption
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import com.rf4.fishingrf4.utils.LanguageManager
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-// ✅ VERSION PRINCIPALE avec tous les paramètres
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    onLanguageChange: (LanguageManager.Language) -> Unit,
-    onResetData: () -> Unit,
-    // ✅ Paramètres optionnels pour compatibilité
     viewModel: FishingViewModel? = null
 ) {
     var showLanguageDialog by remember { mutableStateOf(false) }
@@ -48,8 +37,8 @@ fun SettingsScreen(
     val context = LocalContext.current
     val currentLanguage = LanguageManager.getCurrentLanguage(context)
 
-    // Pour la gestion du temps de jeu (si viewModel fourni)
-    val gameTime by (viewModel?.gameTime?.collectAsState() ?: remember { mutableStateOf(LocalTime.now()) })
+    // Temps de jeu simple
+    val gameTime = remember { mutableStateOf(LocalTime.now()) }
 
     Box(
         modifier = Modifier
@@ -70,7 +59,7 @@ fun SettingsScreen(
                 BackButton(onClick = onBack)
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "⚙️ Paramètres",
+                    text = stringResource(R.string.settings_title),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -79,7 +68,7 @@ fun SettingsScreen(
 
             // Section Langue
             Text(
-                text = "Langue",
+                text = stringResource(R.string.settings_language_section),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -96,11 +85,23 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Language, contentDescription = "Langue", tint = Color.White)
+                    Icon(
+                        Icons.Default.Language,
+                        contentDescription = stringResource(R.string.desc_language_icon),
+                        tint = Color.White
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Langue de l'interface", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text(currentLanguage.displayName, fontSize = 12.sp, color = Color.Gray)
+                        Text(
+                            stringResource(R.string.settings_language_interface),
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            currentLanguage.displayName,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     }
                     Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
                 }
@@ -108,47 +109,9 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Section Temps de jeu (si viewModel disponible)
-            if (viewModel != null) {
-                Text(
-                    text = "Temps de jeu",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showTimePickerDialog = true },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.Schedule, contentDescription = "Horloge", tint = Color(0xFF0EA5E9))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Horloge du jeu", fontWeight = FontWeight.Bold, color = Color.White)
-                            Text("Cliquez pour ajuster l'heure en cas de décalage.", fontSize = 12.sp, color = Color.Gray)
-                        }
-                        Text(
-                            text = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            // Section Affichage
+            // Section Temps de jeu
             Text(
-                text = "Affichage",
+                text = stringResource(R.string.settings_game_time_section),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -158,10 +121,7 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        keepScreenOn = !keepScreenOn
-                        // TODO: Sauvegarder dans SharedPreferences
-                    },
+                    .clickable { showTimePickerDialog = true },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
             ) {
                 Row(
@@ -169,22 +129,71 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        if (keepScreenOn) Icons.Default.ScreenLockPortrait
-                        else Icons.Default.ScreenLockRotation,
-                        contentDescription = "Verrouillage écran",
-                        tint = Color.White
+                        Icons.Default.AccessTime,
+                        contentDescription = stringResource(R.string.desc_time_icon),
+                        tint = Color(0xFF10B981)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Garder l'écran allumé", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Empêche l'écran de se verrouiller", fontSize = 12.sp, color = Color.Gray)
+                        Text(
+                            stringResource(R.string.settings_game_time_current),
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            stringResource(R.string.settings_game_time_desc),
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
+                    Text(
+                        gameTime.value.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Section Affichage
+            Text(
+                text = stringResource(R.string.settings_display_section),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.PhoneAndroid, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            stringResource(R.string.settings_keep_screen_on),
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            stringResource(R.string.settings_keep_screen_desc),
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     }
                     Switch(
                         checked = keepScreenOn,
                         onCheckedChange = { keepScreenOn = it },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color(0xFF10B981),
-                            checkedTrackColor = Color(0xFF10B981).copy(alpha = 0.5f)
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color(0xFF10B981)
                         )
                     )
                 }
@@ -194,7 +203,7 @@ fun SettingsScreen(
 
             // Section Données
             Text(
-                text = "Données",
+                text = stringResource(R.string.settings_data_section),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -211,186 +220,171 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.DeleteSweep, contentDescription = "Réinitialiser", tint = Color(0xFFEF4444))
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.desc_reset_icon),
+                        tint = Color(0xFFEF4444)
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text("Réinitialiser les données", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Effacer les captures, favoris, etc.", fontSize = 12.sp, color = Color.Gray)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            stringResource(R.string.settings_reset_data),
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            stringResource(R.string.settings_reset_desc),
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     }
+                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
                 }
             }
-        }
 
-        // Dialogs
-        if (showLanguageDialog) {
-            AlertDialog(
-                onDismissRequest = { showLanguageDialog = false },
-                title = { Text("Choisir la langue", color = Color.White) },
-                text = {
-                    Column {
-                        LanguageManager.Language.values().forEach { language ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onLanguageChange(language)
-                                        showLanguageDialog = false
-                                        (context as? Activity)?.recreate()
-                                    }
-                                    .padding(vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = currentLanguage == language,
-                                    onClick = null
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(language.displayName, color = Color.White)
-                            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Section À propos
+            Text(
+                text = stringResource(R.string.settings_about_section),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF10B981))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.settings_version),
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text("1.0.0", fontSize = 12.sp, color = Color.Gray)
                         }
                     }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showLanguageDialog = false }) {
-                        Text("Fermer", color = Color.White)
-                    }
-                },
-                containerColor = Color(0xFF1E3A5F)
-            )
-        }
-
-        if (showResetDialog) {
-            AlertDialog(
-                onDismissRequest = { showResetDialog = false },
-                title = { Text("Confirmer la réinitialisation", color = Color.White) },
-                text = {
-                    Text(
-                        "Cette action supprimera définitivement toutes vos données : " +
-                                "captures, statistiques, favoris, etc. Cette action est irréversible.",
-                        color = Color.Gray
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            onResetData()
-                            showResetDialog = false
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
-                    ) {
-                        Text("Réinitialiser")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) {
-                        Text("Annuler", color = Color.White)
-                    }
-                },
-                containerColor = Color(0xFF1E3A5F)
-            )
-        }
-
-        if (showTimePickerDialog && viewModel != null) {
-            TimePickerDialog(
-                initialTime = gameTime,
-                onDismiss = { showTimePickerDialog = false },
-                onConfirm = { newTime ->
-                    viewModel.adjustInGameTime(newTime)
-                    showTimePickerDialog = false
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun TimePickerDialog(
-    initialTime: LocalTime,
-    onDismiss: () -> Unit,
-    onConfirm: (LocalTime) -> Unit
-) {
-    var selectedHour by remember { mutableStateOf(initialTime.hour.toFloat()) }
-    var selectedMinute by remember { mutableStateOf(initialTime.minute.toFloat()) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Régler l'heure du jeu") },
-        text = {
-            Column {
-                Text(
-                    String.format("%02d:%02d", selectedHour.toInt(), selectedMinute.toInt()),
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Heure : ${selectedHour.toInt()}")
-                Slider(
-                    value = selectedHour,
-                    onValueChange = { selectedHour = it },
-                    valueRange = 0f..23f,
-                    steps = 22
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Minute : ${selectedMinute.toInt()}")
-                Slider(
-                    value = selectedMinute,
-                    onValueChange = { selectedMinute = it },
-                    valueRange = 0f..59f,
-                    steps = 58
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(LocalTime.of(selectedHour.toInt(), selectedMinute.toInt())) }) {
-                Text("Confirmer")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annuler") }
-        }
-    )
-}
-
-@Composable
-fun ResetConfirmationDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (Set<ResetOption>) -> Unit
-) {
-    var selectedOptions by remember { mutableStateOf(setOf<ResetOption>()) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Réinitialiser les données") },
-        text = {
-            Column {
-                Text("Quelles données souhaitez-vous effacer ?", style = MaterialTheme.typography.bodyMedium)
-                Spacer(Modifier.height(16.dp))
-                ResetOption.values().forEach { option ->
                     Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .toggleable(
-                                value = selectedOptions.contains(option),
-                                onValueChange = {
-                                    selectedOptions = if (it) selectedOptions + option else selectedOptions - option
-                                },
-                                role = Role.Checkbox
-                            )
-                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(checked = selectedOptions.contains(option), onCheckedChange = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(option.displayName)
+                        Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF10B981))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.settings_developer),
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text("DarkWhoopy", fontSize = 12.sp, color = Color.Gray)
+                        }
                     }
                 }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(selectedOptions) },
-                enabled = selectedOptions.isNotEmpty()
-            ) { Text("Confirmer") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } }
-    )
+        }
+    }
+
+    // Dialog de sélection de langue
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(stringResource(R.string.settings_language_section)) },
+            text = {
+                Column {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                LanguageManager.setAppLanguage(context, LanguageManager.Language.FRENCH)
+                                showLanguageDialog = false
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (currentLanguage == LanguageManager.Language.FRENCH)
+                                Color(0xFF10B981) else Color(0xFF374151)
+                        )
+                    ) {
+                        Text(
+                            text = "Français",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                LanguageManager.setAppLanguage(context, LanguageManager.Language.ENGLISH)
+                                showLanguageDialog = false
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (currentLanguage == LanguageManager.Language.ENGLISH)
+                                Color(0xFF10B981) else Color(0xFF374151)
+                        )
+                    ) {
+                        Text(
+                            text = "English",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dialog de confirmation de reset
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text(stringResource(R.string.dialog_reset_title)) },
+            text = { Text(stringResource(R.string.dialog_reset_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // TODO: Implémenter la fonction de reset
+                        showResetDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.confirm), color = Color(0xFFEF4444))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dialog de sélection d'heure
+    if (showTimePickerDialog) {
+        AlertDialog(
+            onDismissRequest = { showTimePickerDialog = false },
+            title = { Text(stringResource(R.string.dialog_time_picker_title)) },
+            text = { Text("Fonctionnalité à implémenter") },
+            confirmButton = {
+                TextButton(onClick = { showTimePickerDialog = false }) {
+                    Text(stringResource(R.string.ok))
+                }
+            }
+        )
+    }
 }
