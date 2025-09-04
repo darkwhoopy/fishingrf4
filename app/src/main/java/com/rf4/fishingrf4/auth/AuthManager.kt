@@ -2,6 +2,7 @@ package com.rf4.fishingrf4.auth
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -14,13 +15,15 @@ class AuthManager(private val activity: Activity) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Fallback si la ressource générée n’existe pas
+    // Version simplifiée qui utilise uniquement les ressources générées
     private fun resolveWebClientId(): String {
         return try {
             val id = activity.getString(R.string.default_web_client_id)
-            if (id.isNullOrBlank() || id == "default_web_client_id") FALLBACK_WEB_CLIENT_ID else id
-        } catch (_: Exception) {
-            FALLBACK_WEB_CLIENT_ID
+            Log.d("AuthManager", "Web Client ID: ${id.take(20)}...")
+            id
+        } catch (e: Exception) {
+            Log.e("AuthManager", "Erreur récupération Web Client ID", e)
+            throw RuntimeException("Web Client ID non trouvé. Vérifiez google-services.json")
         }
     }
 
@@ -42,23 +45,27 @@ class AuthManager(private val activity: Activity) {
             val account = task.getResult(ApiException::class.java)
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
             auth.signInWithCredential(credential)
-                .addOnSuccessListener { onSuccess() }
-                .addOnFailureListener { onError(it.message ?: "Erreur de connexion") }
+                .addOnSuccessListener {
+                    Log.d("AuthManager", "Connexion réussie")
+                    onSuccess()
+                }
+                .addOnFailureListener {
+                    Log.e("AuthManager", "Erreur Firebase", it)
+                    onError(it.message ?: "Erreur de connexion")
+                }
         } catch (e: ApiException) {
+            Log.e("AuthManager", "Erreur Google Sign-In: ${e.statusCode}")
             onError("Échec Google Sign-In: ${e.statusCode}")
         }
     }
 
-    // Déconnexion Firebase uniquement (tu l'as déjà)
     fun signOut() { auth.signOut() }
 
-    // Déconnexion côté GoogleSignIn (fait apparaître le sélecteur au prochain login)
     fun signOutGoogle(onDone: () -> Unit = {}) {
         googleClient().signOut()
             .addOnCompleteListener { onDone() }
     }
 
-    // Révoquer l'autorisation (oublier le compte pour cette app)
     fun revokeAccess(
         onDone: () -> Unit = {},
         onError: (String) -> Unit = {}
@@ -71,10 +78,4 @@ class AuthManager(private val activity: Activity) {
     }
 
     fun currentUser() = auth.currentUser
-
-    companion object {
-        // 👇 Ton client OAuth Web depuis google-services.json
-        private const val FALLBACK_WEB_CLIENT_ID =
-            "908932428291-75sbfttt018n6dc9lq40mboak5kg3tep.apps.googleusercontent.com"
-    }
 }
