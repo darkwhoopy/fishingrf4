@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "908932428291-88fh9gtvque6ksr6flan2ei61r4oaud1.apps.googleusercontent.com",
+          "client_id": "908932428291-3r7e8vip7ei6h0fo6pplfshieeuqel3a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.rf4.fishingrf4",
@@ -22,7 +22,15 @@
           }
         },
         {
-          "client_id": "908932428291-j066rr9ogcj3dab72n696q502q4n0n72.apps.googleusercontent.com",
+          "client_id": "908932428291-88fh9gtvque6ksr6flan2ei61r4oaud1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rf4.fishingrf4",
+            "certificate_hash": "988d3d9fef64394405f8fb8c75b86d0b21889c80"
+          }
+        },
+        {
+          "client_id": "908932428291-j67jgg7ab871da8er3ipsdv0et910qd9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.rf4.fishingrf4",

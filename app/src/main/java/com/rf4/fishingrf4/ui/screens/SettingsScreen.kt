@@ -270,7 +270,7 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
-                            Text("1.0.0", fontSize = 12.sp, color = Color.Gray)
+                            Text("0.5.0", fontSize = 12.sp, color = Color.Gray)
                         }
                     }
                     Row(

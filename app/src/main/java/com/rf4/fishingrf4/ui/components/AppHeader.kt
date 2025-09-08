@@ -93,15 +93,11 @@ fun AppHeader(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Sous-titre avec badge de connexion intégré
+                    // ✅ NOUVEAU : Sous-titre avec badge de connexion ET version
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Sous-titre avec style
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        // ✅ BADGE DE CONNEXION STYLISÉ
+                        // Badge de connexion stylisé
                         val user = FirebaseAuth.getInstance().currentUser
                         Card(
                             colors = CardDefaults.cardColors(
@@ -129,6 +125,30 @@ fun AppHeader(
                                     color = Color.White,
                                     fontWeight = FontWeight.ExtraBold,
                                     letterSpacing = 0.5.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        // ✅ NOUVEAU : Badge de version
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF6366F1) // Violet/indigo
+                            ),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.height(24.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "v0.5",
+                                    fontSize = 8.sp,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 0.3.sp
                                 )
                             }
                         }
