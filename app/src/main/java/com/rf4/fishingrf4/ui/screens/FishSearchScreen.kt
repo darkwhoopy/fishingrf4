@@ -35,6 +35,8 @@ import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.data.models.LakeType
 import com.rf4.fishingrf4.ui.components.BackButton
+import androidx.compose.ui.platform.LocalContext
+import com.rf4.fishingrf4.data.models.getLocalizedName
 
 // Classe locale pour les statistiques de capture dans la recherche
 data class FishStats(
@@ -737,6 +739,7 @@ fun BaitCard(bait: BaitInfo) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SimpleFishCard(fish: Fish, stats: FishStats?, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -753,7 +756,7 @@ fun SimpleFishCard(fish: Fish, stats: FishStats?, onClick: () -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = fish.name,
+                    text = fish.getLocalizedName(context),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color.White

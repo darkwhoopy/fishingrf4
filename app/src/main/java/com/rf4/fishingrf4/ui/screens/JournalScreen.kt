@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.FishingEntry
+import com.rf4.fishingrf4.data.models.getLocalizedName // 🆕 AJOUTÉ
 import com.rf4.fishingrf4.ui.components.BackButton
 import java.time.Instant
 import java.time.LocalDateTime
@@ -227,7 +228,7 @@ fun JournalScreen(
 
                         // Regroupement par poisson dans ce créneau
                         val fishGroups = timeEntries
-                            .groupBy { it.fish.name }
+                            .groupBy { it.fish.name } // ✅ Garde le nom français pour la logique
                             .map { (fishName, fishEntries) ->
                                 FishGroup(
                                     fish = fishEntries.first().fish,
@@ -244,6 +245,7 @@ fun JournalScreen(
                         items(fishGroups) { fishGroup ->
                             FishGroupCard(
                                 fishGroup = fishGroup,
+                                context = context, // 🆕 AJOUTÉ
                                 onClick = {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     selectedFishGroup = fishGroup
@@ -261,6 +263,7 @@ fun JournalScreen(
     selectedFishGroup?.let { fishGroup ->
         FishDetailDialog(
             fishGroup = fishGroup,
+            context = context, // 🆕 AJOUTÉ
             onDismiss = { selectedFishGroup = null },
             onDeleteEntry = { entryId ->
                 onDeleteEntry(entryId)
@@ -273,6 +276,7 @@ fun JournalScreen(
 @Composable
 fun FishGroupCard(
     fishGroup: FishGroup,
+    context: android.content.Context, // 🆕 AJOUTÉ
     onClick: () -> Unit,
     onDeleteEntry: (String) -> Unit
 ) {
@@ -325,7 +329,7 @@ fun FishGroupCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = fishGroup.fish.name,
+                        text = fishGroup.fish.getLocalizedName(context), // 🔥 MODIFIÉ
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -355,6 +359,7 @@ fun FishGroupCard(
 @Composable
 fun FishDetailDialog(
     fishGroup: FishGroup,
+    context: android.content.Context, // 🆕 AJOUTÉ
     onDismiss: () -> Unit,
     onDeleteEntry: (String) -> Unit
 ) {
@@ -377,13 +382,13 @@ fun FishDetailDialog(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = fishGroup.fish.name,
+                            text = fishGroup.fish.getLocalizedName(context), // 🔥 MODIFIÉ
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
-                            text = fishGroup.fish.scientificName,
+                            text = fishGroup.fish.species, // Garde species pour nom scientifique
                             fontSize = 12.sp,
                             color = Color.Gray,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic

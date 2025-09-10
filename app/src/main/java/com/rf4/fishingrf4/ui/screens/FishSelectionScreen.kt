@@ -170,36 +170,58 @@ private fun FishingStatsCard(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF1E3A5F)
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Section gauche - Statistiques
             Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "$caughtSpecies/$totalSpecies",
+                        fontSize = 24.sp,
+                        color = Color(0xFF10B981),
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "espèces capturées",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    text = stringResource(R.string.stats_species_caught, caughtSpecies, totalSpecies),
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(R.string.stats_total_caught, totalCaught),
+                    text = "$totalCaught captures au total",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = Color(0xFFE2E8F0)
                 )
             }
 
+            // Section droite - Heure
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = stringResource(R.string.game_time_label),
+                    text = "Heure du jeu",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = Color(0xFFE2E8F0)
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     color = Color(0xFFFFB74D),
                     fontWeight = FontWeight.Bold
                 )
@@ -207,7 +229,6 @@ private fun FishingStatsCard(
         }
     }
 }
-
 @Composable
 fun StatItem(icon: String, value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -238,73 +259,72 @@ private fun FishCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(140.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .let { modifier ->
-                if (captureCount > 0) {
-                    modifier.border(
-                        4.dp,
-                        Color.Yellow, // Vert pour capturé
-                        RoundedCornerShape(8.dp)
-                    )
-                } else {
-                    modifier.border(
-                        2.dp,
-                        Color(fish.rarity.colorValue), // 🎨 COULEUR DE RARETÉ
-                        RoundedCornerShape(8.dp)
-                    )
-                }
-            },
+            .border(
+                width = 4.dp,
+                color = Color(fish.rarity.colorValue),
+                shape = RoundedCornerShape(8.dp)
+            ),
         colors = CardDefaults.cardColors(
-            containerColor = Color(fish.rarity.colorValue)
+            containerColor = Color(fish.rarity.colorValue).copy(alpha = 0.3f)
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Nom du poisson traduit
-            Text(
-                text = fish.getLocalizedName(context),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 2
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                // Nom du poisson traduit
+                Text(
+                    text = fish.getLocalizedName(context),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
 
-            Spacer(modifier = Modifier.height(4.dp))
+                // Rareté
+                Text(
+                    text = fish.rarity.displayName,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
+                )
 
-            // Rareté avec couleur
-            Text(
-                text = fish.rarity.displayName,
-                fontSize = 12.sp,
-                color = Color(fish.rarity.colorValue), // 🎨 COULEUR DE RARETÉ
-                fontWeight = FontWeight.Medium
-            )
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Statistiques
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-
+                // Statut de capture
                 if (captureCount > 0) {
                     Text(
-                        text = "✓ $captureCount",
-                        fontSize = 28.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        text = "$captureCount capture(s)",
+                        fontSize = 13.sp,
+                        color = Color.Yellow
                     )
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                // Icône selon statut
+                Text(
+                    text = if (captureCount > 0) "🎣" else "🐟",
+                    fontSize = 24.sp // 🆕 PLUS GROS
+                )
+
+                // Système d'étoiles pour les captures
+                if (captureCount > 0) {
+                    Row {
+                        repeat(minOf(captureCount, 3)) {
+                            Text("⭐", fontSize = 12.sp)
+                        }
+                        if (captureCount > 3) {
+                            Text("+", fontSize = 14.sp, color = Color(0xFFFFD700))
+                        }
+                    }
                 } else {
                     Text(
-                        text = "NEW",
+                        text = "✨",
                         fontSize = 10.sp,
                         color = Color(0xFFFFB74D),
                         fontWeight = FontWeight.Bold

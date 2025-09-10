@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import com.rf4.fishingrf4.data.online.SpeciesCount
+import androidx.compose.ui.platform.LocalContext
+import com.rf4.fishingrf4.data.models.getLocalizedName
+import com.rf4.fishingrf4.data.FishingData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,11 +46,14 @@ fun TopFiveScreen(
 
     // Charger les données au démarrage
     LaunchedEffect(startOfDayTimestamp) {
-        viewModel.fetchTop5PlayersOfDay(startOfDayTimestamp) { players ->
+
+        val weekAgoTimestamp = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L)
+
+        viewModel.fetchTop5PlayersOfDay(weekAgoTimestamp) { players ->
             communityPlayers = players
         }
 
-        viewModel.fetchTop5LakesOfDay(startOfDayTimestamp) { lakes ->
+        viewModel.fetchTop5LakesOfDay(weekAgoTimestamp) { lakes ->
             communityLakes = lakes
         }
 
@@ -208,7 +214,7 @@ private fun CommunitySpeciesTab(species: List<SpeciesCount>) {
                         color = Color.White
                     )
                     Text(
-                        text = "Les poissons les plus capturés aujourd'hui",
+                        text = "Les poissons les plus capturés cette semaine    ",
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
@@ -290,6 +296,9 @@ private fun CommunitySpeciesBaitCard(
     totalCaptures: Int,
     topBaits: List<Pair<String, Long>>
 ) {
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -309,7 +318,7 @@ private fun CommunitySpeciesBaitCard(
                     Text(text = "🐟", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = fishName,
+                        text = fish?.getLocalizedName(context) ?: fishName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -379,6 +388,9 @@ private fun CommunitySpeciesBaitCard(
 // ✅ NOUVEAU COMPOSANT : Carte d'espèce communautaire
 @Composable
 private fun CommunitySpeciesCard(rank: Int, fishName: String, count: Int) {
+
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -406,7 +418,7 @@ private fun CommunitySpeciesCard(rank: Int, fishName: String, count: Int) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = fishName,
+                    text = fish?.getLocalizedName(context) ?: fishName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -489,6 +501,9 @@ private fun CommunityBaitCard(
     fishName: String,
     baits: List<Pair<String, Long>>
 ) {
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -508,7 +523,7 @@ private fun CommunityBaitCard(
                     Text(text = "🐟", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = fishName,
+                        text = fish?.getLocalizedName(context) ?: fishName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -626,6 +641,10 @@ private fun TopFishTab(fishCounts: Map<String, Int>) {
 // ✅ CHANGEMENT 4: Ajouter ce composant TopFishCard
 @Composable
 private fun TopFishCard(rank: Int, fishName: String, count: Int) {
+
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -656,7 +675,7 @@ private fun TopFishCard(rank: Int, fishName: String, count: Int) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = fishName,
+                    text = fish?.getLocalizedName(context) ?: fishName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -797,6 +816,11 @@ private fun BaitStatsCard(
     count: Int,
     totalFishCount: Int
 ) {
+
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
+
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -813,7 +837,7 @@ private fun BaitStatsCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = fishName,
+                    text = fish?.getLocalizedName(context) ?: fishName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -850,6 +874,11 @@ private fun FishCountCard(
     totalCount: Int,
     baitStats: List<Pair<String, Int>>
 ) {
+
+    val context = LocalContext.current
+    val fish = FishingData.getAllFish().find { it.name == fishName }
+
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth()
@@ -869,7 +898,7 @@ private fun FishCountCard(
                     Text(text = "🐟", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = fishName,
+                        text = fish?.getLocalizedName(context) ?: fishName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
