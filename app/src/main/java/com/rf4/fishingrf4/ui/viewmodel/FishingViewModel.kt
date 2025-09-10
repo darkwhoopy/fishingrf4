@@ -383,7 +383,7 @@ class FishingViewModel(context: Context) : ViewModel() {
      * ✅ CORRIGÉ : Retourne tous les appâts du jeu
      */
     fun getAllGameBaits(): List<String> {
-        return FishingData.PERSONAL_BAITS
+        return FishingData.getAllBaitNames()
     }
 
     /**

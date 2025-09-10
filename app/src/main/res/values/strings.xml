@@ -551,5 +551,12 @@
     <!-- APPÂTS -->
 
 
+    <!-- Statistiques FishSelectionScreen -->
+    <string name="stats_species_caught">%1$d/%2$d espèces capturées</string>
+    <string name="stats_total_caught">%d captures au total</string>
+
+
+
+
 </resources>
 

@@ -553,4 +553,12 @@
 
     <!-- BAITS -->
 
+    <!-- Statistics FishSelectionScreen -->
+    <string name="stats_species_caught">%1$d/%2$d species caught</string>
+    <string name="stats_total_caught">%d total catches</string>
+
+
+
+
+
    </resources>

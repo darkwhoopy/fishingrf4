@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext           // 🆕 AJOUTÉ
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,7 @@ import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.Lake
+import com.rf4.fishingrf4.data.models.getLocalizedName  // 🆕 AJOUTÉ
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.BaitSelectionDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
@@ -39,6 +41,7 @@ fun FishSelectionScreen(
     onViewJournal: () -> Unit,
     onFishDetail: (Fish) -> Unit = {}
 ) {
+    val context = LocalContext.current                    // 🆕 AJOUTÉ
     val startOfGameDayTimestamp by viewModel.startOfCurrentGameDayTimestamp.collectAsState()
     val recentBaits by viewModel.recentBaits.collectAsState()
     val gameTime by viewModel.gameTime.collectAsState()
@@ -51,7 +54,7 @@ fun FishSelectionScreen(
     val fishCaptureStats = remember(fishingEntries, lake.id, position, startOfGameDayTimestamp) {
         fishingEntries
             .filter { it.lake.id == lake.id && it.position == position && it.timestamp >= startOfGameDayTimestamp }
-            .groupBy { it.fish.name }
+            .groupBy { it.fish.name }  // ✅ GARDÉ tel quel pour la logique interne
             .mapValues { (_, entries) ->
                 FishCaptureStats(totalCaught = entries.size)
             }
@@ -62,7 +65,7 @@ fun FishSelectionScreen(
         lake.availableFish.sortedWith(
             compareByDescending<Fish> { fishCaptureStats[it.name]?.totalCaught ?: 0 }
                 .thenBy { it.rarity.ordinal }
-                .thenBy { it.name }
+                .thenBy { it.name }  // ✅ GARDÉ tel quel pour le tri
         )
     }
 
@@ -139,11 +142,11 @@ fun FishSelectionScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
-            items(sortedFish, key = { it.id }) { fish ->
-                val stats = fishCaptureStats[fish.name]
+            items(sortedFish) { fish ->
                 FishCard(
                     fish = fish,
-                    stats = stats,
+                    captureCount = fishCaptureStats[fish.name]?.totalCaught ?: 0,
+                    context = context,  // 🆕 AJOUTÉ
                     onClick = {
                         selectedFishForBait = fish
                         showBaitDialog = true
@@ -156,7 +159,7 @@ fun FishSelectionScreen(
 }
 
 @Composable
-fun FishingStatsCard(
+private fun FishingStatsCard(
     totalSpecies: Int,
     caughtSpecies: Int,
     totalCaught: Int,
@@ -164,30 +167,43 @@ fun FishingStatsCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F))
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1E3A5F)
+        ),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            StatItem(
-                icon = "🐟",
-                value = "$caughtSpecies/$totalSpecies",
-                label = stringResource(R.string.stat_species)
-            )
-            StatItem(
-                icon = "🎯",
-                value = "$totalCaught",
-                label = stringResource(R.string.stat_captures)
-            )
-            StatItem(
-                icon = "🕒",
-                value = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                label = stringResource(R.string.game_time_label)
-            )
+            Column {
+                Text(
+                    text = stringResource(R.string.stats_species_caught, caughtSpecies, totalSpecies),
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(R.string.stats_total_caught, totalCaught),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = stringResource(R.string.game_time_label),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                    fontSize = 14.sp,
+                    color = Color(0xFFFFB74D),
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -212,111 +228,85 @@ fun StatItem(icon: String, value: String, label: String) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FishCard(
+private fun FishCard(
     fish: Fish,
-    stats: FishCaptureStats?,
+    captureCount: Int,
+    context: android.content.Context,
     onClick: () -> Unit,
-    onLongClick: () -> Unit = {}
+    onLongClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onClick() },
-                onLongClick = { onLongClick() }
+                onClick = onClick,
+                onLongClick = onLongClick
             )
-            .border(
-                width = 2.dp,
-                color = Color(fish.rarity.colorValue),
-                shape = RoundedCornerShape(8.dp)
-            ),
+            .let { modifier ->
+                if (captureCount > 0) {
+                    modifier.border(
+                        4.dp,
+                        Color.Yellow, // Vert pour capturé
+                        RoundedCornerShape(8.dp)
+                    )
+                } else {
+                    modifier.border(
+                        2.dp,
+                        Color(fish.rarity.colorValue), // 🎨 COULEUR DE RARETÉ
+                        RoundedCornerShape(8.dp)
+                    )
+                }
+            },
         colors = CardDefaults.cardColors(
-            containerColor = Color(fish.rarity.colorValue).copy(alpha = 0.3f)
+            containerColor = Color(fish.rarity.colorValue)
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Première ligne : Icône + Étoiles
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (stats == null || stats.totalCaught == 0) "✨" else "🎣",
-                    fontSize = 16.sp
-                )
-                if (stats != null && stats.totalCaught > 0) {
-                    Row {
-                        repeat(minOf(stats.totalCaught, 3)) {
-                            Text("⭐", fontSize = 10.sp)
-                        }
-                        if (stats.totalCaught > 3) {
-                            Text("+", fontSize = 12.sp, color = Color(0xFFFFD700))
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // Nom du poisson
+            // Nom du poisson traduit
             Text(
-                text = fish.name,
-                fontSize = 16.sp,
+                text = fish.getLocalizedName(context),
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                maxLines = 1
+                maxLines = 2
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Dernière ligne : Badge de rareté + Compteur
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Badge de rareté
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(fish.rarity.colorValue)
-                    ),
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Text(
-                        text = stringResource(
-                            when(fish.rarity) {
-                                com.rf4.fishingrf4.data.models.FishRarity.COMMON -> R.string.rarity_common
-                                com.rf4.fishingrf4.data.models.FishRarity.UNCOMMON -> R.string.rarity_uncommon
-                                com.rf4.fishingrf4.data.models.FishRarity.RARE -> R.string.rarity_rare
-                                com.rf4.fishingrf4.data.models.FishRarity.EPIC -> R.string.rarity_epic
-                                com.rf4.fishingrf4.data.models.FishRarity.LEGENDARY -> R.string.rarity_legendary
-                            }
-                        ).take(1),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                    )
-                }
+            // Rareté avec couleur
+            Text(
+                text = fish.rarity.displayName,
+                fontSize = 12.sp,
+                color = Color(fish.rarity.colorValue), // 🎨 COULEUR DE RARETÉ
+                fontWeight = FontWeight.Medium
+            )
 
-                // Compteur de captures
-                if (stats != null && stats.totalCaught > 0) {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Statistiques
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+
+                if (captureCount > 0) {
                     Text(
-                        text = stringResource(R.string.fish_count_format, stats.totalCaught),
-                        fontSize = 14.sp,
+                        text = "✓ $captureCount",
+                        fontSize = 28.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 } else {
                     Text(
-                        text = stringResource(R.string.fish_new_badge),
+                        text = "NEW",
                         fontSize = 10.sp,
-                        color = Color(0xFFFFD700),
+                        color = Color(0xFFFFB74D),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -325,4 +315,6 @@ fun FishCard(
     }
 }
 
-data class FishCaptureStats(val totalCaught: Int)
+private data class FishCaptureStats(
+    val totalCaught: Int
+)

@@ -482,7 +482,7 @@ fun SimpleBaitDialog(
 
     // ✅ CHANGEMENT : Utiliser la liste de FishingData au lieu du paramètre
     val availableBaits = remember(currentBaits, searchQuery) {
-        FishingData.PERSONAL_BAITS
+        FishingData.getAllBaitNames()
             .filter { !currentBaits.contains(it) }
             .filter { it.contains(searchQuery, ignoreCase = true) }
             .sorted()

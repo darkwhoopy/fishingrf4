@@ -184,7 +184,7 @@ fun FishSearchContent(
         if (searchQuery.isNotBlank()) {
             filtered = filtered.filter { fish ->
                 fish.name.contains(searchQuery, ignoreCase = true) ||
-                        fish.species.contains(searchQuery, ignoreCase = true)
+                        fish.scientificName.contains(searchQuery, ignoreCase = true)
             }
         }
 
@@ -759,7 +759,7 @@ fun SimpleFishCard(fish: Fish, stats: FishStats?, onClick: () -> Unit) {
                     color = Color.White
                 )
                 Text(
-                    text = fish.species,
+                    text = fish.scientificName,
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

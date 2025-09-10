@@ -383,7 +383,7 @@ fun FishDetailDialog(
                             color = Color.White
                         )
                         Text(
-                            text = fishGroup.fish.species,
+                            text = fishGroup.fish.scientificName,
                             fontSize = 12.sp,
                             color = Color.Gray,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
