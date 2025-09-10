@@ -1,20 +1,39 @@
 package com.rf4.fishingrf4.data.models
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
+import com.rf4.fishingrf4.utils.LanguageManager
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Fish(
-    val name: String,
-    val species: String,
+    val name: String,           // Nom français (existant)
+    val nameEn: String,         // 🆕 NOUVEAU : Nom anglais
+    val scientificName: String,
     val rarity: FishRarity,
-    @Serializable(with = DoubleRangeSerializer::class) // Gardez bien cette ligne !
-    val weight: ClosedFloatingPointRange<Double>? = null,
-    val preferredBait: List<String> = emptyList(),
-    val bestHours: List<Int> = emptyList(),
-    val bestWeather: List<WeatherType> = emptyList()
-) {
-    val id: String = "${name}_${species}"
+    val minWeight: Double,
+    val maxWeight: Double,
+    val preferredBaits: List<String>,
+    val preferredTime: List<String>,
+    val preferredWeather: List<WeatherType>,
+    val description: String,
+    val descriptionEn: String   // 🆕 NOUVEAU : Description anglaise
+)
+
+// 🆕 NOUVEAU : Extension pour obtenir le nom selon la langue
+fun Fish.getLocalizedName(context: Context): String {
+    return when (LanguageManager.getCurrentLanguage(context)) {
+        LanguageManager.Language.ENGLISH -> this.nameEn
+        LanguageManager.Language.FRENCH -> this.name
+    }
+}
+
+// 🆕 NOUVEAU : Extension pour obtenir la description selon la langue
+fun Fish.getLocalizedDescription(context: Context): String {
+    return when (LanguageManager.getCurrentLanguage(context)) {
+        LanguageManager.Language.ENGLISH -> this.descriptionEn
+        LanguageManager.Language.FRENCH -> this.description
+    }
 }
 
 @Serializable

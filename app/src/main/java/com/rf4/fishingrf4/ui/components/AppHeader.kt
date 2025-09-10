@@ -144,7 +144,7 @@ fun AppHeader(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = "v0.5",
+                                    text = "v0.5b",
                                     fontSize = 8.sp,
                                     color = Color.White,
                                     fontWeight = FontWeight.ExtraBold,

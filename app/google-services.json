@@ -22,19 +22,19 @@
           }
         },
         {
+          "client_id": "908932428291-47so50dihsa06b58h3tjiit9cgckv8es.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rf4.fishingrf4",
+            "certificate_hash": "669146a6d02dcd90d64856d7f855b09afe66bff2"
+          }
+        },
+        {
           "client_id": "908932428291-88fh9gtvque6ksr6flan2ei61r4oaud1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.rf4.fishingrf4",
             "certificate_hash": "988d3d9fef64394405f8fb8c75b86d0b21889c80"
-          }
-        },
-        {
-          "client_id": "908932428291-j67jgg7ab871da8er3ipsdv0et910qd9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.rf4.fishingrf4",
-            "certificate_hash": "988d3d9fef64394465f8fb8c75b86ddb21889c80"
           }
         },
         {

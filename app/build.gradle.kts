@@ -25,9 +25,12 @@ android {
         applicationId = "com.rf4.fishingrf4"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
+        versionCode = 9
         versionName = "0.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // ✅ AJOUT : Support multilingue pour AAB
+        resourceConfigurations += listOf("fr", "en")
     }
 
     buildTypes {
@@ -50,6 +53,13 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    // ✅ AJOUT : Configuration AAB pour garder toutes les langues
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 }
 
