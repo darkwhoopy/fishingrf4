@@ -15,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext           // 🆕 AJOUTÉ
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,12 +24,18 @@ import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.Lake
-import com.rf4.fishingrf4.data.models.getLocalizedName  // 🆕 AJOUTÉ
+import com.rf4.fishingrf4.data.models.FishRarity
+import com.rf4.fishingrf4.data.models.getLocalizedName
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.BaitSelectionDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+
+// Data class pour les statistiques de capture
+data class FishCaptureStats(
+    val totalCaught: Int
+)
 
 @Composable
 fun FishSelectionScreen(
@@ -41,7 +47,7 @@ fun FishSelectionScreen(
     onViewJournal: () -> Unit,
     onFishDetail: (Fish) -> Unit = {}
 ) {
-    val context = LocalContext.current                    // 🆕 AJOUTÉ
+    val context = LocalContext.current
     val startOfGameDayTimestamp by viewModel.startOfCurrentGameDayTimestamp.collectAsState()
     val recentBaits by viewModel.recentBaits.collectAsState()
     val gameTime by viewModel.gameTime.collectAsState()
@@ -54,7 +60,7 @@ fun FishSelectionScreen(
     val fishCaptureStats = remember(fishingEntries, lake.id, position, startOfGameDayTimestamp) {
         fishingEntries
             .filter { it.lake.id == lake.id && it.position == position && it.timestamp >= startOfGameDayTimestamp }
-            .groupBy { it.fish.name }  // ✅ GARDÉ tel quel pour la logique interne
+            .groupBy { it.fish.name }
             .mapValues { (_, entries) ->
                 FishCaptureStats(totalCaught = entries.size)
             }
@@ -65,7 +71,7 @@ fun FishSelectionScreen(
         lake.availableFish.sortedWith(
             compareByDescending<Fish> { fishCaptureStats[it.name]?.totalCaught ?: 0 }
                 .thenBy { it.rarity.ordinal }
-                .thenBy { it.name }  // ✅ GARDÉ tel quel pour le tri
+                .thenBy { it.name }
         )
     }
 
@@ -74,6 +80,7 @@ fun FishSelectionScreen(
         BaitSelectionDialog(
             fish = selectedFishForBait!!,
             recentBaits = recentBaits,
+            fishingEntries = fishingEntries,
             onBaitSelected = { bait ->
                 viewModel.catchFishWithBait(
                     selectedFishForBait!!,
@@ -96,7 +103,7 @@ fun FishSelectionScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // En-tête
+        // En-tête avec bouton retour, titre et bouton journal
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -135,7 +142,7 @@ fun FishSelectionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Grille des poissons
+        // Grille des poissons (2 colonnes)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -146,7 +153,7 @@ fun FishSelectionScreen(
                 FishCard(
                     fish = fish,
                     captureCount = fishCaptureStats[fish.name]?.totalCaught ?: 0,
-                    context = context,  // 🆕 AJOUTÉ
+                    context = context,
                     onClick = {
                         selectedFishForBait = fish
                         showBaitDialog = true
@@ -158,6 +165,9 @@ fun FishSelectionScreen(
     }
 }
 
+/**
+ * Carte d'affichage des statistiques de pêche
+ */
 @Composable
 private fun FishingStatsCard(
     totalSpecies: Int,
@@ -177,62 +187,49 @@ private fun FishingStatsCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Section gauche - Statistiques
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "$caughtSpecies/$totalSpecies",
-                        fontSize = 24.sp,
-                        color = Color(0xFF10B981),
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "espèces capturées",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+            // Statistique des espèces
+            StatItem(
+                icon = "🐟",
+                value = "$caughtSpecies/$totalSpecies",
+                label = stringResource(R.string.stat_species)
+            )
 
-                Spacer(modifier = Modifier.height(4.dp))
+            // Statistique des captures totales
+            StatItem(
+                icon = "🎯",
+                value = "$totalCaught",
+                label = stringResource(R.string.stat_captures)
+            )
 
-                Text(
-                    text = "$totalCaught captures au total",
-                    fontSize = 12.sp,
-                    color = Color(0xFFE2E8F0)
-                )
-            }
-
-            // Section droite - Heure
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "Heure du jeu",
-                    fontSize = 12.sp,
-                    color = Color(0xFFE2E8F0)
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                    fontSize = 20.sp,
-                    color = Color(0xFFFFB74D),
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // Temps de jeu
+            StatItem(
+                icon = "🕒",
+                value = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                label = stringResource(R.string.game_time_label)
+            )
         }
     }
 }
+
+/**
+ * Composant pour afficher une statistique individuelle
+ */
 @Composable
-fun StatItem(icon: String, value: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = icon, fontSize = 20.sp)
+private fun StatItem(
+    icon: String,
+    value: String,
+    label: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally  // ✅ CORRIGÉ: CenterHorizontally au lieu de CenterVertically
+    ) {
+        Text(
+            text = icon,
+            fontSize = 20.sp
+        )
         Text(
             text = value,
             fontSize = 16.sp,
@@ -247,6 +244,12 @@ fun StatItem(icon: String, value: String, label: String) {
     }
 }
 
+/**
+ * Carte d'affichage d'un poisson avec traductions
+ */
+/**
+ * Carte d'affichage d'un poisson avec traductions
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FishCard(
@@ -274,67 +277,85 @@ private fun FishCard(
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            // Contenu principal centré
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 // Nom du poisson traduit
                 Text(
                     text = fish.getLocalizedName(context),
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                // Rareté
-                Text(
-                    text = fish.rarity.displayName,
-                    fontSize = 12.sp,
                     color = Color.White,
-                    fontWeight = FontWeight.Medium
+                    maxLines = 2,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
 
-                // Statut de capture
-                if (captureCount > 0) {
+                // Multiplicateur de captures si > 1
+                if (captureCount > 1) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$captureCount capture(s)",
-                        fontSize = 13.sp,
-                        color = Color.Yellow
+                        text = "x$captureCount",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF10B981)
                     )
                 }
-            }
 
-            Column(horizontalAlignment = Alignment.End) {
-                // Icône selon statut
-                Text(
-                    text = if (captureCount > 0) "🎣" else "🐟",
-                    fontSize = 24.sp // 🆕 PLUS GROS
-                )
-
-                // Système d'étoiles pour les captures
+                // Affichage des étoiles pour les poissons capturés (centré)
                 if (captureCount > 0) {
-                    Row {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         repeat(minOf(captureCount, 3)) {
-                            Text("⭐", fontSize = 12.sp)
+                            Text(
+                                text = "⭐",
+                                fontSize = 12.sp
+                            )
                         }
                         if (captureCount > 3) {
-                            Text("+", fontSize = 14.sp, color = Color(0xFFFFD700))
+                            Text(
+                                text = "+",
+                                fontSize = 14.sp,
+                                color = Color(0xFFFFD700),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
-                } else {
+                }
+            }
+
+            // Badge NEW en bas à gauche
+            if (captureCount == 0) {
+                Surface(
+                    color = Color(0xFFFFB74D),
+                    shape = RoundedCornerShape(4.dp),
+                    modifier = Modifier.align(Alignment.BottomStart)
+                ) {
                     Text(
-                        text = "✨",
+                        text = stringResource(R.string.status_new),
                         fontSize = 10.sp,
-                        color = Color(0xFFFFB74D),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
             }
+
+            // ✅ NOUVEAU: Symbole poisson en haut à droite
+            Text(
+                text = if (captureCount > 0) "🎣" else "🐟",  // 🎣 si pêché, 🐟 si pas pêché
+                fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
         }
     }
 }
-
-private data class FishCaptureStats(
-    val totalCaught: Int
-)

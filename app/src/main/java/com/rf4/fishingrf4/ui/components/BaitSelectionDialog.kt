@@ -1,8 +1,3 @@
-// ============================================================================
-// FICHIER: ui/components/BaitSelectionDialog.kt (VERSION AMÉLIORÉE)
-// Remplacer votre fichier existant par cette version
-// ============================================================================
-
 package com.rf4.fishingrf4.ui.components
 
 import androidx.compose.foundation.clickable
@@ -20,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,13 +43,8 @@ import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 
-/**
- * Dialog pour sélectionner l'appât utilisé pour capturer un poisson
- * ✅ AMÉLIORATION : Clic direct sur l'appât = validation automatique
- */
 @Composable
 fun BaitSelectionDialog(
-
     fish: Fish,
     recentBaits: List<String>,
     fishingEntries: List<FishingEntry> = emptyList(),
@@ -68,9 +57,12 @@ fun BaitSelectionDialog(
     // Liste complète des appâts possibles
     val allBaits = FishingData.ALL_BAITS
 
-    // Séparer les appâts : récents + préférés du poisson + autres
-    val preferredBaits = fish.preferredBait
-    val otherBaits = allBaits.filterNot { it in preferredBaits || it in recentBaits }
+    // ✅ CORRECTION: Accéder aux appâts préférés via finalPreferredBaits
+    val preferredBaits = fish.finalPreferredBaits
+
+    // ✅ CORRECTION: Ne PAS filtrer les préférés s'ils sont dans les récents
+    // On veut les voir dans les deux sections !
+    val otherBaits = allBaits.filterNot { it in preferredBaits }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -143,23 +135,20 @@ fun BaitSelectionDialog(
                         }
 
                         items(recentBaits) { bait ->
-                            // ✅ Calculer le nombre d'utilisations de cet appât
                             val usageCount = fishingEntries.count { it.bait == bait }
 
                             QuickBaitOption(
                                 baitName = bait,
                                 isRecent = true,
-                                usageCount = usageCount, // ✅ NOUVEAU
-                                onClick = {
-                                    onBaitSelected(bait)
-                                }
+                                usageCount = usageCount,
+                                onClick = { onBaitSelected(bait) }
                             )
                         }
 
                         item { Spacer(modifier = Modifier.height(8.dp)) }
                     }
 
-                    // Section : Appâts préférés du poisson
+                    // ✅ CORRECTION: Toujours afficher les appâts préférés
                     if (preferredBaits.isNotEmpty()) {
                         item {
                             SectionHeader(
@@ -168,14 +157,11 @@ fun BaitSelectionDialog(
                             )
                         }
 
-                        items(preferredBaits.filterNot { it in recentBaits }) { bait ->
+                        items(preferredBaits) { bait ->
                             QuickBaitOption(
                                 baitName = bait,
                                 isRecommended = true,
-                                onClick = {
-                                    // ✅ VALIDATION DIRECTE
-                                    onBaitSelected(bait)
-                                }
+                                onClick = { onBaitSelected(bait) }
                             )
                         }
 
@@ -183,25 +169,26 @@ fun BaitSelectionDialog(
                     }
 
                     // Section : Autres appâts
-                    item {
-                        SectionHeader(
-                            title = "🎯 Autres appâts",
-                            color = Color.White
-                        )
-                    }
+                    if (otherBaits.isNotEmpty()) {
+                        item {
+                            SectionHeader(
+                                title = "🎯 Autres appâts",
+                                color = Color.White
+                            )
+                        }
 
-                    items(otherBaits) { bait ->
-                        QuickBaitOption(
-                            baitName = bait,
-                            onClick = {
-                                if (bait == "Autre") {
-                                    showCustomInput = true
-                                } else {
-                                    // ✅ VALIDATION DIRECTE
-                                    onBaitSelected(bait)
+                        items(otherBaits) { bait ->
+                            QuickBaitOption(
+                                baitName = bait,
+                                onClick = {
+                                    if (bait == "Autre") {
+                                        showCustomInput = true
+                                    } else {
+                                        onBaitSelected(bait)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
 
                     // Input pour appât personnalisé
@@ -271,17 +258,13 @@ private fun SectionHeader(title: String, color: Color) {
     )
 }
 
-/**
- * Option d'appât cliquable avec validation directe
- * ✅ PLUS GROS et PLUS LISIBLE pour vos yeux
- */
 @Composable
 private fun QuickBaitOption(
     baitName: String,
     isSelected: Boolean = false,
     isRecent: Boolean = false,
     isRecommended: Boolean = false,
-    usageCount: Int = 0, // ✅ NOUVEAU paramètre
+    usageCount: Int = 0,
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
@@ -339,7 +322,7 @@ private fun QuickBaitOption(
                 modifier = Modifier.weight(1f)
             )
 
-            // ✅ NOUVEAU : Compteur d'usage pour les appâts récents
+            // Compteur d'usage pour les appâts récents
             if (isRecent && usageCount > 0) {
                 Card(
                     colors = CardDefaults.cardColors(

@@ -569,8 +569,21 @@
     <string name="level_decrease">Diminuer le niveau</string>
     <string name="level_increase">Augmenter le niveau</string>
 
+    <!-- À ajouter dans la section SÉLECTION DE POISSON -->
 
+    <!-- À ajouter dans la section STATUTS -->
+    <string name="status_new">NEW</string>
 
+    <!-- À ajouter dans la section TEMPS DE JEU -->
+    <string name="period_day">Jour</string>
+    <string name="period_week">Semaine</string>
+    <string name="period_month">Mois</string>
+
+    <string name="top5_subtitle">Statistiques communautaires temps réel</string>
+    <string name="top5_players">Joueurs</string>
+    <string name="top5_lakes">Lacs</string>
+    <string name="top5_species">Espèces</string>
+    <string name="top5_baits">Appâts</string>
 
 </resources>
 
