@@ -559,6 +559,18 @@
 
 
 
+    <string name="app_version">v0.6</string>
+    <string name="status_online">ONLINE</string>
+    <string name="status_offline">OFFLINE</string>
+
+    <!-- Navigation -->
+
+    <!-- Level -->
+
+    <string name="level_decrease">Decrease level</string>
+    <string name="level_increase">Increase level</string>
+
+
 
 
    </resources>
