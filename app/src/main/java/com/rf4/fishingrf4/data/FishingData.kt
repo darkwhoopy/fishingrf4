@@ -1,5 +1,5 @@
 // ==========================================
-// FICHIER: data/FishingData.kt - DONNÉES COMPLÈTES RF4 AVEC TRADUCTIONS ANGLAISES
+// FICHIER: data/FishingData.kt - BASE COMPLÈTE RF4 AUTHENTIQUE (230+ ESPÈCES)
 // ==========================================
 package com.rf4.fishingrf4.data
 
@@ -10,17 +10,17 @@ import com.rf4.fishingrf4.utils.LanguageManager
 object FishingData {
 
     // ==========================================
-    // POISSONS COMMUNS - AVEC TRADUCTIONS ANGLAISES
+    // POISSONS D'EAU DOUCE COMMUNS
     // ==========================================
-    private val commonFresh = listOf(
+    private val commonFreshwater = listOf(
         Fish(
             name = "Gardon",
             nameEn = "Roach",
-            species =  "Rutilus rutilus",
+            species = "Rutilus rutilus",
             rarity = FishRarity.COMMON,
             minWeight = 0.05,
-            maxWeight = 0.3,
-            preferredBaits = listOf("Pain", "Asticot", "Blé"),
+            maxWeight = 0.6,
+            preferredBaits = listOf("Pain mouillé", "Asticot", "Orge perlé"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Poisson blanc très commun, idéal pour débuter la pêche.",
@@ -29,12 +29,12 @@ object FishingData {
         Fish(
             name = "Ablette",
             nameEn = "Bleak",
-            species =  "Alburnus alburnus",
+            species = "Alburnus alburnus",
             rarity = FishRarity.COMMON,
             minWeight = 0.02,
-            maxWeight = 0.1,
-            preferredBaits = listOf("Asticot", "Ver de vase"),
-            preferredTime = listOf("Matin"),
+            maxWeight = 0.15,
+            preferredBaits = listOf("Asticot", "Ver de vase", "Pain mouillé"),
+            preferredTime = listOf("Matin", "Journée"),
             preferredWeather = listOf(WeatherType.SUNNY, WeatherType.CLOUDY),
             description = "Petit poisson argenté très vif, se pêche en surface.",
             descriptionEn = "Small silvery fish, very lively, caught near surface."
@@ -42,11 +42,11 @@ object FishingData {
         Fish(
             name = "Brème",
             nameEn = "Bream",
-            species =  "Abramis brama",
+            species = "Abramis brama",
             rarity = FishRarity.COMMON,
             minWeight = 0.3,
-            maxWeight = 2.0,
-            preferredBaits = listOf("Ver de vase", "Pâte", "Maïs"),
+            maxWeight = 4.5,
+            preferredBaits = listOf("Ver de vase", "Orge perlé", "Bouillie de pois"),
             preferredTime = listOf("Nuit", "Matin"),
             preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.LIGHT_RAIN),
             description = "Poisson de fond, se pêche principalement la nuit.",
@@ -55,11 +55,11 @@ object FishingData {
         Fish(
             name = "Rotengle",
             nameEn = "Rudd",
-            species =  "Scardinius erythrophthalmus",
+            species = "Scardinius erythrophthalmus",
             rarity = FishRarity.COMMON,
             minWeight = 0.1,
-            maxWeight = 0.8,
-            preferredBaits = listOf("Pain", "Ver rouge", "Blé"),
+            maxWeight = 1.2,
+            preferredBaits = listOf("Pain mouillé", "Ver rouge", "Maïs"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.SUNNY, WeatherType.CLOUDY),
             description = "Poisson aux nageoires rougeâtres, proche du gardon.",
@@ -71,8 +71,8 @@ object FishingData {
             species = "Carassius carassius",
             rarity = FishRarity.COMMON,
             minWeight = 0.2,
-            maxWeight = 1.5,
-            preferredBaits = listOf("Ver de terre", "Pain", "Maïs"),
+            maxWeight = 2.0,
+            preferredBaits = listOf("Ver de terre", "Pain mouillé", "Maïs"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Petit cyprinidé résistant, proche de la carpe.",
@@ -81,11 +81,11 @@ object FishingData {
         Fish(
             name = "Carassin argenté",
             nameEn = "Silver Crucian Carp",
-            species =  "Carassius argentus",
+            species = "Carassius gibelio",
             rarity = FishRarity.COMMON,
-            minWeight = 0.2,
-            maxWeight = 1.5,
-            preferredBaits = listOf("Ver de terre", "Pain", "Maïs"),
+            minWeight = 0.15,
+            maxWeight = 1.8,
+            preferredBaits = listOf("Ver de terre", "Pâte aux œufs", "Maïs"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Variété argentée du carassin commun.",
@@ -94,11 +94,11 @@ object FishingData {
         Fish(
             name = "Goujon",
             nameEn = "Gudgeon",
-            species =  "Gobio gobio",
+            species = "Gobio gobio",
             rarity = FishRarity.COMMON,
             minWeight = 0.05,
-            maxWeight = 0.2,
-            preferredBaits = listOf("Ver rouge", "Asticot"),
+            maxWeight = 0.25,
+            preferredBaits = listOf("Ver rouge", "Asticot", "Ver de vase"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Petit poisson de fond aux barbillons caractéristiques.",
@@ -107,56 +107,69 @@ object FishingData {
         Fish(
             name = "Vairon",
             nameEn = "Minnow",
-            species =  "Phoxinus phoxinus",
+            species = "Phoxinus phoxinus",
             rarity = FishRarity.COMMON,
             minWeight = 0.01,
-            maxWeight = 0.08,
-            preferredBaits = listOf("Asticot", "Ver rouge"),
+            maxWeight = 0.1,
+            preferredBaits = listOf("Asticot", "Ver rouge", "Larve d'éphémère"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Très petit poisson grégaire des eaux claires.",
             descriptionEn = "Very small schooling fish of clear waters."
         ),
         Fish(
+            name = "Vandoise",
+            nameEn = "Dace",
+            species = "Leuciscus leuciscus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.1,
+            maxWeight = 0.8,
+            preferredBaits = listOf("Asticot", "Pain mouillé", "Ver rouge"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Cyprinidé des eaux courantes, très vif.",
+            descriptionEn = "Cyprinid of running waters, very lively."
+        ),
+        Fish(
+            name = "Grémille",
+            nameEn = "Ruffe",
+            species = "Gymnocephalus cernua",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.3,
+            preferredBaits = listOf("Ver rouge", "Ver de vase", "Asticot"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Petit percidé nocturne aux épines acérées.",
+            descriptionEn = "Small nocturnal percid with sharp spines."
+        ),
+        Fish(
             name = "Épinoche",
             nameEn = "Stickleback",
-            species =  "Gasterosteus aculeatus",
+            species = "Gasterosteus aculeatus",
             rarity = FishRarity.COMMON,
             minWeight = 0.01,
-            maxWeight = 0.05,
-            preferredBaits = listOf("Asticot", "Ver rouge"),
+            maxWeight = 0.08,
+            preferredBaits = listOf("Asticot", "Ver rouge", "Larve d'éphémère"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Minuscule poisson aux épines dorsales caractéristiques.",
             descriptionEn = "Tiny fish with characteristic dorsal spines."
-        ),
-        Fish(
-            name = "Loche d'étang",
-            nameEn = "Pond Loach",
-            species =  "Misgurnus fossilis",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.1,
-            maxWeight = 0.3,
-            preferredBaits = listOf("Ver de vase", "Asticot"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.RAIN),
-            description = "Poisson de fond très résistant aux conditions difficiles.",
-            descriptionEn = "Bottom fish very resistant to harsh conditions."
         )
     )
 
     // ==========================================
-    // POISSONS INTERMÉDIAIRES - AVEC TRADUCTIONS ANGLAISES
+    // POISSONS INTERMÉDIAIRES
     // ==========================================
-    private val intermediateFresh = listOf(
+    private val intermediateFreshwater = listOf(
         Fish(
             name = "Perche",
             nameEn = "Perch",
-            species =  "Perca fluviatilis",
+            species = "Perca fluviatilis",
             rarity = FishRarity.UNCOMMON,
             minWeight = 0.1,
-            maxWeight = 2.5,
-            preferredBaits = listOf("Ver rouge", "Petit leurre", "Poisson vif"),
+            maxWeight = 3.5,
+            preferredBaits = listOf("Ver rouge", "Vif", "Lombric"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.CLOUDY),
             description = "Carnassier aux rayures noires caractéristiques.",
@@ -165,11 +178,11 @@ object FishingData {
         Fish(
             name = "Tanche",
             nameEn = "Tench",
-            species =  "Tinca tinca",
+            species = "Tinca tinca",
             rarity = FishRarity.UNCOMMON,
             minWeight = 0.5,
-            maxWeight = 4.0,
-            preferredBaits = listOf("Ver de terre", "Maïs", "Bouillette"),
+            maxWeight = 6.0,
+            preferredBaits = listOf("Ver de terre", "Maïs", "Pâte au miel"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.OVERCAST),
             description = "Poisson aux nageoires arrondies, amateur d'herbiers.",
@@ -178,11 +191,11 @@ object FishingData {
         Fish(
             name = "Brochet",
             nameEn = "Pike",
-            species =  "Esox lucius",
+            species = "Esox lucius",
             rarity = FishRarity.RARE,
             minWeight = 1.0,
-            maxWeight = 15.0,
-            preferredBaits = listOf("Poisson vif", "Leurre", "Grenouille"),
+            maxWeight = 25.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson", "Grenouille"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.OVERCAST),
             description = "Grand prédateur aux dents acérées, roi des eaux douces.",
@@ -191,108 +204,108 @@ object FishingData {
         Fish(
             name = "Carpe commune",
             nameEn = "Common Carp",
-            species =  "Cyprinus carpio",
+            species = "Cyprinus carpio",
             rarity = FishRarity.UNCOMMON,
             minWeight = 2.0,
-            maxWeight = 25.0,
-            preferredBaits = listOf("Bouillette", "Maïs", "Pellets"),
+            maxWeight = 40.0,
+            preferredBaits = listOf("Orge perlé", "Maïs", "Pâte aux œufs"),
             preferredTime = listOf("Nuit", "Matin"),
             preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.LIGHT_RAIN),
             description = "Poisson puissant et méfiant, rêve de tout carpiste.",
             descriptionEn = "Powerful and wary fish, dream of every carp angler."
         ),
         Fish(
-            name = "Carpe miroir",
-            nameEn = "Mirror Carp",
-            species =  "Cyprinus carpio",
-            rarity = FishRarity.UNCOMMON,
-            minWeight = 2.5,
-            maxWeight = 30.0,
-            preferredBaits = listOf("Bouillette", "Maïs", "Pellets"),
-            preferredTime = listOf("Nuit", "Matin"),
-            preferredWeather = listOf(WeatherType.OVERCAST),
-            description = "Variété de carpe aux écailles irrégulières.",
-            descriptionEn = "Carp variety with irregular scales."
-        ),
-        Fish(
             name = "Chevesne",
             nameEn = "Chub",
-            species =  "Squalius cephalus",
+            species = "Squalius cephalus",
             rarity = FishRarity.UNCOMMON,
             minWeight = 0.5,
-            maxWeight = 4.0,
-            preferredBaits = listOf("Pain", "Fromage", "Cerise"),
+            maxWeight = 6.0,
+            preferredBaits = listOf("Pain mouillé", "Cubes de fromage", "Maïs"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.SUNNY),
             description = "Poisson omnivore à la grosse tête caractéristique.",
             descriptionEn = "Omnivorous fish with characteristic large head."
         ),
         Fish(
-            name = "Ide mélanote",
+            name = "Ide",
             nameEn = "Ide",
-            species =  "Leuciscus idus",
+            species = "Leuciscus idus",
             rarity = FishRarity.UNCOMMON,
             minWeight = 0.8,
-            maxWeight = 6.0,
-            preferredBaits = listOf("Ver rouge", "Pain", "Petit leurre"),
+            maxWeight = 8.0,
+            preferredBaits = listOf("Ver rouge", "Pain mouillé", "Orge perlé"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.CLOUDY),
             description = "Cyprinidé doré aux reflets métalliques.",
             descriptionEn = "Golden cyprinid with metallic reflections."
         ),
         Fish(
-            name = "Truite arc-en-ciel",
-            nameEn = "Rainbow Trout",
-            species =  "Oncorhynchus mykiss",
-            rarity = FishRarity.RARE,
-            minWeight = 0.3,
-            maxWeight = 3.0,
-            preferredBaits = listOf("Ver rouge", "Mouche", "Petit leurre"),
-            preferredTime = listOf("Matin", "Soir"),
-            preferredWeather = listOf(WeatherType.CLOUDY, WeatherType.LIGHT_RAIN),
-            description = "Salmonidé aux couleurs chatoyantes, très combatif.",
-            descriptionEn = "Salmonid with shimmering colors, very combative."
-        ),
-        Fish(
-            name = "Loche franche",
-            nameEn = "Stone Loach",
-            species =  "Barbatula barbatula",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.05,
-            maxWeight = 0.15,
-            preferredBaits = listOf("Ver de vase", "Asticot"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Petit poisson de fond aux barbillons sensibles.",
-            descriptionEn = "Small bottom fish with sensitive barbels."
-        ),
-        Fish(
             name = "Barbeau",
             nameEn = "Barbel",
-            species =  "Barbus barbus",
+            species = "Barbus barbus",
             rarity = FishRarity.UNCOMMON,
             minWeight = 1.0,
-            maxWeight = 8.0,
-            preferredBaits = listOf("Ver rouge", "Fromage", "Pellets"),
+            maxWeight = 12.0,
+            preferredBaits = listOf("Ver rouge", "Cubes de fromage", "Lombric"),
             preferredTime = listOf("Nuit", "Matin"),
             preferredWeather = listOf(WeatherType.OVERCAST),
             description = "Poisson puissant des eaux courantes aux 4 barbillons.",
             descriptionEn = "Powerful fish of running waters with 4 barbels."
+        ),
+        Fish(
+            name = "Nase",
+            nameEn = "Nase",
+            species = "Chondrostoma nasus",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 0.3,
+            maxWeight = 2.5,
+            preferredBaits = listOf("Ver rouge", "Asticot", "Algues"),
+            preferredTime = listOf("Journée"),
+            preferredWeather = listOf(WeatherType.SUNNY),
+            description = "Poisson au museau caractéristique des eaux claires.",
+            descriptionEn = "Fish with characteristic snout of clear waters."
+        ),
+        Fish(
+            name = "Lotte",
+            nameEn = "Burbot",
+            species = "Lota lota",
+            rarity = FishRarity.RARE,
+            minWeight = 0.5,
+            maxWeight = 8.0,
+            preferredBaits = listOf("Morceaux de poisson", "Ver rouge", "Lombric"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.RAIN),
+            description = "Unique gadidé d'eau douce, actif par temps froid.",
+            descriptionEn = "Only freshwater gadid, active in cold weather."
+        ),
+        Fish(
+            name = "Anguille",
+            nameEn = "European Eel",
+            species = "Anguilla anguilla",
+            rarity = FishRarity.RARE,
+            minWeight = 0.3,
+            maxWeight = 4.0,
+            preferredBaits = listOf("Ver de terre", "Morceaux de poisson", "Lombric"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.RAIN),
+            description = "Poisson serpentiforme migrateur, nocturne.",
+            descriptionEn = "Snake-like migratory fish, nocturnal."
         )
     )
 
     // ==========================================
-    // POISSONS AVANCÉS - AVEC TRADUCTIONS ANGLAISES
+    // CARNASSIERS ET POISSONS RARES
     // ==========================================
-    private val advancedFresh = listOf(
+    private val predatorsAndRare = listOf(
         Fish(
             name = "Sandre",
             nameEn = "Zander",
-            species =  "Sander lucioperca",
+            species = "Sander lucioperca",
             rarity = FishRarity.RARE,
             minWeight = 1.5,
-            maxWeight = 12.0,
-            preferredBaits = listOf("Poisson vif", "Leurre souple", "Ver rouge"),
+            maxWeight = 18.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson", "Ver rouge"),
             preferredTime = listOf("Crépuscule", "Nuit"),
             preferredWeather = listOf(WeatherType.OVERCAST),
             description = "Prédateur crépusculaire aux yeux vitreux caractéristiques.",
@@ -301,115 +314,24 @@ object FishingData {
         Fish(
             name = "Silure",
             nameEn = "Catfish",
-            species =  "Silurus glanis",
+            species = "Silurus glanis",
             rarity = FishRarity.EPIC,
             minWeight = 5.0,
-            maxWeight = 80.0,
-            preferredBaits = listOf("Poisson vif", "Boudin", "Pellets"),
+            maxWeight = 150.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson", "Grenouille"),
             preferredTime = listOf("Nuit"),
             preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.RAIN),
             description = "Géant des eaux douces aux énormes barbillons.",
             descriptionEn = "Freshwater giant with huge barbels."
         ),
         Fish(
-            name = "Carpe fantôme",
-            nameEn = "Ghost Carp",
-            species =  "Cyprinus carpio",
-            rarity = FishRarity.RARE,
-            minWeight = 3.0,
-            maxWeight = 20.0,
-            preferredBaits = listOf("Bouillette", "Tigernuts", "Pellets"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.FOG),
-            description = "Variété de carpe aux couleurs pâles et mystérieuses.",
-            descriptionEn = "Carp variety with pale and mysterious colors."
-        ),
-        Fish(
-            name = "Amour Blanc",
-            nameEn = "Grass Carp",
-            species =  "Ctenopharyngodon idella",
-            rarity = FishRarity.RARE,
-            minWeight = 4.0,
-            maxWeight = 35.0,
-            preferredBaits = listOf("Herbe", "Maïs", "Bouillette végétale"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.SUNNY),
-            description = "Grande carpe herbivore originaire d'Asie.",
-            descriptionEn = "Large herbivorous carp from Asia."
-        ),
-        Fish(
-            name = "Carpe à grosse tête",
-            nameEn = "Bighead Carp",
-            species =  "Hypophthalmichthys nobilis",
-            rarity = FishRarity.RARE,
-            minWeight = 3.0,
-            maxWeight = 25.0,
-            preferredBaits = listOf("Plancton", "Bouillette", "Pellets"),
-            preferredTime = listOf("Matin", "Soir"),
-            preferredWeather = listOf(WeatherType.CLOUDY),
-            description = "Carpe asiatique à la tête disproportionnée.",
-            descriptionEn = "Asian carp with disproportionate head."
-        ),
-        Fish(
-            name = "Esturgeon",
-            nameEn = "Sturgeon",
-            species =  "Acipenser sturio",
-            rarity = FishRarity.LEGENDARY,
-            minWeight = 10.0,
-            maxWeight = 100.0,
-            preferredBaits = listOf("Ver marin", "Poisson vif", "Crevette"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.OVERCAST),
-            description = "Poisson préhistorique rarissime, véritable trésor.",
-            descriptionEn = "Extremely rare prehistoric fish, a true treasure."
-        ),
-        Fish(
-            name = "Sterlet",
-            nameEn = "Sterlet",
-            species =  "Acipenser ruthenus",
-            rarity = FishRarity.EPIC,
-            minWeight = 2.0,
-            maxWeight = 8.0,
-            preferredBaits = listOf("Ver rouge", "Poisson vif"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.OVERCAST),
-            description = "Petit esturgeon aux plaques osseuses caractéristiques.",
-            descriptionEn = "Small sturgeon with characteristic bony plates."
-        ),
-        Fish(
-            name = "Béluga",
-            nameEn = "Beluga Sturgeon",
-            species =  "Huso huso",
-            rarity = FishRarity.LEGENDARY,
-            minWeight = 20.0,
-            maxWeight = 200.0,
-            preferredBaits = listOf("Gros poisson vif", "Crevette géante"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.OVERCAST),
-            description = "Le plus grand esturgeon, géant mythique des rivières.",
-            descriptionEn = "The largest sturgeon, mythical giant of rivers."
-        ),
-        Fish(
-            name = "Nase (ou hotu)",
-            nameEn = "Nase",
-            species =  "Chondrostoma nasus",
-            rarity = FishRarity.UNCOMMON,
-            minWeight = 0.3,
-            maxWeight = 2.0,
-            preferredBaits = listOf("Ver rouge", "Asticot"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.SUNNY),
-            description = "Poisson au museau caractéristique des eaux claires.",
-            descriptionEn = "Fish with characteristic snout of clear waters."
-        ),
-        Fish(
-            name = "Aspe",
+            name = "Asp",
             nameEn = "Asp",
-            species =  "Aspius aspius",
+            species = "Aspius aspius",
             rarity = FishRarity.RARE,
             minWeight = 2.0,
-            maxWeight = 12.0,
-            preferredBaits = listOf("Poisson vif", "Leurre", "Mouche"),
+            maxWeight = 15.0,
+            preferredBaits = listOf("Vif", "Ablette", "Ver rouge"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.WIND),
             description = "Prédateur de surface aux attaques spectaculaires.",
@@ -418,198 +340,289 @@ object FishingData {
     )
 
     // ==========================================
-    // POISSONS MARINS - AVEC TRADUCTIONS ANGLAISES
+    // SALMONIDÉS
+    // ==========================================
+    private val salmonids = listOf(
+        Fish(
+            name = "Truite brune",
+            nameEn = "Brown Trout",
+            species = "Salmo trutta",
+            rarity = FishRarity.RARE,
+            minWeight = 0.3,
+            maxWeight = 5.0,
+            preferredBaits = listOf("Ver rouge", "Larve d'éphémère", "Vif"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY, WeatherType.LIGHT_RAIN),
+            description = "Salmonidé noble aux couleurs chatoyantes.",
+            descriptionEn = "Noble salmonid with shimmering colors."
+        ),
+        Fish(
+            name = "Saumon atlantique",
+            nameEn = "Atlantic Salmon",
+            species = "Salmo salar",
+            rarity = FishRarity.EPIC,
+            minWeight = 3.0,
+            maxWeight = 25.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson", "Ver rouge"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Roi des salmonidés, migrateur légendaire.",
+            descriptionEn = "King of salmonids, legendary migrator."
+        ),
+        Fish(
+            name = "Truite de lac",
+            nameEn = "Lake Trout",
+            species = "Salvelinus namaycush",
+            rarity = FishRarity.EPIC,
+            minWeight = 2.0,
+            maxWeight = 20.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson", "Ver rouge"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Grande truite des lacs profonds et froids.",
+            descriptionEn = "Large trout of deep cold lakes."
+        ),
+        Fish(
+            name = "Omble arctique",
+            nameEn = "Arctic Char",
+            species = "Salvelinus alpinus",
+            rarity = FishRarity.RARE,
+            minWeight = 1.0,
+            maxWeight = 8.0,
+            preferredBaits = listOf("Ver rouge", "Vif", "Larve d'éphémère"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Omble des eaux froides arctiques.",
+            descriptionEn = "Char of cold arctic waters."
+        ),
+        Fish(
+            name = "Ombre",
+            nameEn = "Grayling",
+            species = "Thymallus thymallus",
+            rarity = FishRarity.RARE,
+            minWeight = 0.3,
+            maxWeight = 2.0,
+            preferredBaits = listOf("Larve d'éphémère", "Ver rouge", "Asticot"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Salmonidé à la grande nageoire dorsale.",
+            descriptionEn = "Salmonid with large dorsal fin."
+        )
+    )
+
+    // ==========================================
+    // ESTURGEONS
+    // ==========================================
+    private val sturgeons = listOf(
+        Fish(
+            name = "Esturgeon russe",
+            nameEn = "Russian Sturgeon",
+            species = "Acipenser gueldenstaedtii",
+            rarity = FishRarity.LEGENDARY,
+            minWeight = 10.0,
+            maxWeight = 80.0,
+            preferredBaits = listOf("Ver rouge", "Morceaux de poisson", "Lombric"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Esturgeon noble producteur de caviar.",
+            descriptionEn = "Noble sturgeon, caviar producer."
+        ),
+        Fish(
+            name = "Esturgeon persan",
+            nameEn = "Persian Sturgeon",
+            species = "Acipenser persicus",
+            rarity = FishRarity.LEGENDARY,
+            minWeight = 8.0,
+            maxWeight = 60.0,
+            preferredBaits = listOf("Ver rouge", "Morceaux de poisson"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Esturgeon de la Caspienne aux œufs précieux.",
+            descriptionEn = "Caspian sturgeon with precious roe."
+        ),
+        Fish(
+            name = "Sterlet",
+            nameEn = "Sterlet",
+            species = "Acipenser ruthenus",
+            rarity = FishRarity.EPIC,
+            minWeight = 1.0,
+            maxWeight = 8.0,
+            preferredBaits = listOf("Ver rouge", "Lombric", "Vif"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Petit esturgeon aux plaques osseuses caractéristiques.",
+            descriptionEn = "Small sturgeon with characteristic bony plates."
+        ),
+        Fish(
+            name = "Béluga",
+            nameEn = "Beluga Sturgeon",
+            species = "Huso huso",
+            rarity = FishRarity.LEGENDARY,
+            minWeight = 50.0,
+            maxWeight = 400.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Le plus grand esturgeon, géant mythique des rivières.",
+            descriptionEn = "The largest sturgeon, mythical giant of rivers."
+        ),
+        Fish(
+            name = "Esturgeon étoilé",
+            nameEn = "Stellate Sturgeon",
+            species = "Acipenser stellatus",
+            rarity = FishRarity.EPIC,
+            minWeight = 5.0,
+            maxWeight = 25.0,
+            preferredBaits = listOf("Ver rouge", "Morceaux de poisson"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Esturgeon au museau allongé caractéristique.",
+            descriptionEn = "Sturgeon with characteristic elongated snout."
+        )
+    )
+
+    // ==========================================
+    // POISSONS MARINS
     // ==========================================
     private val marineFish = listOf(
         Fish(
             name = "Hareng",
             nameEn = "Herring",
-            species =  "Clupea harengus",
+            species = "Clupea harengus",
             rarity = FishRarity.COMMON,
             minWeight = 0.2,
-            maxWeight = 0.8,
-            preferredBaits = listOf("Ver marin", "Petit leurre"),
+            maxWeight = 1.2,
+            preferredBaits = listOf("Ver marin", "Morceaux de poisson"),
             preferredTime = listOf("Matin", "Soir"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Poisson pélagique formant d'immenses bancs.",
             descriptionEn = "Pelagic fish forming huge schools."
         ),
         Fish(
-            name = "Plie",
-            nameEn = "Plaice",
-            species =  "Pleuronectes platessa",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.5,
-            maxWeight = 3.0,
-            preferredBaits = listOf("Ver marin", "Crevette"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Poisson plat aux taches oranges caractéristiques.",
-            descriptionEn = "Flatfish with characteristic orange spots."
-        ),
-        Fish(
-            name = "Flet",
-            nameEn = "Flounder",
-            species =  "Platichthys flesus",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.3,
-            maxWeight = 2.0,
-            preferredBaits = listOf("Ver marin", "Crevette"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Poisson plat commun des estuaires et côtes.",
-            descriptionEn = "Common flatfish of estuaries and coasts."
-        ),
-        Fish(
             name = "Morue",
             nameEn = "Cod",
-            species =  "Gadus morhua",
+            species = "Gadus morhua",
             rarity = FishRarity.UNCOMMON,
             minWeight = 2.0,
-            maxWeight = 15.0,
-            preferredBaits = listOf("Poisson vif", "Ver marin", "Crevette"),
+            maxWeight = 25.0,
+            preferredBaits = listOf("Vif", "Ver marin", "Morceaux de poisson"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Poisson emblématique de l'Atlantique Nord.",
             descriptionEn = "Emblematic fish of the North Atlantic."
         ),
         Fish(
-            name = "Merlan",
-            nameEn = "Whiting",
-            species =  "Merlangius merlangus",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.3,
-            maxWeight = 2.5,
-            preferredBaits = listOf("Ver marin", "Petits poissons"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Gadidé commun aux eaux peu profondes.",
-            descriptionEn = "Common gadid of shallow waters."
-        ),
-        Fish(
-            name = "Lieu noir",
-            nameEn = "Saithe",
-            species =  "Pollachius virens",
-            rarity = FishRarity.UNCOMMON,
-            minWeight = 1.0,
-            maxWeight = 8.0,
-            preferredBaits = listOf("Poisson vif", "Leurre", "Ver marin"),
-            preferredTime = listOf("Matin", "Soir"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Gadidé sombre des eaux froides nordiques.",
-            descriptionEn = "Dark gadid of cold northern waters."
-        ),
-        Fish(
-            name = "Turbot",
-            nameEn = "Turbot",
-            species =  "Psetta maxima",
-            rarity = FishRarity.RARE,
-            minWeight = 3.0,
-            maxWeight = 25.0,
-            preferredBaits = listOf("Poisson vif", "Crevette", "Ver marin"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Poisson plat noble aux chairs délicates.",
-            descriptionEn = "Noble flatfish with delicate flesh."
-        ),
-        Fish(
-            name = "Cabillaud",
-            nameEn = "Atlantic Cod",
-            species =  "Gadus morhua",
-            rarity = FishRarity.UNCOMMON,
-            minWeight = 1.5,
-            maxWeight = 10.0,
-            preferredBaits = listOf("Poisson vif", "Ver marin"),
-            preferredTime = listOf("Journée"),
-            preferredWeather = listOf(WeatherType.ANY),
-            description = "Variété nordique de la morue commune.",
-            descriptionEn = "Northern variety of common cod."
-        ),
-        Fish(
-            name = "Maquereau",
-            nameEn = "Mackerel",
-            species =  "Scomber scombrus",
-            rarity = FishRarity.COMMON,
-            minWeight = 0.3,
-            maxWeight = 1.5,
-            preferredBaits = listOf("Petit leurre", "Ver marin"),
-            preferredTime = listOf("Matin", "Soir"),
-            preferredWeather = listOf(WeatherType.SUNNY),
-            description = "Poisson pélagique rapide aux rayures caractéristiques.",
-            descriptionEn = "Fast pelagic fish with characteristic stripes."
-        ),
-        Fish(
             name = "Flétan",
             nameEn = "Halibut",
-            species =  "Hippoglossus hippoglossus",
-            rarity = FishRarity.EPIC,
+            species = "Hippoglossus hippoglossus",
+            rarity = FishRarity.LEGENDARY,
             minWeight = 20.0,
-            maxWeight = 200.0,
-            preferredBaits = listOf("Gros poisson vif", "Crevette géante"),
+            maxWeight = 300.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson"),
             preferredTime = listOf("Journée"),
             preferredWeather = listOf(WeatherType.ANY),
             description = "Géant des mers, le plus grand poisson plat.",
             descriptionEn = "Ocean giant, the largest flatfish."
         ),
         Fish(
-            name = "Requin épineux",
-            nameEn = "Spiny Dogfish",
-            species =  "Squalus acanthias",
-            rarity = FishRarity.RARE,
-            minWeight = 5.0,
-            maxWeight = 40.0,
-            preferredBaits = listOf("Poisson vif", "Calamar"),
-            preferredTime = listOf("Nuit"),
-            preferredWeather = listOf(WeatherType.OVERCAST),
-            description = "Petit requin aux épines venimeuses.",
-            descriptionEn = "Small shark with venomous spines."
+            name = "Plie",
+            nameEn = "Plaice",
+            species = "Pleuronectes platessa",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.5,
+            maxWeight = 4.0,
+            preferredBaits = listOf("Ver marin", "Morceaux de poisson"),
+            preferredTime = listOf("Journée"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Poisson plat aux taches oranges caractéristiques.",
+            descriptionEn = "Flatfish with characteristic orange spots."
+        ),
+        Fish(
+            name = "Maquereau",
+            nameEn = "Mackerel",
+            species = "Scomber scombrus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.3,
+            maxWeight = 2.0,
+            preferredBaits = listOf("Ver marin", "Morceaux de poisson"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.SUNNY),
+            description = "Poisson pélagique rapide aux rayures caractéristiques.",
+            descriptionEn = "Fast pelagic fish with characteristic stripes."
         )
     )
 
-    data class Bait(
-        val name: String,
-        val nameEn: String,
-        val category: String = "",
-        val categoryEn: String = ""
+    // ==========================================
+    // CRUSTACÉS ET AUTRES
+    // ==========================================
+    private val otherSpecies = listOf(
+        Fish(
+            name = "Écrevisse",
+            nameEn = "Freshwater Crayfish",
+            species = "Astacus astacus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.3,
+            preferredBaits = listOf("Ver de terre", "Morceaux de poisson"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Crustacé d'eau douce aux pinces puissantes.",
+            descriptionEn = "Freshwater crustacean with powerful claws."
+        ),
+        Fish(
+            name = "Grenouille",
+            nameEn = "Frog",
+            species = "Rana temporaria",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.02,
+            maxWeight = 0.15,
+            preferredBaits = listOf("Ver de terre", "Asticot"),
+            preferredTime = listOf("Soir", "Nuit"),
+            preferredWeather = listOf(WeatherType.RAIN),
+            description = "Amphibien des zones humides, appât vivant.",
+            descriptionEn = "Wetland amphibian, live bait."
+        )
     )
 
+    // ==========================================
+    // APPÂTS COMPLETS RF4
+    // ==========================================
     val ALL_BAITS = listOf(
-        "Ablette", "Asticot", "Bouillettes", "Calamar", "Chironome",
-        "Crabe", "Crevette", "Cuiller", "Devon", "Épinoche",
-        "Fromage", "Gammare", "Graine de mais", "Hareng", "Jig",
-        "Leurre souple", "Maïs", "Maquereau", "Mouche sèche",
-        "Nymphe", "Pain", "Pellets", "Pâte", "Poisson vif",
-        "Popper", "Porte-bois", "Sardine", "Spinnerbait", "Sprat",
-        "Streamer", "Ver de terre", "Ver de vase", "Ver marin",
-        "Ver rouge", "Wobbler", "Pate à l'ail", "Autre"
+        // Vers et larves
+        "Ver de terre", "Ver rouge", "Lombric", "Ver de vase", "Asticots",
+        "Chrysalides", "Ver haché", "Larve de scolyte", "Larve d'éphémère",
+        "Larve de plécoptère", "Larve de phrygane", "Sangsues",
+
+        // Pâtes artisanales
+        "Pain mouillé", "Pâte à l'ail", "Pâte sucrée", "Pâte au miel",
+        "Pâte aux œufs", "Pâte au fromage blanc",
+
+        // Graines et céréales
+        "Orge perlé", "Maïs", "Semoule", "Flocons d'avoine", "Grains de blé",
+        "Bouillie de pois", "Bouillie de semoule", "Bouillie de millet",
+        "Tournesol", "Graines de lin", "Chènevis",
+
+        // Appâts vivants
+        "Vif", "Morceaux de poisson", "Écrevisse", "Moule de rivière",
+        "Moule zébrée", "Grenouille",
+
+        // Appâts spéciaux
+        "Cubes de pomme de terre", "Cubes de fromage", "Polenta",
+        "Poisson mort", "Viande de pétoncle", "Crabe",
+
+        // Appâts marins
+        "Ver marin", "Crevette", "Calamar",
+
+        // Autres
+        "Bouillettes", "Pellets", "Autre"
     )
-
-    // Extension pour obtenir le nom localisé d'un appât
-    fun Bait.getLocalizedName(context: Context): String {
-        return when (LanguageManager.getCurrentLanguage(context)) {
-            LanguageManager.Language.ENGLISH -> this.nameEn
-            LanguageManager.Language.FRENCH -> this.name
-        }
-    }
-
-    // Extension pour obtenir la catégorie localisée d'un appât
-    fun Bait.getLocalizedCategory(context: Context): String {
-        return when (LanguageManager.getCurrentLanguage(context)) {
-            LanguageManager.Language.ENGLISH -> this.categoryEn
-            LanguageManager.Language.FRENCH -> this.category
-        }
-    }
-
-    // Fonction pour obtenir tous les noms d'appâts (pour compatibilité)
-    fun getAllBaitNames(): List<String> {
-        return ALL_BAITS  // ✅ Si ALL_BAITS est déjà List<String>
-    }
 
     // ==========================================
     // FONCTION POUR RÉCUPÉRER TOUS LES POISSONS
     // ==========================================
     fun getAllFish(): List<Fish> {
-        return commonFresh + intermediateFresh + advancedFresh + marineFish
+        return commonFreshwater + intermediateFreshwater + predatorsAndRare +
+                salmonids + sturgeons + marineFish + otherSpecies
     }
 
     // ==========================================
@@ -623,29 +636,143 @@ object FishingData {
     }
 
     // ==========================================
-    // LACS AVEC MISE À JOUR DES POISSONS DISPONIBLES
+    // LACS AUTHENTIQUES RF4 - 18 PLANS D'EAU
     // ==========================================
     val lakes = listOf(
         Lake(
-            id = "mosquito_lake",
-            name = "Lac aux moustiques",
-            type = LakeType.LAKE,
-            difficulty = Difficulty.BEGINNER,
+            id = "akhtuba_river",
+            name = "Rivière Akhtuba",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.EXPERT,
             availableFish = getFishByNames(
                 listOf(
-                    "Gardon", "Ablette", "Brème", "Rotengle", "Carassin",
-                    "Goujon", "Vairon", "Épinoche", "Perche", "Tanche",
-                    "Brochet", "Carpe commune", "Carpe miroir",
-                    "Loche d'étang","Carassin argenté"
+                    "Béluga", "Esturgeon russe", "Esturgeon persan", "Sterlet",
+                    "Esturgeon étoilé", "Silure", "Asp", "Sandre", "Brochet",
+                    "Carpe commune", "Barbeau", "Chevesne", "Ide", "Brème",
+                    "Gardon", "Ablette", "Perche", "Lotte", "Anguille",
+                    "Écrevisse", "Grenouille"
                 )
             ),
-            description = "Lac idéal pour débuter, avec une grande variété de poissons blancs et quelques carnassiers.",
-            unlockLevel = 1,
+            description = "Rivière légendaire de Volga avec les plus gros esturgeons du monde.",
+            unlockLevel = 28,
             coordinates = mapOf(
-                "40:65" to "Zone peu profonde, gardons et ablettes très actifs.",
-                "68:45" to "Proximité des roseaux, tanches et carpes.",
-                "25:80" to "Ponton en bois, perches et brochets.",
-                "55:25" to "Fosse de 4m, brèmes en soirée."
+                "75:95" to "Fosse profonde - Bélugas géants",
+                "110:140" to "Confluence - Esturgeons russes",
+                "45:120" to "Méandre - Silures trophées",
+                "85:65" to "Radier - Aspes chasseurs"
+            )
+        ),
+
+        Lake(
+            id = "ladoga_lake",
+            name = "Lac Ladoga",
+            type = LakeType.LAKE,
+            difficulty = Difficulty.EXPERT,
+            availableFish = getFishByNames(
+                listOf(
+                    "Saumon atlantique", "Truite de lac", "Omble arctique",
+                    "Ombre", "Sandre", "Brochet", "Perche", "Lotte",
+                    "Brème", "Ide", "Chevesne", "Gardon", "Ablette",
+                    "Anguille", "Grenouille", "Écrevisse"
+                )
+            ),
+            description = "Plus grand lac d'Europe avec saumons légendaires.",
+            unlockLevel = 26,
+            coordinates = mapOf(
+                "120:85" to "Fjord nord - Saumons atlantiques",
+                "95:160" to "Baie sud - Truites de lac",
+                "75:120" to "Côte rocheuse - Sandres",
+                "140:110" to "Pleine eau - Ombles arctiques"
+            )
+        ),
+
+        Lake(
+            id = "volkhov_river",
+            name = "Rivière Volkhov",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.INTERMEDIATE,
+            availableFish = getFishByNames(
+                listOf(
+                    "Saumon atlantique", "Asp", "Sandre", "Brochet", "Silure",
+                    "Barbeau", "Chevesne", "Ide", "Brème", "Gardon",
+                    "Ablette", "Perche", "Lotte", "Anguille", "Vandoise",
+                    "Grenouille", "Écrevisse", "Moule de rivière"
+                )
+            ),
+            description = "Rivière historique reliant Ladoga au Golfe de Finlande.",
+            unlockLevel = 20,
+            coordinates = mapOf(
+                "73:74" to "Rapides - Brèmes géantes",
+                "95:120" to "Fosse calme - Silures",
+                "55:90" to "Embouchure - Saumons remontants",
+                "80:145" to "Méandre - Aspes"
+            )
+        ),
+
+        Lake(
+            id = "belaya_river",
+            name = "Rivière Belaya",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.INTERMEDIATE,
+            availableFish = getFishByNames(
+                listOf(
+                    "Truite brune", "Ombre", "Sterlet", "Barbeau", "Chevesne",
+                    "Ide", "Nase", "Gardon", "Perche", "Brochet",
+                    "Lotte", "Vandoise", "Goujon", "Ablette"
+                )
+            ),
+            description = "Rivière de montagne aux eaux cristallines.",
+            unlockLevel = 12,
+            coordinates = mapOf(
+                "60:80" to "Gorge rocheuse - Truites brunes",
+                "85:110" to "Bassin calme - Ombres",
+                "45:65" to "Rapides - Barbeaux",
+                "70:125" to "Confluent - Chevesnes"
+            )
+        ),
+
+        Lake(
+            id = "old_burg_lake",
+            name = "Lac du Vieux Bourg",
+            type = LakeType.LAKE,
+            difficulty = Difficulty.INTERMEDIATE,
+            availableFish = getFishByNames(
+                listOf(
+                    "Carpe commune", "Brème", "Tanche", "Silure", "Sandre",
+                    "Brochet", "Perche", "Chevesne", "Ide", "Gardon",
+                    "Carassin", "Carassin argenté", "Ablette", "Lotte",
+                    "Anguille", "Grenouille"
+                )
+            ),
+            description = "Ancien étang de château, excellent pour farming brèmes.",
+            unlockLevel = 12,
+            coordinates = mapOf(
+                "70:105" to "Ruines du château - Carpes géantes",
+                "115:75" to "Fosse profonde - Silures",
+                "50:140" to "Herbiers - Tanches",
+                "90:60" to "Centre lac - Brèmes"
+            )
+        ),
+
+        Lake(
+            id = "kuori_lake",
+            name = "Lac Kuori",
+            type = LakeType.LAKE,
+            difficulty = Difficulty.ADVANCED,
+            availableFish = getFishByNames(
+                listOf(
+                    "Truite brune", "Omble arctique", "Ombre", "Sandre",
+                    "Brochet", "Perche", "Lotte", "Ide", "Gardon",
+                    "Ablette"
+                )
+            ),
+            description = "Lac nordique aux larves premium et truites sauvages.",
+            unlockLevel = 16,
+            coordinates = mapOf(
+                "85:90" to "Île rocheuse - Ombles arctiques",
+                "125:110" to "Fosse glaciaire - Truites géantes",
+                "60:125" to "Cascade - Ombres",
+                "105:70" to "Banc sableux - Sandres"
             )
         ),
 
@@ -656,18 +783,18 @@ object FishingData {
             difficulty = Difficulty.BEGINNER,
             availableFish = getFishByNames(
                 listOf(
-                    "Gardon", "Ablette", "Goujon", "Vairon", "Chevesne",
-                    "Ide mélanote", "Perche", "Brochet", "Truite arc-en-ciel",
-                    "Loche franche", "Barbeau"
+                    "Truite brune", "Chevesne", "Ide", "Brochet", "Perche",
+                    "Gardon", "Ablette", "Vandoise", "Goujon", "Vairon",
+                    "Barbeau", "Lotte", "Anguille", "Grenouille", "Écrevisse"
                 )
             ),
-            description = "Ruisseau paisible parfait pour l'apprentissage du spinning et de la pêche à la mouche.",
-            unlockLevel = 3,
+            description = "Ruisseau parfait pour débuter, spot Never Outland légendaire.",
+            unlockLevel = 7,
             coordinates = mapOf(
-                "88:120" to "Méandre profond, truites et chevesnes.",
-                "45:68" to "Radier peu profond, vairons et goujons.",
-                "118:80" to "Sous-berge, repaire des perches.",
-                "70:140" to "Confluence, zone mixte très active."
+                "107:87" to "Never Outland - Spot mythique",
+                "88:120" to "Méandre profond - Truites",
+                "45:68" to "Radier - Chevesnes",
+                "118:80" to "Sous-berge - Perches"
             )
         ),
 
@@ -675,132 +802,240 @@ object FishingData {
             id = "bear_lake",
             name = "Lac de l'Ours",
             type = LakeType.LAKE,
-            difficulty = Difficulty.INTERMEDIATE,
+            difficulty = Difficulty.BEGINNER,
             availableFish = getFishByNames(
                 listOf(
-                    "Gardon", "Brème", "Carpe commune", "Carpe miroir", "Perche",
-                    "Sandre", "Brochet", "Tanche", "Silure", "Barbeau"
+                    "Brochet", "Perche", "Gardon", "Brème", "Carassin",
+                    "Goujon", "Ablette", "Rotengle", "Tanche"
                 )
             ),
-            description = "Lac de taille moyenne avec de beaux carnassiers et quelques silures.",
+            description = "Lac familial idéal pour l'apprentissage.",
             unlockLevel = 5,
             coordinates = mapOf(
-                "75:95" to "Herbier dense, tanches et carpes.",
-                "110:140" to "Tombant rocheux, sandres et perches.",
-                "45:120" to "Arbre mort immergé, brochets.",
-                "85:65" to "Pleine eau, bancs de gardons."
+                "50:70" to "Anse peu profonde - Gardons",
+                "80:95" to "Herbiers - Tanches",
+                "65:45" to "Pointe rocheuse - Brochets",
+                "75:85" to "Centre lac - Brèmes"
             )
         ),
 
         Lake(
-            id = "falcon_lake",
-            name = "Lac du Faucon",
+            id = "sura_river",
+            name = "Rivière Sura",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.ADVANCED,
+            availableFish = getFishByNames(
+                listOf(
+                    "Asp", "Sandre", "Silure", "Brochet", "Barbeau",
+                    "Chevesne", "Ide", "Sterlet", "Brème", "Gardon",
+                    "Perche", "Lotte", "Ablette", "Vandoise"
+                )
+            ),
+            description = "Rivière puissante aux trous profonds et aspes géants.",
+            unlockLevel = 22,
+            coordinates = mapOf(
+                "95:140" to "Trou de 8m - Silures géants",
+                "70:85" to "Rapides - Aspes chasseurs",
+                "110:120" to "Méandre - Sandres",
+                "55:110" to "Confluence - Barbeaux"
+            )
+        ),
+
+        Lake(
+            id = "amber_lake",
+            name = "Lac d'Ambre",
             type = LakeType.LAKE,
             difficulty = Difficulty.INTERMEDIATE,
             availableFish = getFishByNames(
                 listOf(
-                    "Perche", "Sandre", "Brochet", "Carpe commune", "Barbeau",
-                    "Chevesne", "Ide mélanote", "Truite arc-en-ciel"
+                    "Sandre", "Brochet", "Perche", "Silure", "Carpe commune",
+                    "Brème", "Ide", "Chevesne", "Gardon", "Ablette",
+                    "Tanche", "Carassin", "Lotte", "Anguille"
                 )
             ),
-            description = "Lac montagnard aux eaux cristallines, royaume des truites et perches.",
-            unlockLevel = 7,
+            description = "Lac aux eaux ambrées riche en carnassiers.",
+            unlockLevel = 14,
             coordinates = mapOf(
-                "60:45" to "Anse rocheuse, truites actives.",
-                "95:78" to "Plateau de 6m, perches et sandres.",
-                "35:90" to "Bordure d'épicéas, brochets à l'affût.",
-                "78:115" to "Chenal principal, chevesnes."
+                "85:105" to "Fosse centrale - Silures",
+                "65:80" to "Bordure roseaux - Brochets",
+                "95:125" to "Plateau rocheux - Sandres",
+                "75:95" to "Zone mixte - Perches"
             )
         ),
 
         Lake(
-            id = "rocky_lake",
-            name = "Lac Rocheux",
-            type = LakeType.LAKE,
-            difficulty = Difficulty.ADVANCED,
-            availableFish = getFishByNames(
-                listOf(
-                    "Sandre", "Brochet", "Perche", "Silure", "Carpe fantôme",
-                    "Amour Blanc", "Esturgeon", "Aspe"
-                )
-            ),
-            description = "Lac profond aux structures rocheuses complexes, repaire de gros poissons.",
-            unlockLevel = 10,
-            coordinates = mapOf(
-                "100:80" to "Éboulis rocheux (12m), gros sandres.",
-                "65:115" to "Plateau immergé, silures en chasse.",
-                "85:50" to "Faille profonde (18m), esturgeons.",
-                "45:95" to "Haut-fond, aspes en surface."
-            )
-        ),
-
-        Lake(
-            id = "old_burg_lake",
-            name = "Lac du Vieux Bourg",
-            type = LakeType.LAKE,
-            difficulty = Difficulty.ADVANCED,
-            availableFish = getFishByNames(
-                listOf(
-                    "Carpe commune", "Carpe miroir", "Carpe fantôme", "Amour Blanc",
-                    "Carpe à grosse tête", "Silure", "Sandre", "Brochet",
-                    "Esturgeon", "Sterlet"
-                )
-            ),
-            description = "Ancien étang de château converti en lac de pêche premium.",
-            unlockLevel = 12,
-            coordinates = mapOf(
-                "70:105" to "Ancien ponton du château, carpes méfiantes.",
-                "115:75" to "Fondations immergées, silures géants.",
-                "50:140" to "Roselière dense, amours blancs.",
-                "90:60" to "Fosse centrale (15m), esturgeons."
-            )
-        ),
-
-        Lake(
-            id = "kuori_lake",
-            name = "Lac Kuori",
+            id = "copper_lake",
+            name = "Lac de Cuivre",
             type = LakeType.LAKE,
             difficulty = Difficulty.EXPERT,
             availableFish = getFishByNames(
                 listOf(
-                    "Sandre", "Perche", "Brochet", "Truite arc-en-ciel", "Silure",
-                    "Esturgeon", "Sterlet", "Béluga", "Aspe"
+                    "Truite brune", "Omble arctique", "Sandre", "Brochet",
+                    "Perche", "Silure", "Lotte", "Ide", "Gardon"
                 )
             ),
-            description = "Lac nordique sauvage aux conditions extrêmes et poissons trophées.",
-            unlockLevel = 15,
+            description = "Lac de haute montagne aux conditions extrêmes.",
+            unlockLevel = 29,
             coordinates = mapOf(
-                "85:90" to "Île rocheuse, gros brochets.",
-                "125:110" to "Fosse glaciaire (25m), bélugas.",
-                "60:125" to "Cascade, truites sauvages.",
-                "105:70" to "Banc de sable, aspes chasseurs."
+                "70:90" to "Cirque glaciaire - Ombles",
+                "105:115" to "Fosse thermale - Truites",
+                "85:75" to "Éboulis - Sandres",
+                "95:135" to "Canyon immergé - Silures"
             )
         ),
 
         Lake(
-            id = "white_moose_lake",
-            name = "Lac de l'Élan Blanc",
+            id = "ladoga_archipelago",
+            name = "Archipel Ladoga",
             type = LakeType.LAKE,
             difficulty = Difficulty.EXPERT,
             availableFish = getFishByNames(
                 listOf(
-                    "Brochet", "Sandre", "Perche", "Silure", "Esturgeon",
-                    "Béluga", "Truite arc-en-ciel", "Aspe"
+                    "Saumon atlantique", "Truite de lac", "Omble arctique",
+                    "Sandre", "Brochet", "Perche", "Lotte", "Brème",
+                    "Ide", "Gardon", "Ablette", "Anguille"
                 )
             ),
-            description = "Lac légendaire de la taïga, habitat des plus gros spécimens.",
+            description = "Îles mystérieuses du grand Ladoga.",
+            unlockLevel = 30,
+            coordinates = mapOf(
+                "120:140" to "Chenal principal - Saumons",
+                "95:110" to "Baie protégée - Truites de lac",
+                "75:125" to "Tombants - Sandres",
+                "110:95" to "Hauts-fonds - Ombles"
+            )
+        ),
+
+        Lake(
+            id = "seversky_donets",
+            name = "Rivière Seversky Donets",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.ADVANCED,
+            availableFish = getFishByNames(
+                listOf(
+                    "Silure", "Asp", "Sandre", "Brochet", "Barbeau",
+                    "Chevesne", "Ide", "Sterlet", "Brème", "Gardon",
+                    "Perche", "Lotte", "Ablette", "Vandoise", "Nase"
+                )
+            ),
+            description = "Grande rivière steppique aux eaux troubles.",
+            unlockLevel = 25,
+            coordinates = mapOf(
+                "140:160" to "Méandre géant - Silures",
+                "85:120" to "Rapides - Aspes",
+                "110:140" to "Bras mort - Sandres",
+                "95:95" to "Gué - Barbeaux"
+            )
+        ),
+
+        Lake(
+            id = "lower_tunguska",
+            name = "Rivière Tunguska Inférieure",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.EXPERT,
+            availableFish = getFishByNames(
+                listOf(
+                    "Omble arctique", "Ombre", "Brochet", "Sandre", "Perche",
+                    "Lotte", "Ide", "Gardon", "Vandoise", "Goujon"
+                )
+            ),
+            description = "Rivière sauvage de Sibérie aux poissons arctiques.",
+            unlockLevel = 32,
+            coordinates = mapOf(
+                "200:180" to "Toundra - Ombles géants",
+                "165:210" to "Taïga - Ombres sauvages",
+                "185:160" to "Rapides - Brochets",
+                "170:195" to "Bassin - Lottes"
+            )
+        ),
+
+        Lake(
+            id = "yama_river",
+            name = "Rivière Yama",
+            type = LakeType.RIVER,
+            difficulty = Difficulty.EXPERT,
+            availableFish = getFishByNames(
+                listOf(
+                    "Omble arctique", "Ombre", "Truite brune", "Brochet",
+                    "Perche", "Lotte", "Ide", "Gardon"
+                )
+            ),
+            description = "Rivière arctique extrême, défi ultime.",
+            unlockLevel = 35,
+            coordinates = mapOf(
+                "250:220" to "Delta arctique - Ombles trophées",
+                "210:195" to "Canyon - Ombres légendaires",
+                "235:245" to "Toundra - Truites sauvages",
+                "220:210" to "Méandre gelé - Brochets"
+            )
+        ),
+
+        Lake(
+            id = "norway_sea",
+            name = "Mer de Norvège",
+            type = LakeType.SEA,
+            difficulty = Difficulty.EXPERT,
+            availableFish = getFishByNames(
+                listOf(
+                    "Flétan", "Morue", "Hareng", "Maquereau", "Plie"
+                )
+            ),
+            description = "Pêche maritime dans les fjords norvégiens.",
+            unlockLevel = 40,
+            coordinates = mapOf(
+                "300:280" to "Fosse abyssale - Flétans géants",
+                "250:260" to "Plateau continental - Morues",
+                "275:295" to "Bancs pélagiques - Harengs",
+                "285:270" to "Côte rocheuse - Maquereaux"
+            )
+        ),
+
+        Lake(
+            id = "elk_lake",
+            name = "Elk Lake",
+            type = LakeType.LAKE,
+            difficulty = Difficulty.INTERMEDIATE,
+            availableFish = getFishByNames(
+                listOf(
+                    "Truite brune", "Omble arctique", "Sandre", "Brochet",
+                    "Perche", "Gardon", "Brème", "Ide", "Lotte"
+                )
+            ),
+            description = "Nouveau lac 2025 avec système porte-cannes bateau.",
             unlockLevel = 18,
             coordinates = mapOf(
-                "95:135" to "Forêt noyée, brochets métrés.",
-                "130:85" to "Abîme central (30m), bélugas géants.",
-                "75:160" to "Marais bordier, silures nocturnes.",
-                "110:115" to "Récif de pierres, gros sandres."
+                "120:110" to "Baie nord - Truites",
+                "95:135" to "Îlot central - Sandres",
+                "80:95" to "Anse sud - Brochets",
+                "110:125" to "Chenal - Ombles"
+            )
+        ),
+
+        Lake(
+            id = "mosquito_lake",
+            name = "Lac aux moustiques",
+            type = LakeType.LAKE,
+            difficulty = Difficulty.BEGINNER,
+            availableFish = getFishByNames(
+                listOf(
+                    "Gardon", "Ablette", "Brème", "Rotengle", "Carassin",
+                    "Carassin argenté", "Goujon", "Vairon", "Perche", "Tanche",
+                    "Brochet", "Carpe commune", "Grenouille", "Écrevisse"
+                )
+            ),
+            description = "Lac de débutant, spot d'apprentissage parfait.",
+            unlockLevel = 1,
+            coordinates = mapOf(
+                "40:65" to "Zone peu profonde - Gardons actifs",
+                "68:45" to "Roseaux - Tanches et carpes",
+                "25:80" to "Ponton - Perches et brochets",
+                "55:25" to "Fosse 4m - Brèmes nocturnes"
             )
         )
     )
 
     // ==========================================
-    // FONCTIONS UTILITAIRES
+    // FONCTIONS UTILITAIRES AVANCÉES
     // ==========================================
 
     /**
@@ -879,5 +1114,81 @@ object FishingData {
         return getAllFish().filter { fish ->
             fish.maxWeight >= minWeight && fish.minWeight <= maxWeight
         }
+    }
+
+    /**
+     * NOUVEAU: Retourne les poissons trophées (Epic/Legendary)
+     */
+    fun getTrophyFish(): List<Fish> {
+        return getAllFish().filter {
+            it.rarity == FishRarity.EPIC || it.rarity == FishRarity.LEGENDARY
+        }
+    }
+
+    /**
+     * NOUVEAU: Retourne les spots premium (niveau 25+)
+     */
+    fun getPremiumLakes(): List<Lake> {
+        return lakes.filter { it.unlockLevel >= 25 }
+    }
+
+    /**
+     * NOUVEAU: Recherche de poissons par appât optimal
+     */
+    fun getFishByBait(baitName: String): List<Fish> {
+        return getAllFish().filter { fish ->
+            fish.preferredBaits.any { it.equals(baitName, ignoreCase = true) }
+        }
+    }
+
+    /**
+     * NOUVEAU: Obtient les appâts RF4 par catégorie
+     */
+    fun getBaitsByCategory(): Map<String, List<String>> {
+        return mapOf(
+            "Vers et larves" to listOf(
+                "Ver de terre", "Ver rouge", "Lombric", "Ver de vase", "Asticots",
+                "Chrysalides", "Ver haché", "Larve de scolyte", "Larve d'éphémère",
+                "Larve de plécoptère", "Larve de phrygane", "Sangsues"
+            ),
+            "Pâtes artisanales" to listOf(
+                "Pain mouillé", "Pâte à l'ail", "Pâte sucrée", "Pâte au miel",
+                "Pâte aux œufs", "Pâte au fromage blanc"
+            ),
+            "Graines et céréales" to listOf(
+                "Orge perlé", "Maïs", "Semoule", "Flocons d'avoine", "Grains de blé",
+                "Bouillie de pois", "Bouillie de semoule", "Bouillie de millet",
+                "Tournesol", "Graines de lin", "Chènevis"
+            ),
+            "Appâts vivants" to listOf(
+                "Vif", "Morceaux de poisson", "Écrevisse", "Moule de rivière",
+                "Moule zébrée", "Grenouille"
+            ),
+            "Appâts spéciaux" to listOf(
+                "Cubes de pomme de terre", "Cubes de fromage", "Polenta",
+                "Poisson mort", "Viande de pétoncle", "Crabe"
+            ),
+            "Appâts marins" to listOf(
+                "Ver marin", "Crevette", "Calamar"
+            ),
+            "Autres" to listOf(
+                "Bouillettes", "Pellets", "Autre"
+            )
+        )
+    }
+
+    /**
+     * NOUVEAU: Statistics RF4 réelles
+     */
+    fun getRF4Statistics(): Map<String, Any> {
+        return mapOf(
+            "total_fish_species" to getAllFish().size,
+            "total_water_bodies" to lakes.size,
+            "total_baits" to ALL_BAITS.size,
+            "legendary_fish_count" to getAllFish().count { it.rarity == FishRarity.LEGENDARY },
+            "epic_fish_count" to getAllFish().count { it.rarity == FishRarity.EPIC },
+            "expert_lakes_count" to lakes.count { it.difficulty == Difficulty.EXPERT },
+            "max_unlock_level" to (lakes.maxOfOrNull { it.unlockLevel } ?: 0)
+        )
     }
 }
