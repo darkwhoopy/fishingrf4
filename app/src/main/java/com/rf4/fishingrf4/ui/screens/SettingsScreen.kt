@@ -35,7 +35,8 @@ fun SettingsScreen(
     var keepScreenOn by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
-    val currentLanguage = LanguageManager.getCurrentLanguage(context)
+    // ✅ CORRECTION : Utiliser un state pour la langue actuelle
+    var currentLanguage by remember { mutableStateOf(LanguageManager.getCurrentLanguage(context)) }
 
     // Temps de jeu simple
     val gameTime = remember { mutableStateOf(LocalTime.now()) }
@@ -292,7 +293,7 @@ fun SettingsScreen(
         }
     }
 
-    // Dialog de sélection de langue
+    // ✅ DIALOG DE LANGUE CORRIGÉ
     if (showLanguageDialog) {
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
@@ -303,6 +304,8 @@ fun SettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                // ✅ CORRECTION : Mettre à jour le state local immédiatement
+                                currentLanguage = LanguageManager.Language.FRENCH
                                 LanguageManager.setAppLanguage(context, LanguageManager.Language.FRENCH)
                                 showLanguageDialog = false
                             },
@@ -325,6 +328,8 @@ fun SettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                // ✅ CORRECTION : Mettre à jour le state local immédiatement
+                                currentLanguage = LanguageManager.Language.ENGLISH
                                 LanguageManager.setAppLanguage(context, LanguageManager.Language.ENGLISH)
                                 showLanguageDialog = false
                             },

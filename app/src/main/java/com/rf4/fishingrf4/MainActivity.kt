@@ -1,6 +1,7 @@
 package com.rf4.fishingrf4
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -14,12 +15,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.rf4.fishingrf4.ui.FishingRF4App
+import com.rf4.fishingrf4.utils.LanguageManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LanguageManager.applyLanguage(this)
         setContent { MaterialTheme { FishingRF4App() }
             ScreenLockManager()
+        }
+    }
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase)
+        newBase?.let {
+            LanguageManager.applyLanguage(it)
         }
     }
 }

@@ -29,7 +29,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.ui.screens.TopFiveScreen
-import com.rf4.fishingrf4.utils.LanguageManager
 import kotlinx.coroutines.delay // ✅ NOUVEAU IMPORT
 
 // Vue modèle pour la création de FishingViewModel
@@ -103,10 +102,15 @@ fun FishingRF4App() {
 
     // Récupération des données (Top 5) et votes communautaires
     LaunchedEffect(startOfDay) {
-        viewModel.fetchTop5SpeciesCountsToday { topSpecies = it }
+        // ✅ CORRIGÉ : Utiliser startOfDay au lieu de timestampBack
+        viewModel.fetchTop5SpeciesCountsToday(startOfDay) { topSpecies = it }
         viewModel.fetchTop5PlayersOfDay(startOfDay) { topPlayers = it }
         viewModel.fetchTop5LakesOfDay(startOfDay) { topLakes = it }
-        // Récupère les votes communautaires
+        // ✅ AJOUT : Récupérer les stats d'appâts aussi
+        viewModel.fetchSpeciesWithBaitStats(startOfDay) { baitStats ->
+            // Vous pouvez stocker ces données si nécessaire
+            println("Stats appâts reçues: ${baitStats.size} espèces")
+        }
     }
 
     // Structure principale de la colonne avec l'UI

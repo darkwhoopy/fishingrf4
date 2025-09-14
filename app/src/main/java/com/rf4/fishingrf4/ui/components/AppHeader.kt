@@ -238,7 +238,7 @@ fun AppHeader(
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "v0.7",  // ✅ SE MET À JOUR
+                                        text = "v0.8b",  // ✅ SE MET À JOUR version
                                         fontSize = 8.sp,
                                         color = Color.White,
                                         fontWeight = FontWeight.ExtraBold,

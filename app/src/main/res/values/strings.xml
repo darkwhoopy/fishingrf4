@@ -702,6 +702,18 @@
     <string name="bait_shrimp">Crevette</string>
     <string name="bait_squid">Calamar</string>
 
+
+    <!--Leurre-->
+    <string name="Wobblers">poisson nageurs</string>
+    <string name="Poppers">Poppers</string>
+    <string name="Cuillères">cuillères</string>
+    <string name="Spinners">cuillères tournantes</string>
+    <string name="Plastique_Souple">leurre plastique</string>
+    <string name="Swimbaits">swimbait</string>
+    <string name="Jigs">jigs</string>
+    <string name="Spinnerbaits">Spinnerbaits</string>
+
+
     <!-- Autres -->
     <string name="bait_boilies">Bouillettes</string>
     <string name="bait_pellets">Pellets</string>

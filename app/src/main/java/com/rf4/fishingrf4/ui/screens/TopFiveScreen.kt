@@ -1,7 +1,3 @@
-// ============================================================================
-// FICHIER: ui/screens/TopFiveScreen.kt (VERSION COMPLÈTE CORRIGÉE)
-// ============================================================================
-
 package com.rf4.fishingrf4.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -90,14 +86,14 @@ fun TopFiveScreen(
                     isLoading = false
                 }
             }
-            2 -> { // Espèces
-                viewModel.fetchTop5SpeciesCountsToday { species ->
+            2 -> { // Espèces - ✅ CORRIGÉ : Passer timestampBack
+                viewModel.fetchTop5SpeciesCountsToday(timestampBack) { species ->
                     communitySpecies = species
                     isLoading = false
                 }
             }
-            3 -> { // Appâts - CORRIGÉ
-                viewModel.fetchSpeciesWithBaitStats { stats ->
+            3 -> { // Appâts - ✅ CORRIGÉ : Passer timestampBack
+                viewModel.fetchSpeciesWithBaitStats(timestampBack) { stats ->
                     communitySpeciesWithBaits = stats
                     isLoading = false
                 }
@@ -304,8 +300,33 @@ private fun SpeciesRankingContent(species: List<SpeciesCount>) {
         } else {
             items(species.take(5)) { speciesCount ->
                 val rank = species.indexOf(speciesCount) + 1
-                val fish = FishingData.getAllFish().find { it.name == speciesCount.species }
-                val displayName = fish?.getLocalizedName(context) ?: speciesCount.species
+
+                // ✅ CORRECTION : Recherche optimisée et logique
+                val fish = FishingData.getAllFish().find { fishItem ->
+                    // Comparaison directe d'abord (plus rapide)
+                    fishItem.name == speciesCount.species ||
+                            fishItem.nameEn == speciesCount.species ||
+                            // Puis comparaison insensible à la casse
+                            fishItem.name.equals(speciesCount.species, ignoreCase = true) ||
+                            fishItem.nameEn.equals(speciesCount.species, ignoreCase = true)
+                }
+
+                // ✅ CORRECTION : Gestion des cas null plus robuste
+                val displayName = when {
+                    fish != null -> {
+                        // Utiliser la localisation si le poisson est trouvé
+                        try {
+                            fish.getLocalizedName(context)
+                        } catch (e: Exception) {
+                            // Fallback si getLocalizedName échoue
+                            fish.name
+                        }
+                    }
+                    else -> {
+                        // Si le poisson n'est pas trouvé, utiliser le nom original
+                        speciesCount.species
+                    }
+                }
 
                 RankingCard(
                     rank = rank,
@@ -320,12 +341,14 @@ private fun SpeciesRankingContent(species: List<SpeciesCount>) {
 
 @Composable
 private fun BaitsRankingContent(baitsStats: Map<String, Pair<Long, List<Pair<String, Long>>>>) {
+    val context = LocalContext.current
+
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (baitsStats.isEmpty()) {
             item {
                 EmptyStateCard(
                     title = "Aucun appât trouvé",
-                    message = "Aucune donnée communautaire",
+                    message = "Aucune donnée d'appâts disponible. Effectuez des captures avec des appâts pour voir les statistiques.",
                     icon = "🎣"
                 )
             }
@@ -333,8 +356,9 @@ private fun BaitsRankingContent(baitsStats: Map<String, Pair<Long, List<Pair<Str
             items(baitsStats.entries.toList()) { (fishName, baitData) ->
                 CommunityBaitCard(
                     fishName = fishName,
-                    totalVotes = baitData.first,
-                    baits = baitData.second
+                    totalCaptures = baitData.first,
+                    baits = baitData.second,
+                    context = context
                 )
             }
         }
@@ -447,10 +471,10 @@ private fun RankingCard(
 @Composable
 private fun CommunityBaitCard(
     fishName: String,
-    totalVotes: Long,
-    baits: List<Pair<String, Long>>
+    totalCaptures: Long,
+    baits: List<Pair<String, Long>>,
+    context: android.content.Context
 ) {
-    val context = LocalContext.current  // ✅ AJOUTÉ
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
         modifier = Modifier.fillMaxWidth(),
@@ -470,8 +494,15 @@ private fun CommunityBaitCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "🐟", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    // ✅ CORRECTION : Recherche et traduction du nom du poisson
+                    val fish = FishingData.getAllFish().find {
+                        it.name == fishName || it.nameEn == fishName
+                    }
+                    val displayName = fish?.getLocalizedName(context) ?: fishName
+
                     Text(
-                        text = FishingData.getAllFish().find { it.name == fishName }?.getLocalizedName(context) ?: fishName,  // ✅ TRADUIT
+                        text = displayName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -483,7 +514,7 @@ private fun CommunityBaitCard(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "$totalVotes votes",
+                        text = "$totalCaptures captures",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF10B981),
@@ -496,7 +527,7 @@ private fun CommunityBaitCard(
             if (baits.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "🎯 Top appâts votés :",
+                    text = "🎯 Top appâts utilisés :",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF10B981)
@@ -504,7 +535,7 @@ private fun CommunityBaitCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                baits.take(3).forEachIndexed { index, (bait, votes) ->
+                baits.take(3).forEachIndexed { index, (bait, count) ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -527,7 +558,7 @@ private fun CommunityBaitCard(
                         }
 
                         Text(
-                            text = "×$votes",
+                            text = "×$count",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF10B981)
@@ -538,6 +569,14 @@ private fun CommunityBaitCard(
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Aucun appât utilisé pour cette espèce",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    style = androidx.compose.ui.text.TextStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                )
             }
         }
     }

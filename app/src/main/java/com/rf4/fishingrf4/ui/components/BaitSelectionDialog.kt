@@ -58,12 +58,19 @@ fun BaitSelectionDialog(
     // Liste complète des appâts possibles
     val allBaits = FishingData.ALL_BAITS
 
+
     // ✅ CORRECTION: Accéder aux appâts préférés via finalPreferredBaits
     val preferredBaits = fish.finalPreferredBaits
 
     // ✅ CORRECTION: Ne PAS filtrer les préférés s'ils sont dans les récents
     // On veut les voir dans les deux sections !
-    val otherBaits = allBaits.filterNot { it in preferredBaits }
+    val otherBaitsFiltered = allBaits.filterNot { it in preferredBaits }
+    val otherBaitsSorted = otherBaitsFiltered.filter { it != "Autre" }.sorted()
+    val otherBaits = if (otherBaitsFiltered.contains("Autre")) {
+        otherBaitsSorted + "Autre" // "Autre" à la fin
+    } else {
+        otherBaitsSorted
+    }
 
     Dialog(
         onDismissRequest = onDismiss,

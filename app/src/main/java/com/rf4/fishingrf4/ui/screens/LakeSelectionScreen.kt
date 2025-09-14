@@ -67,7 +67,18 @@ fun LakeSelectionScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val sortedLakes = lakes.sortedByDescending { favoriteLakeIds.contains(it.id) }
+            val sortedLakes = lakes.sortedWith { lake1, lake2 ->
+                val isFavorite1 = favoriteLakeIds.contains(lake1.id)
+                val isFavorite2 = favoriteLakeIds.contains(lake2.id)
+
+                when {
+                    // Si les deux sont favoris OU aucun n'est favori, on trie par niveau
+                    isFavorite1 == isFavorite2 -> lake1.unlockLevel.compareTo(lake2.unlockLevel)
+                    // Sinon, les favoris vont en premier
+                    isFavorite1 -> -1
+                    else -> 1
+                }
+            }
             items(sortedLakes) { lake ->
                 LakeCard(
                     lake = lake,

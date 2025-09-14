@@ -15,6 +15,7 @@ data class FishingEntry(
     val hour: Int? = null,
     val timeOfDay: String? = null,
     val notes: String = "",
+    val userName: String = "Joueur Local",
     val bait: String = "" // ✅ Champ ajouté pour l'appât utilisé
 ) {
     // ✅ Points simplifiés pour éviter les crashs

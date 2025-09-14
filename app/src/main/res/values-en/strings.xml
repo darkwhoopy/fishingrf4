@@ -700,6 +700,18 @@
     <string name="bait_shrimp">Shrimp</string>
     <string name="bait_squid">Squid</string>
 
+    <!--Leurre-->
+    <string name="Wobblers">Wobblers</string>
+    <string name="Poppers">Poppers</string>
+    <string name="Cuillères">cuillères</string>
+    <string name="Spinners">Spinners</string>
+    <string name="Plastique_Souple">Plastique_Souple</string>
+    <string name="Swimbaits">swimbait</string>
+    <string name="Jigs">jigs</string>
+    <string name="Spinnerbaits">Spinnerbaits</string>
+
+
+
     <!-- Others -->
     <string name="bait_boilies">Boilies</string>
     <string name="bait_pellets">Pellets</string>
