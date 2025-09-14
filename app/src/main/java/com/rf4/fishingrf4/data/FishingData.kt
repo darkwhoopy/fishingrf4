@@ -131,6 +131,35 @@ object FishingData {
             descriptionEn = "Cyprinid of running waters, very lively."
         ),
         Fish(
+            name = "Brème bleue",
+            nameEn = "Blue Bream",
+            species = "Ballerus ballerus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.1,
+            maxWeight = 1.5,
+            preferredBaits = listOf("Ver de vase", "Asticot", "Blé"),
+            preferredTime = listOf("Soirée", "Nuit"),
+            preferredWeather = listOf(WeatherType.CLOUDY, WeatherType.OVERCAST),
+            description = "Cyprinidé de taille moyenne, reconnaissable à son corps élancé et sa teinte bleuâtre. Préfère les zones profondes et calmes.",
+            descriptionEn = "Medium-sized cyprinid, recognizable by its slender body and bluish hue. Prefers deeper and calmer waters."
+        ),
+        // Brème blanche — utilisée dans Old Burg, Winding, Mosquito
+        Fish(
+            name = "Brème blanche",
+            nameEn = "White Bream",
+            species = "Blicca bjoerkna",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.1,
+            maxWeight = 2.0,
+            preferredBaits = listOf("Ver de vase", "Asticot", "Orge perlé"),
+            preferredTime = listOf("Soir", "Nuit", "Matin"),
+            preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.LIGHT_RAIN),
+            description = "Cyprinidé de fond plus mince que la brème commune, actif au crépuscule et la nuit.",
+            descriptionEn = "Bottom-dwelling cyprinid, slimmer than common bream; active at dusk and night."
+        ),
+
+// Grémille — utilisée dans Old Burg, Mosquito
+        Fish(
             name = "Grémille",
             nameEn = "Ruffe",
             species = "Gymnocephalus cernua",
@@ -143,6 +172,68 @@ object FishingData {
             description = "Petit percidé nocturne aux épines acérées.",
             descriptionEn = "Small nocturnal percid with sharp spines."
         ),
+
+// Loche d’étang — utilisée dans Mosquito
+        Fish(
+            name = "Loche d’étang",
+            nameEn = "Weatherfish",
+            species = "Misgurnus fossilis",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.3,
+            preferredBaits = listOf("Ver de vase", "Asticot", "Ver rouge"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.RAIN, WeatherType.OVERCAST),
+            description = "Poisson de fond fouisseur, actif par temps couvert ou pluvieux.",
+            descriptionEn = "Burrowing bottom fish, active in overcast or rainy weather."
+        ),
+
+// Dormeur chinois — utilisée dans Old Burg, Winding, Mosquito
+        Fish(
+            name = "Dormeur chinois",
+            nameEn = "Amur Sleeper",
+            species = "Perccottus glenii",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.7,
+            preferredBaits = listOf("Ver rouge", "Ver de vase", "Asticot"),
+            preferredTime = listOf("Soir", "Nuit"),
+            preferredWeather = listOf(WeatherType.CLOUDY, WeatherType.OVERCAST),
+            description = "Petit prédateur opportuniste des zones calmes et herbeuses.",
+            descriptionEn = "Small opportunistic predator of calm, weedy areas."
+        ),
+
+// Gardon commun — tes lacs citent explicitement ce libellé
+        Fish(
+            name = "Gardon commun",
+            nameEn = "Common Roach",
+            species = "Rutilus rutilus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.6,
+            preferredBaits = listOf("Pain mouillé", "Asticot", "Orge perlé"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Synonyme explicite du 'Gardon' avec le même comportement.",
+            descriptionEn = "Explicit synonym of 'Roach' with the same behavior."
+        ),
+
+// Hotu — utilisé dans Winding (synonyme de 'Nase')
+        Fish(
+            name = "Hotu",
+            nameEn = "Nasus (Dace)",
+            species = "Chondrostoma nasus",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 0.3,
+            maxWeight = 2.5,
+            preferredBaits = listOf("Ver rouge", "Asticot", "Algues"),
+            preferredTime = listOf("Journée"),
+            preferredWeather = listOf(WeatherType.SUNNY),
+            description = "Synonyme régional du nase, préfère le courant et les fonds pierreux.",
+            descriptionEn = "Regional synonym of 'Nase'; prefers current and stony bottoms."
+        ),
+
+
         Fish(
             name = "Épinoche",
             nameEn = "Stickleback",
@@ -227,6 +318,96 @@ object FishingData {
             description = "Poisson omnivore à la grosse tête caractéristique.",
             descriptionEn = "Omnivorous fish with characteristic large head."
         ),
+        // Amour blanc — utilisé dans Old Burg
+        Fish(
+            name = "Amour blanc",
+            nameEn = "Grass Carp",
+            species = "Ctenopharyngodon idella",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 2.0,
+            maxWeight = 35.0,
+            preferredBaits = listOf("Herbes", "Choux", "Feuilles de roseau", "Maïs"),
+            preferredTime = listOf("Journée", "Soir"),
+            preferredWeather = listOf(WeatherType.SUNNY, WeatherType.CLOUDY),
+            description = "Grand herbivore puissant fréquentant les bordures végétales.",
+            descriptionEn = "Large herbivorous carp frequenting vegetated margins."
+        ),
+
+// Amour noir — utilisé dans Old Burg
+        Fish(
+            name = "Amour noir",
+            nameEn = "Black Carp",
+            species = "Mylopharyngodon piceus",
+            rarity = FishRarity.RARE,
+            minWeight = 3.0,
+            maxWeight = 35.0,
+            preferredBaits = listOf("Moules", "Écrevisse", "Moule de rivière"),
+            preferredTime = listOf("Soir", "Nuit"),
+            preferredWeather = listOf(WeatherType.CLOUDY, WeatherType.OVERCAST),
+            description = "Cyprinidé spécialisé sur les mollusques, très combatif.",
+            descriptionEn = "Mollusc-feeding cyprinid; very powerful fighter."
+        ),
+
+// Carpe miroir — utilisée dans Mosquito
+        Fish(
+            name = "Carpe miroir",
+            nameEn = "Mirror Carp",
+            species = "Cyprinus carpio (var. mirror)",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 2.0,
+            maxWeight = 40.0,
+            preferredBaits = listOf("Maïs", "Orge perlé", "Bouillettes"),
+            preferredTime = listOf("Nuit", "Matin"),
+            preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.LIGHT_RAIN),
+            description = "Variante à grandes écailles de la carpe commune.",
+            descriptionEn = "Large-scaled variant of the common carp."
+        ),
+
+// Tanche dorée — utilisée dans Mosquito
+        Fish(
+            name = "Tanche dorée",
+            nameEn = "Golden Tench",
+            species = "Tinca tinca (var. auratus)",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 0.5,
+            maxWeight = 4.0,
+            preferredBaits = listOf("Ver de terre", "Maïs", "Pâte au miel"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.OVERCAST),
+            description = "Morphotype doré de la tanche, fréquentant les herbiers.",
+            descriptionEn = "Golden morph of tench, inhabiting weed beds."
+        ),
+
+// Ide mélanote — utilisée dans Old Burg & Winding
+        Fish(
+            name = "Ide mélanote",
+            nameEn = "Black-finned Ide",
+            species = "Leuciscus melanotus",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 0.6,
+            maxWeight = 6.0,
+            preferredBaits = listOf("Ver rouge", "Pain mouillé", "Orge perlé"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Proche de l’ide ordinaire, préférant eaux lentes et calmes.",
+            descriptionEn = "Close to common ide; prefers slow, calm waters."
+        ),
+
+// Corégone d’Ostrog — utilisé dans Old Burg
+        Fish(
+            name = "Corégone d’Ostrog",
+            nameEn = "Ostrog Whitefish",
+            species = "Coregonus sp.",
+            rarity = FishRarity.RARE,
+            minWeight = 0.5,
+            maxWeight = 4.0,
+            preferredBaits = listOf("Ver de vase", "Larve d'éphémère", "Moucherons"),
+            preferredTime = listOf("Matin", "Soir"),
+            preferredWeather = listOf(WeatherType.CLOUDY),
+            description = "Corégone d’eau froide, sensible à la clarté et aux fonds profonds.",
+            descriptionEn = "Cold-water whitefish, sensitive to clarity and deep bottoms."
+        ),
+
         Fish(
             name = "Ide",
             nameEn = "Ide",
@@ -253,6 +434,21 @@ object FishingData {
             description = "Poisson puissant des eaux courantes aux 4 barbillons.",
             descriptionEn = "Powerful fish of running waters with 4 barbels."
         ),
+        // Grémille du Donets — utilisée dans Winding
+        Fish(
+            name = "Grémille du Donets",
+            nameEn = "Donets Ruffe",
+            species = "Gymnocephalus acerina",
+            rarity = FishRarity.UNCOMMON,
+            minWeight = 0.05,
+            maxWeight = 0.4,
+            preferredBaits = listOf("Ver de vase", "Asticot"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Percidé nocturne proche de la grémille, endémique du bassin du Donets.",
+            descriptionEn = "Nocturnal percid close to ruffe, endemic to Donets basin."
+        ),
+
         Fish(
             name = "Nase",
             nameEn = "Nase",
@@ -311,6 +507,21 @@ object FishingData {
             description = "Prédateur crépusculaire aux yeux vitreux caractéristiques.",
             descriptionEn = "Twilight predator with characteristic glassy eyes."
         ),
+        // Sandre de la Volga — utilisé dans Winding (espèce distincte du sandre)
+        Fish(
+            name = "Sandre de la Volga",
+            nameEn = "Volga Pikeperch",
+            species = "Sander volgensis",
+            rarity = FishRarity.RARE,
+            minWeight = 0.8,
+            maxWeight = 6.0,
+            preferredBaits = listOf("Vif", "Morceaux de poisson"),
+            preferredTime = listOf("Crépuscule", "Nuit"),
+            preferredWeather = listOf(WeatherType.OVERCAST, WeatherType.CLOUDY),
+            description = "Cousin du sandre commun, plus petit, actif la nuit.",
+            descriptionEn = "Smaller relative of zander, most active at night."
+        ),
+
         Fish(
             name = "Silure",
             nameEn = "Catfish",
@@ -569,6 +780,37 @@ object FishingData {
             description = "Crustacé d'eau douce aux pinces puissantes.",
             descriptionEn = "Freshwater crustacean with powerful claws."
         ),
+
+        // Écrevisse d’eau douce — Winding cite ce libellé exact
+        Fish(
+            name = "Écrevisse d’eau douce",
+            nameEn = "Freshwater Crayfish",
+            species = "Astacus astacus",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.05,
+            maxWeight = 0.3,
+            preferredBaits = listOf("Ver de terre", "Morceaux de poisson"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Alias explicite de l’écrevisse déjà présente — utilisé par certains lacs.",
+            descriptionEn = "Explicit alias of crayfish already present — used by certain lakes."
+        ),
+
+// Moule de rivière — utilisée dans Volkhov
+        Fish(
+            name = "Moule de rivière",
+            nameEn = "River Mussel",
+            species = "Unio pictorum",
+            rarity = FishRarity.COMMON,
+            minWeight = 0.03,
+            maxWeight = 0.2,
+            preferredBaits = listOf("—"),
+            preferredTime = listOf("Nuit"),
+            preferredWeather = listOf(WeatherType.ANY),
+            description = "Bivalve d’eau douce capturé accidentellement sur le fond.",
+            descriptionEn = "Freshwater bivalve, incidentally caught on the bottom."
+        ),
+
         Fish(
             name = "Grenouille",
             nameEn = "Frog",
@@ -738,10 +980,12 @@ object FishingData {
             difficulty = Difficulty.INTERMEDIATE,
             availableFish = getFishByNames(
                 listOf(
-                    "Carpe commune", "Brème", "Tanche", "Silure", "Sandre",
-                    "Brochet", "Perche", "Chevesne", "Ide", "Gardon",
-                    "Carassin", "Carassin argenté", "Ablette", "Lotte",
-                    "Anguille", "Grenouille"
+                    "Ablette", "Amour blanc", "Amour noir",
+                    "Anguille", "Brochet", "Brème", "Brème blanche",
+                    "Carassin", "Carassin argenté", "Carpe commune",
+                    "Chevesne", "Corégone d’Ostrog", "Dormeur chinois",
+                    "Gardon commun", "Grenouille", "Grémille", "Ide mélanote",
+                    "Perche", "Silure", "Tanche"
                 )
             ),
             description = "Ancien étang de château, excellent pour farming brèmes.",
@@ -783,9 +1027,11 @@ object FishingData {
             difficulty = Difficulty.BEGINNER,
             availableFish = getFishByNames(
                 listOf(
-                    "Truite brune", "Chevesne", "Ide", "Brochet", "Perche",
-                    "Gardon", "Ablette", "Vandoise", "Goujon", "Vairon",
-                    "Barbeau", "Lotte", "Anguille", "Grenouille", "Écrevisse"
+                    "Ablette", "Aspe", "Brème", "Brème blanche", "Brème bleue",
+                    "Carassin", "Carassin argenté", "Carpe commune", "Chevesne",
+                    "Dormeur chinois", "Écrevisse d’eau douce", "Gardon commun", "Goujon",
+                    "Grenouille", "Grémille", "Grémille du Donets", "Hotu", "Ide mélanote",
+                    "Perche", "Sandre de la Volga", "Silure", "Tanche", "Vandoise"
                 )
             ),
             description = "Ruisseau parfait pour débuter, spot Never Outland légendaire.",
@@ -1018,9 +1264,11 @@ object FishingData {
             difficulty = Difficulty.BEGINNER,
             availableFish = getFishByNames(
                 listOf(
-                    "Gardon", "Ablette", "Brème", "Rotengle", "Carassin",
-                    "Carassin argenté", "Goujon", "Vairon", "Perche", "Tanche",
-                    "Brochet", "Carpe commune", "Grenouille", "Écrevisse"
+                    "Ablette", "Brème", "Brème blanche", "Carassin",
+                    "Carassin argenté", "Carpe commune", "Carpe miroir",
+                    "Chevesne", "Dormeur chinois", "Gardon commun", "Grenouille",
+                    "Grémille", "Ide mélanote", "Loche d’étang", "Perche", "Silure",
+                    "Tanche", "Tanche dorée"
                 )
             ),
             description = "Lac de débutant, spot d'apprentissage parfait.",

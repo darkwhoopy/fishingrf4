@@ -167,7 +167,7 @@ fun AppHeader(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = stringResource(R.string.app_version),  // ✅ SE MET À JOUR
+                                    text = "v0.7",  // ✅ SE MET À JOUR
                                     fontSize = 8.sp,
                                     color = Color.White,
                                     fontWeight = FontWeight.ExtraBold,
