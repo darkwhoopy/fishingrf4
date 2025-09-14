@@ -42,6 +42,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
+import com.rf4.fishingrf4.utils.getLocalizedBaitName
 
 @Composable
 fun BaitSelectionDialog(
@@ -138,7 +139,7 @@ fun BaitSelectionDialog(
                             val usageCount = fishingEntries.count { it.bait == bait }
 
                             QuickBaitOption(
-                                baitName = bait,
+                                baitName = bait.getLocalizedBaitName(),
                                 isRecent = true,
                                 usageCount = usageCount,
                                 onClick = { onBaitSelected(bait) }
@@ -159,7 +160,7 @@ fun BaitSelectionDialog(
 
                         items(preferredBaits) { bait ->
                             QuickBaitOption(
-                                baitName = bait,
+                                baitName = bait.getLocalizedBaitName(),
                                 isRecommended = true,
                                 onClick = { onBaitSelected(bait) }
                             )
@@ -179,7 +180,7 @@ fun BaitSelectionDialog(
 
                         items(otherBaits) { bait ->
                             QuickBaitOption(
-                                baitName = bait,
+                                baitName = bait.getLocalizedBaitName(),
                                 onClick = {
                                     if (bait == "Autre") {
                                         showCustomInput = true
@@ -315,7 +316,7 @@ private fun QuickBaitOption(
 
             // Nom de l'appât
             Text(
-                text = baitName,
+                text = baitName.getLocalizedBaitName(),
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,

@@ -108,7 +108,7 @@
     <string name="bait_selection_title">Choisir un appât</string>
     <string name="bait_recommended">Recommandés</string>
     <string name="bait_recent">Récents</string>
-    <string name="bait_other">Autres</string>
+
     <string name="bait_custom">Appât personnalisé</string>
     <string name="bait_add_custom">Ajouter un appât</string>
     <string name="bait_placeholder">Nom de l\'appât</string>
@@ -585,5 +585,148 @@
     <string name="top5_species">Espèces</string>
     <string name="top5_baits">Appâts</string>
 
+    <!-- Noms des lacs -->
+    <string name="lake_mosquito_lake">Lac aux moustiques</string>
+    <string name="lake_winding_rivulet">Ruisselet qui serpente</string>
+    <string name="lake_old_burg_lake">Lac du Vieux Bourg</string>
+    <string name="lake_belaya_river">Rivière Belaya</string>
+    <string name="lake_kuori_lake">Lac Kuori</string>
+    <string name="lake_amber_lake">Lac d\'Ambre</string>
+    <string name="lake_volkhov_river">Rivière Volkhov</string>
+    <string name="lake_copper_lake">Lac de Cuivre</string>
+    <string name="lake_ladoga_lake">Lac Ladoga</string>
+    <string name="lake_ladoga_archipelago">Archipel Ladoga</string>
+    <string name="lake_sura_river">Rivière Sura</string>
+    <string name="lake_tunguska_river">Rivière Tunguska</string>
+
+    <!-- Descriptions des lacs -->
+    <string name="lake_mosquito_lake_desc">Lac idéal pour débuter, avec une grande variété de poissons blancs et quelques carnassiers.</string>
+    <string name="lake_winding_rivulet_desc">Ruisseau paisible parfait pour l\'apprentissage du spinning et de la pêche à la mouche.</string>
+    <string name="lake_old_burg_lake_desc">Ancien étang de château, excellent pour farming brèmes.</string>
+    <string name="lake_belaya_river_desc">Rivière de montagne aux eaux cristallines.</string>
+    <string name="lake_kuori_lake_desc">Lac nordique aux larves premium et truites sauvages.</string>
+    <string name="lake_amber_lake_desc">Lac aux eaux ambrées riche en carnassiers.</string>
+    <string name="lake_volkhov_river_desc">Rivière historique reliant Ladoga au Golfe de Finlande.</string>
+    <string name="lake_copper_lake_desc">Lac de haute montagne aux conditions extrêmes.</string>
+    <string name="lake_ladoga_lake_desc">Plus grand lac d\'Europe avec saumons légendaires.</string>
+    <string name="lake_ladoga_archipelago_desc">Îles mystérieuses du grand Ladoga.</string>
+    <string name="lake_sura_river_desc">Rivière sauvage aux esturgeons légendaires.</string>
+    <string name="lake_tunguska_river_desc">Rivière sibérienne aux poissons trophées.</string>
+
+    <!-- FishInfoScreen - Sections -->
+    <string name="fish_info_presence_captures">Présence &amp; Captures</string>
+    <string name="fish_info_baits">Appâts</string>
+    <string name="fish_info_optimal_hours">Heures Optimales</string>
+    <string name="fish_info_favorable_weather">Météo Favorable</string>
+    <string name="fish_info_best_spots">Mes Meilleurs Spots</string>
+    <string name="fish_info_captures_by_period">Captures par Période</string>
+
+    <!-- FishInfoScreen - Contenu -->
+    <string name="fish_info_no_lakes">Aucun lac disponible</string>
+    <string name="fish_info_favorite_baits">Appâts favoris :</string>
+    <string name="fish_info_my_baits">Mes appâts :</string>
+    <string name="fish_info_no_predefined_baits">Aucun appât prédéfini</string>
+    <string name="fish_info_all_hours">Toutes les heures</string>
+    <string name="fish_info_all_conditions">Toutes les conditions</string>
+    <string name="fish_info_captures_count">%d capture(s)</string>
+
+    <!-- FishInfoScreen - Boutons -->
+    <string name="fish_info_add_personal_bait">Ajouter un appât personnel</string>
+    <string name="fish_info_vote_community_bait">Voter pour un appât (Communauté)</string>
+
+    <!-- FishInfoScreen - Messages -->
+    <string name="fish_info_vote_success">✅ Vote enregistré pour \'%s\' !</string>
+
+    <!-- FishInfoScreen - Dialogs -->
+    <string name="fish_info_add_bait_dialog_title">Ajouter un appât</string>
+    <string name="fish_info_search_bait">Rechercher un appât</string>
+    <string name="fish_info_community_vote_title">👥 Vote communautaire</string>
+    <string name="fish_info_community_vote_question">Quel appât recommandez-vous pour %s ?</string>
+    <string name="fish_info_vote_button">Voter</string>
+
+    <string name="action_delete">Supprimer</string>
+    <string name="action_cancel">Annuler</string>
+    <!-- Vers et larves -->
+    <string name="bait_earthworm">Ver de terre</string>
+    <string name="bait_red_worm">Ver rouge</string>
+    <string name="bait_earthworm_large">Lombric</string>
+    <string name="bait_bloodworm">Ver de vase</string>
+    <string name="bait_maggots">Asticots</string>
+    <string name="bait_chrysalis">Chrysalides</string>
+    <string name="bait_chopped_worm">Ver haché</string>
+    <string name="bait_bark_beetle_larvae">Larve de scolyte</string>
+    <string name="bait_mayfly_larvae">Larve d\'éphémère</string>
+    <string name="bait_stonefly_larvae">Larve de plécoptère</string>
+    <string name="bait_caddisfly_larvae">Larve de phrygane</string>
+    <string name="bait_leeches">Sangsues</string>
+
+    <!-- Pâtes artisanales -->
+    <string name="bait_wet_bread">Pain mouillé</string>
+    <string name="bait_garlic_paste">Pâte à l\'ail</string>
+    <string name="bait_sweet_paste">Pâte sucrée</string>
+    <string name="bait_honey_paste">Pâte au miel</string>
+    <string name="bait_egg_paste">Pâte aux œufs</string>
+    <string name="bait_cottage_cheese_paste">Pâte au fromage blanc</string>
+
+    <!-- Graines et céréales -->
+    <string name="bait_pearl_barley">Orge perlé</string>
+    <string name="bait_corn">Maïs</string>
+    <string name="bait_semolina">Semoule</string>
+    <string name="bait_oat_flakes">Flocons d\'avoine</string>
+    <string name="bait_wheat_grains">Grains de blé</string>
+    <string name="bait_pea_porridge">Bouillie de pois</string>
+    <string name="bait_semolina_porridge">Bouillie de semoule</string>
+    <string name="bait_millet_porridge">Bouillie de millet</string>
+    <string name="bait_sunflower_seeds">Tournesol</string>
+    <string name="bait_flax_seeds">Graines de lin</string>
+    <string name="bait_hemp_seeds">Chènevis</string>
+
+    <!-- Appâts vivants -->
+    <string name="bait_live_bait">Vif</string>
+    <string name="bait_fish_pieces">Morceaux de poisson</string>
+    <string name="bait_crayfish">Écrevisse</string>
+    <string name="bait_river_mussel">Moule de rivière</string>
+    <string name="bait_zebra_mussel">Moule zébrée</string>
+    <string name="bait_frog">Grenouille</string>
+
+    <!-- Appâts spéciaux -->
+    <string name="bait_potato_cubes">Cubes de pomme de terre</string>
+    <string name="bait_cheese_cubes">Cubes de fromage</string>
+    <string name="bait_polenta">Polenta</string>
+    <string name="bait_dead_fish">Poisson mort</string>
+    <string name="bait_scallop_meat">Viande de pétoncle</string>
+    <string name="bait_crab">Crabe</string>
+
+    <!-- Appâts marins -->
+    <string name="bait_marine_worm">Ver marin</string>
+    <string name="bait_shrimp">Crevette</string>
+    <string name="bait_squid">Calamar</string>
+
+    <!-- Autres -->
+    <string name="bait_boilies">Bouillettes</string>
+    <string name="bait_pellets">Pellets</string>
+    <string name="bait_other">Autre</string>
+
+    <!-- Popup de mise à jour -->
+    <string name="update_title">🎉 Mise à jour %s disponible !</string>
+    <string name="update_subtitle">Découvrez les nouvelles fonctionnalités</string>
+    <string name="update_whats_new">✨ Quoi de neuf ?</string>
+    <string name="update_button_continue">Continuer à pêcher ! 🎣</string>
+    <string name="update_thanks_message">Merci de faire partie de la communauté Fishing RF4 ! Vos retours nous aident à améliorer l\'expérience.</string>
+
+    <!-- Fonctionnalités de la mise à jour -->
+    <string name="update_feature_1_title">Interface multilingue</string>
+    <string name="update_feature_1_desc">Application entièrement traduite en français et anglais</string>
+
+    <string name="update_feature_2_title">Appâts traduits</string>
+    <string name="update_feature_2_desc">Tous les noms d\'appâts s\'adaptent à votre langue</string>
+
+    <string name="update_feature_3_title">Lacs internationaux</string>
+    <string name="update_feature_3_desc">Noms et descriptions des lacs traduits</string>
+
+    <string name="update_feature_4_title">Connexion améliorée</string>
+    <string name="update_feature_4_desc">Nouveau popup de connexion non-intrusif</string>
+
+    <string name="button_close">Fermer</string>
 </resources>
 

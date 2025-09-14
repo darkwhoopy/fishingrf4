@@ -37,6 +37,7 @@ import com.rf4.fishingrf4.data.models.LakeType
 import com.rf4.fishingrf4.ui.components.BackButton
 import androidx.compose.ui.platform.LocalContext
 import com.rf4.fishingrf4.data.models.getLocalizedName
+import com.rf4.fishingrf4.utils.getLocalizedName
 
 // Classe locale pour les statistiques de capture dans la recherche
 data class FishStats(
@@ -355,7 +356,7 @@ fun FishSearchContent(
                         items(allLakes) { lake ->
                             FilterChip(
                                 onClick = { selectedLake = if (selectedLake == lake) null else lake },
-                                label = { Text(stringResource(R.string.search_lake_level_format, lake.name, lake.unlockLevel), fontSize = 11.sp) },
+                                label = { Text(stringResource(R.string.search_lake_level_format, lake.getLocalizedName(), lake.unlockLevel), fontSize = 11.sp) },
                                 selected = selectedLake == lake
                             )
                         }

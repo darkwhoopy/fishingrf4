@@ -108,7 +108,7 @@
     <string name="bait_selection_title">Choose a bait</string>
     <string name="bait_recommended">Recommended</string>
     <string name="bait_recent">Recent</string>
-    <string name="bait_other">Others</string>
+
     <string name="bait_custom">Custom bait</string>
     <string name="bait_add_custom">Add a bait</string>
     <string name="bait_placeholder">Bait name</string>
@@ -580,5 +580,152 @@
     <string name="top5_lakes">Lakes</string>
     <string name="top5_species">Species</string>
     <string name="top5_baits">Baits</string>
+
+    <!-- Lake names -->
+    <string name="lake_mosquito_lake">Mosquito Lake</string>
+    <string name="lake_winding_rivulet">Winding Rivulet</string>
+    <string name="lake_old_burg_lake">Old Burg Lake</string>
+    <string name="lake_belaya_river">Belaya River</string>
+    <string name="lake_kuori_lake">Kuori Lake</string>
+    <string name="lake_amber_lake">Amber Lake</string>
+    <string name="lake_volkhov_river">Volkhov River</string>
+    <string name="lake_copper_lake">Copper Lake</string>
+    <string name="lake_ladoga_lake">Ladoga Lake</string>
+    <string name="lake_ladoga_archipelago">Ladoga Archipelago</string>
+    <string name="lake_sura_river">Sura River</string>
+    <string name="lake_tunguska_river">Tunguska River</string>
+
+    <!-- Lake descriptions -->
+    <string name="lake_mosquito_lake_desc">Ideal lake for beginners, with a wide variety of white fish and some predators.</string>
+    <string name="lake_winding_rivulet_desc">Peaceful stream perfect for learning spinning and fly fishing.</string>
+    <string name="lake_old_burg_lake_desc">Old castle pond, excellent for bream farming.</string>
+    <string name="lake_belaya_river_desc">Mountain river with crystal clear waters.</string>
+    <string name="lake_kuori_lake_desc">Nordic lake with premium larvae and wild trout.</string>
+    <string name="lake_amber_lake_desc">Lake with amber waters rich in predators.</string>
+    <string name="lake_volkhov_river_desc">Historic river connecting Ladoga to the Gulf of Finland.</string>
+    <string name="lake_copper_lake_desc">High mountain lake with extreme conditions.</string>
+    <string name="lake_ladoga_lake_desc">Largest lake in Europe with legendary salmon.</string>
+    <string name="lake_ladoga_archipelago_desc">Mysterious islands of the great Ladoga.</string>
+    <string name="lake_sura_river_desc">Wild river with legendary sturgeon.</string>
+    <string name="lake_tunguska_river_desc">Siberian river with trophy fish.</string>
+
+    <!-- FishInfoScreen - Sections -->
+    <string name="fish_info_presence_captures">Presence &amp; Catches</string>
+    <string name="fish_info_baits">Baits</string>
+    <string name="fish_info_optimal_hours">Optimal Hours</string>
+    <string name="fish_info_favorable_weather">Favorable Weather</string>
+    <string name="fish_info_best_spots">My Best Spots</string>
+    <string name="fish_info_captures_by_period">Catches by Period</string>
+
+    <!-- FishInfoScreen - Content -->
+    <string name="fish_info_no_lakes">No lakes available</string>
+    <string name="fish_info_favorite_baits">Favorite baits:</string>
+    <string name="fish_info_my_baits">My baits:</string>
+    <string name="fish_info_no_predefined_baits">No predefined baits</string>
+    <string name="fish_info_all_hours">All hours</string>
+    <string name="fish_info_all_conditions">All conditions</string>
+    <string name="fish_info_captures_count">%d catch(es)</string>
+
+    <!-- FishInfoScreen - Buttons -->
+    <string name="fish_info_add_personal_bait">Add personal bait</string>
+    <string name="fish_info_vote_community_bait">Vote for bait (Community)</string>
+
+    <!-- FishInfoScreen - Messages -->
+    <string name="fish_info_vote_success">✅ Vote recorded for \'%s\'!</string>
+
+    <!-- FishInfoScreen - Dialogs -->
+    <string name="fish_info_add_bait_dialog_title">Add bait</string>
+    <string name="fish_info_search_bait">Search for a bait</string>
+    <string name="fish_info_community_vote_title">👥 Community vote</string>
+    <string name="fish_info_community_vote_question">Which bait do you recommend for %s?</string>
+    <string name="fish_info_vote_button">Vote</string>
+
+
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Worms and larvae -->
+    <string name="bait_earthworm">Earthworm</string>
+    <string name="bait_red_worm">Red Worm</string>
+    <string name="bait_earthworm_large">Large Earthworm</string>
+    <string name="bait_bloodworm">Bloodworm</string>
+    <string name="bait_maggots">Maggots</string>
+    <string name="bait_chrysalis">Chrysalis</string>
+    <string name="bait_chopped_worm">Chopped Worm</string>
+    <string name="bait_bark_beetle_larvae">Bark Beetle Larvae</string>
+    <string name="bait_mayfly_larvae">Mayfly Larvae</string>
+    <string name="bait_stonefly_larvae">Stonefly Larvae</string>
+    <string name="bait_caddisfly_larvae">Caddisfly Larvae</string>
+    <string name="bait_leeches">Leeches</string>
+
+    <!-- Artisanal pastes -->
+    <string name="bait_wet_bread">Wet Bread</string>
+    <string name="bait_garlic_paste">Garlic Paste</string>
+    <string name="bait_sweet_paste">Sweet Paste</string>
+    <string name="bait_honey_paste">Honey Paste</string>
+    <string name="bait_egg_paste">Egg Paste</string>
+    <string name="bait_cottage_cheese_paste">Cottage Cheese Paste</string>
+
+    <!-- Seeds and cereals -->
+    <string name="bait_pearl_barley">Pearl Barley</string>
+    <string name="bait_corn">Corn</string>
+    <string name="bait_semolina">Semolina</string>
+    <string name="bait_oat_flakes">Oat Flakes</string>
+    <string name="bait_wheat_grains">Wheat Grains</string>
+    <string name="bait_pea_porridge">Pea Porridge</string>
+    <string name="bait_semolina_porridge">Semolina Porridge</string>
+    <string name="bait_millet_porridge">Millet Porridge</string>
+    <string name="bait_sunflower_seeds">Sunflower Seeds</string>
+    <string name="bait_flax_seeds">Flax Seeds</string>
+    <string name="bait_hemp_seeds">Hemp Seeds</string>
+
+    <!-- Live baits -->
+    <string name="bait_live_bait">Live Bait</string>
+    <string name="bait_fish_pieces">Fish Pieces</string>
+    <string name="bait_crayfish">Crayfish</string>
+    <string name="bait_river_mussel">River Mussel</string>
+    <string name="bait_zebra_mussel">Zebra Mussel</string>
+    <string name="bait_frog">Frog</string>
+
+    <!-- Special baits -->
+    <string name="bait_potato_cubes">Potato Cubes</string>
+    <string name="bait_cheese_cubes">Cheese Cubes</string>
+    <string name="bait_polenta">Polenta</string>
+    <string name="bait_dead_fish">Dead Fish</string>
+    <string name="bait_scallop_meat">Scallop Meat</string>
+    <string name="bait_crab">Crab</string>
+
+    <!-- Marine baits -->
+    <string name="bait_marine_worm">Marine Worm</string>
+    <string name="bait_shrimp">Shrimp</string>
+    <string name="bait_squid">Squid</string>
+
+    <!-- Others -->
+    <string name="bait_boilies">Boilies</string>
+    <string name="bait_pellets">Pellets</string>
+    <string name="bait_other">Other</string>
+    <!-- Time periods -->
+
+    <string name="button_close">Closed</string>
+
+    <!-- Update popup -->
+    <string name="update_title">🎉 Update %s available!</string>
+    <string name="update_subtitle">Discover the new features</string>
+    <string name="update_whats_new">✨ What\'s new?</string>
+    <string name="update_button_continue">Continue fishing! 🎣</string>
+    <string name="update_thanks_message">Thank you for being part of the Fishing RF4 community! Your feedback helps us improve the experience.</string>
+
+    <!-- Update features -->
+    <string name="update_feature_1_title">Multilingual interface</string>
+    <string name="update_feature_1_desc">App fully translated in French and English</string>
+
+    <string name="update_feature_2_title">Translated baits</string>
+    <string name="update_feature_2_desc">All bait names adapt to your language</string>
+
+    <string name="update_feature_3_title">International lakes</string>
+    <string name="update_feature_3_desc">Lake names and descriptions translated</string>
+
+    <string name="update_feature_4_title">Improved connection</string>
+    <string name="update_feature_4_desc">New non-intrusive connection popup</string>
 
    </resources>

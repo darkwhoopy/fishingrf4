@@ -32,3 +32,4 @@ enum class Difficulty(val displayName: String, val colorValue: Long) {
     ADVANCED("Avancé", 0xFFE91E63),
     EXPERT("Expert", 0xFF9C27B0)
 }
+

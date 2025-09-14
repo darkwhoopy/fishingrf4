@@ -47,6 +47,7 @@ import com.rf4.fishingrf4.data.models.getLocalizedName
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import com.rf4.fishingrf4.utils.getLocalizedName
 
 // Énumération pour les périodes
 enum class TopPeriod(val displayName: String, val emoji: String, val daysBack: Int) {
@@ -269,9 +270,16 @@ private fun LakesRankingContent(lakes: List<Pair<String, Long>>) {
         } else {
             items(lakes.take(5)) { (lakeName, visits) ->
                 val rank = lakes.indexOf(lakeName to visits) + 1
+
+                // ✅ SOLUTION : Chercher par ID ou par nom
+                val lake = FishingData.lakes.find {
+                    it.name == lakeName || it.id == lakeName
+                }
+                val localizedName = lake?.getLocalizedName() ?: lakeName
+
                 RankingCard(
                     rank = rank,
-                    title = lakeName,
+                    title = localizedName,
                     subtitle = "$visits visites",
                     icon = "🌊"
                 )

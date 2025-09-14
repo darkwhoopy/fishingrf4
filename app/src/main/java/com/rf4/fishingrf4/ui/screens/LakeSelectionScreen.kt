@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Lake
+import com.rf4.fishingrf4.utils.getLocalizedDescription
+import com.rf4.fishingrf4.utils.getLocalizedName
 
 @Composable
 fun LakeSelectionScreen(
@@ -125,7 +127,7 @@ private fun LakeCard(
                     Text(text = lake.type.emoji, fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(text = lake.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(text = lake.getLocalizedName(), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Text(text = lake.type.displayName, fontSize = 12.sp, color = Color(0xFFE2E8F0))
                     }
                 }
@@ -171,7 +173,7 @@ private fun LakeCard(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = lake.description, fontSize = 13.sp, color = Color(0xFFE2E8F0))
+            Text(text = lake.getLocalizedDescription(), fontSize = 13.sp, color = Color(0xFFE2E8F0))
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

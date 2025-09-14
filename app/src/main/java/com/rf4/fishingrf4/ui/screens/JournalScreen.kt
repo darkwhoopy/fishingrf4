@@ -34,6 +34,7 @@ import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.getLocalizedName // 🆕 AJOUTÉ
 import com.rf4.fishingrf4.ui.components.BackButton
+import com.rf4.fishingrf4.utils.getLocalizedName
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -428,7 +429,7 @@ fun FishDetailDialog(
                 ) {
                     FishStatItem(stringResource(R.string.stat_captures), fishGroup.count.toString(), "🎣")
                     FishStatItem(stringResource(R.string.stat_species), "1", "🐠")
-                    FishStatItem(stringResource(R.string.stat_locations), fishGroup.entries.distinctBy { "${it.lake.name}-${it.position}" }.size.toString(), "📍")
+                    FishStatItem(stringResource(R.string.stat_locations), fishGroup.entries.distinctBy { "${it.lake.getLocalizedName()}-${it.position}" }.size.toString(), "📍")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

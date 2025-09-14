@@ -25,6 +25,7 @@ import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.data.models.UserSpot
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import com.rf4.fishingrf4.utils.getLocalizedName
 
 @Composable
 fun PositionSelectionScreen(
@@ -77,7 +78,7 @@ fun PositionSelectionScreen(
             BackButton(onClick = onBack)
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = lake.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(text = lake.getLocalizedName(), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Text("📍 Choisissez votre position", fontSize = 14.sp, color = Color(0xFFE2E8F0))
             }
         }

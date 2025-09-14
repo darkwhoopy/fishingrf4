@@ -29,6 +29,7 @@ import com.rf4.fishingrf4.data.models.getLocalizedName
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.BaitSelectionDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import com.rf4.fishingrf4.utils.getLocalizedName
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -112,7 +113,7 @@ fun FishSelectionScreen(
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.fish_position_format, lake.name, position),
+                    text = stringResource(R.string.fish_position_format, lake.getLocalizedName(), position),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

@@ -14,9 +14,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rf4.fishingrf4.data.models.*
 import com.rf4.fishingrf4.ui.components.AppHeader
+import com.rf4.fishingrf4.ui.components.UpdateAnnouncementPopup // ✅ NOUVEAU IMPORT
 import com.rf4.fishingrf4.ui.navigation.Screen
 import com.rf4.fishingrf4.ui.screens.*
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import com.rf4.fishingrf4.utils.UpdateManager // ✅ NOUVEAU IMPORT
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -28,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.ui.screens.TopFiveScreen
 import com.rf4.fishingrf4.utils.LanguageManager
+import kotlinx.coroutines.delay // ✅ NOUVEAU IMPORT
 
 // Vue modèle pour la création de FishingViewModel
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -42,9 +45,13 @@ class FishingViewModelFactory(private val context: Context) : ViewModelProvider.
 
 @Composable
 fun FishingRF4App() {
-    // ✅ CORRECTION : context déclaré au début du Composable
+    // Context déclaré au début du Composable
     val context = LocalContext.current
     val viewModel: FishingViewModel = viewModel(factory = FishingViewModelFactory(context))
+
+    // ✅ NOUVEAU : Gestionnaire de mise à jour
+    val updateManager = remember { UpdateManager(context) }
+    var showUpdatePopup by remember { mutableStateOf(false) }
 
     // État de l'utilisateur Firebase
     var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
@@ -56,6 +63,15 @@ fun FishingRF4App() {
         }
         FirebaseAuth.getInstance().addAuthStateListener(listener)
         onDispose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
+    }
+
+    // ✅ NOUVEAU : Vérification du popup de mise à jour au démarrage
+    LaunchedEffect(Unit) {
+        // Délai pour laisser l'app se charger complètement
+        delay(2500) // 2.5 secondes après le démarrage
+        if (updateManager.shouldShowUpdatePopup()) {
+            showUpdatePopup = true
+        }
     }
 
     // Collecte de l'état de l'UI et des données
@@ -265,6 +281,17 @@ fun FishingRF4App() {
                 )
             }
         }
+    }
+
+    // ✅ NOUVEAU : Popup de mise à jour
+    if (showUpdatePopup) {
+        UpdateAnnouncementPopup(
+            currentVersion = updateManager.getCurrentVersion(),
+            onDismiss = {
+                updateManager.markUpdatePopupShown()
+                showUpdatePopup = false
+            }
+        )
     }
 }
 

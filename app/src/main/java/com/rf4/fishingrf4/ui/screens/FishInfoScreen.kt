@@ -42,13 +42,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import com.rf4.fishingrf4.utils.getLocalizedBaitName
+import com.rf4.fishingrf4.utils.getLocalizedName // ✅ IMPORT pour la traduction des lacs
 
 @Composable
 fun FishInfoScreen(
@@ -100,9 +104,9 @@ fun FishInfoScreen(
             }
         }
 
-        // Présence & Captures
+        // Présence & Captures - ✅ TRADUIT
         item {
-            FishCard(icon = "📍", title = "Présence & Captures") {
+            FishCard(icon = "📍", title = stringResource(R.string.fish_info_presence_captures)) {
                 Row(modifier = Modifier.padding(bottom = 12.dp)) {
                     RarityBadge(text = fish.rarity.displayName, color = Color(fish.rarity.colorValue))
                 }
@@ -114,14 +118,14 @@ fun FishInfoScreen(
                         )
                     }
                 } else {
-                    Text("Aucun lac disponible", color = Color.Gray)
+                    Text(stringResource(R.string.fish_info_no_lakes), color = Color.Gray)
                 }
             }
         }
 
-        // ✅ SECTION APPÂTS FAVORIS - CORRIGÉE
+        // ✅ SECTION APPÂTS FAVORIS - TRADUITE
         item {
-            FishCard(icon = "🎣", title = "Appâts") {
+            FishCard(icon = "🎣", title = stringResource(R.string.fish_info_baits)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     // ✅ Utilisation directe des propriétés du Fish
                     val baitsList = if (fish.preferredBaits.isNotEmpty()) {
@@ -133,7 +137,7 @@ fun FishInfoScreen(
                     // Appâts favoris du poisson
                     if (baitsList.isNotEmpty()) {
                         Text(
-                            "Appâts favoris :",
+                            stringResource(R.string.fish_info_favorite_baits),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -147,20 +151,20 @@ fun FishInfoScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(bait, color = Color.White)
+                                Text(bait.getLocalizedBaitName(), color = Color.White)
                             }
                         }
                         if (customAddedBaits.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     } else {
-                        Text("Aucun appât prédéfini", color = Color.Gray)
+                        Text(stringResource(R.string.fish_info_no_predefined_baits), color = Color.Gray)
                     }
 
                     // Appâts personnalisés ajoutés
                     if (customAddedBaits.isNotEmpty()) {
                         Text(
-                            "Mes appâts :",
+                            stringResource(R.string.fish_info_my_baits),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -177,14 +181,14 @@ fun FishInfoScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(bait, color = Color.White, modifier = Modifier.weight(1f))
+                                Text(bait.getLocalizedBaitName(), color = Color.White, modifier = Modifier.weight(1f))
                                 IconButton(
                                     onClick = { viewModel.removeCustomBaitFromFish(fish.id, bait) },
                                     modifier = Modifier.size(24.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
-                                        contentDescription = "Supprimer",
+                                        contentDescription = stringResource(R.string.action_delete),
                                         tint = Color.Red,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -207,7 +211,7 @@ fun FishInfoScreen(
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Ajouter un appât personnel", fontSize = 12.sp)
+                            Text(stringResource(R.string.fish_info_add_personal_bait), fontSize = 12.sp)
                         }
                     }
 
@@ -223,7 +227,7 @@ fun FishInfoScreen(
                         ) {
                             Icon(Icons.Default.ThumbUp, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Voter pour un appât (Communauté)", fontSize = 12.sp)
+                            Text(stringResource(R.string.fish_info_vote_community_bait), fontSize = 12.sp)
                         }
                     }
 
@@ -239,9 +243,9 @@ fun FishInfoScreen(
             }
         }
 
-        // ✅ SECTION HEURES OPTIMALES - CORRIGÉE
+        // ✅ SECTION HEURES OPTIMALES - TRADUITE
         item {
-            FishCard(icon = "🕐", title = "Heures Optimales") {
+            FishCard(icon = "🕐", title = stringResource(R.string.fish_info_optimal_hours)) {
                 when {
                     // Nouvelle structure : preferredTime (List<String>)
                     fish.preferredTime.isNotEmpty() -> {
@@ -255,15 +259,15 @@ fun FishInfoScreen(
                     }
                     // Aucune donnée
                     else -> {
-                        Text("Toutes les heures", color = Color.Gray)
+                        Text(stringResource(R.string.fish_info_all_hours), color = Color.Gray)
                     }
                 }
             }
         }
 
-        // ✅ SECTION MÉTÉO FAVORABLE - CORRIGÉE
+        // ✅ SECTION MÉTÉO FAVORABLE - TRADUITE
         item {
-            FishCard(icon = "🌤️", title = "Météo Favorable") {
+            FishCard(icon = "🌤️", title = stringResource(R.string.fish_info_favorable_weather)) {
                 val weatherList = if (fish.preferredWeather.isNotEmpty()) {
                     fish.preferredWeather // Nouvelle structure
                 } else {
@@ -274,15 +278,15 @@ fun FishInfoScreen(
                     val weatherText = weatherList.joinToString(", ") { it.displayName }
                     Text(weatherText, color = Color.White)
                 } else {
-                    Text("Toutes les conditions", color = Color.Gray)
+                    Text(stringResource(R.string.fish_info_all_conditions), color = Color.Gray)
                 }
             }
         }
 
-        // Mes meilleurs spots
+        // Mes meilleurs spots - ✅ TRADUIT
         if (topSpots.isNotEmpty()) {
             item {
-                FishCard(icon = "🏆", title = "Mes Meilleurs Spots") {
+                FishCard(icon = "🏆", title = stringResource(R.string.fish_info_best_spots)) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         topSpots.forEachIndexed { index, spot ->
                             TopSpotRow(rank = index + 1, spotName = spot.first, count = spot.second)
@@ -292,16 +296,24 @@ fun FishInfoScreen(
             }
         }
 
-        // Captures par période
+        // Captures par période - ✅ TRADUIT
         if (timeOfDayStats.isNotEmpty()) {
             item {
-                FishCard(icon = "📊", title = "Captures par Période") {
-                    val periods = listOf("Matinée", "Journée", "Soirée", "Nuit")
+                FishCard(icon = "📊", title = stringResource(R.string.fish_info_captures_by_period)) {
+                    val periods = listOf(
+                        stringResource(R.string.time_morning),
+                        stringResource(R.string.time_day),
+                        stringResource(R.string.time_evening),
+                        stringResource(R.string.time_night)
+                    )
+                    val periodKeys = listOf("Matinée", "Journée", "Soirée", "Nuit")
+
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        periods.forEach { period ->
-                            val count = timeOfDayStats[period] ?: 0
+                        periods.forEachIndexed { index, translatedPeriod ->
+                            val periodKey = periodKeys[index]
+                            val count = timeOfDayStats[periodKey] ?: 0
                             if (count > 0) {
-                                TimeOfDayStatsRow(period = period, count = count)
+                                TimeOfDayStatsRow(period = translatedPeriod, count = count, periodKey = periodKey)
                             }
                         }
                     }
@@ -310,7 +322,7 @@ fun FishInfoScreen(
         }
     }
 
-    // ✅ Dialog d'ajout d'appât personnel
+    // ✅ Dialog d'ajout d'appât personnel - TRADUIT
     if (showAddBaitDialog) {
         SimpleBaitDialog(
             allGameBaits = viewModel.getAllGameBaits(),
@@ -323,7 +335,7 @@ fun FishInfoScreen(
         )
     }
 
-    // ✅ Dialog pour voter pour un appât communautaire
+    // ✅ Dialog pour voter pour un appât communautaire - TRADUIT
     if (showCommunityBaitDialog) {
         CommunityBaitVotingDialog(
             fish = fish,
@@ -391,7 +403,7 @@ fun RarityBadge(text: String, color: Color) {
     }
 }
 
-// ✅ COMPOSABLE POUR AFFICHER LES INFORMATIONS DE LAC
+// ✅ COMPOSABLE POUR AFFICHER LES INFORMATIONS DE LAC - TRADUIT
 @Composable
 fun LakeInfoRow(lake: Lake, captureCount: Int) {
     Row(
@@ -408,7 +420,7 @@ fun LakeInfoRow(lake: Lake, captureCount: Int) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = lake.name,
+            text = lake.getLocalizedName(), // ✅ NOM TRADUIT
             color = Color.White,
             modifier = Modifier.weight(1f)
         )
@@ -428,7 +440,7 @@ fun LakeInfoRow(lake: Lake, captureCount: Int) {
     }
 }
 
-// ✅ COMPOSABLE POUR AFFICHER LES TOPS SPOTS
+// ✅ COMPOSABLE POUR AFFICHER LES TOPS SPOTS - TRADUIT
 @Composable
 fun TopSpotRow(rank: Int, spotName: String, count: Int) {
     Row(
@@ -465,21 +477,21 @@ fun TopSpotRow(rank: Int, spotName: String, count: Int) {
         )
 
         Text(
-            text = "$count captures",
+            text = stringResource(R.string.fish_info_captures_count, count),
             color = Color.Gray,
             fontSize = 12.sp
         )
     }
 }
 
-// ✅ COMPOSABLE POUR LES STATISTIQUES PAR PÉRIODE
+// ✅ COMPOSABLE POUR LES STATISTIQUES PAR PÉRIODE - TRADUIT
 @Composable
-fun TimeOfDayStatsRow(period: String, count: Int) {
+fun TimeOfDayStatsRow(period: String, count: Int, periodKey: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        val periodIcon = when (period) {
+        val periodIcon = when (periodKey) {
             "Matinée" -> "🌅"
             "Journée" -> "☀️"
             "Soirée" -> "🌇"
@@ -510,7 +522,7 @@ fun TimeOfDayStatsRow(period: String, count: Int) {
     }
 }
 
-// ✅ DIALOG SIMPLE POUR AJOUTER UN APPÂT PERSONNEL
+// ✅ DIALOG SIMPLE POUR AJOUTER UN APPÂT PERSONNEL - TRADUIT
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleBaitDialog(
@@ -529,14 +541,14 @@ fun SimpleBaitDialog(
         onDismissRequest = onDismiss,
         containerColor = Color(0xFF1E3A5F),
         title = {
-            Text("Ajouter un appât", color = Color.White)
+            Text(stringResource(R.string.fish_info_add_bait_dialog_title), color = Color.White)
         },
         text = {
             Column {
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
-                    label = { Text("Rechercher un appât") },
+                    label = { Text(stringResource(R.string.fish_info_search_bait)) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -560,7 +572,7 @@ fun SimpleBaitDialog(
                                 contentColor = Color.White
                             )
                         ) {
-                            Text(bait)
+                            Text(bait.getLocalizedBaitName())
                         }
                         if (index < availableBaits.size - 1) {
                             Spacer(modifier = Modifier.height(4.dp))
@@ -572,13 +584,13 @@ fun SimpleBaitDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annuler", color = Color.White)
+                Text(stringResource(R.string.action_cancel), color = Color.White)
             }
         }
     )
 }
 
-// ✅ Dialog pour voter pour un appât communautaire
+// ✅ Dialog pour voter pour un appât communautaire - TRADUIT
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityBaitVotingDialog(
@@ -601,12 +613,12 @@ fun CommunityBaitVotingDialog(
         onDismissRequest = onDismiss,
         containerColor = Color(0xFF1E3A5F),
         title = {
-            Text("👥 Vote communautaire", color = Color.White)
+            Text(stringResource(R.string.fish_info_community_vote_title), color = Color.White)
         },
         text = {
             Column {
                 Text(
-                    text = "Quel appât recommandez-vous pour ${fish.name} ?",
+                    text = stringResource(R.string.fish_info_community_vote_question, fish.name),
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -624,7 +636,7 @@ fun CommunityBaitVotingDialog(
                                 containerColor = if (selectedBait == bait) Color(0xFF10B981).copy(alpha = 0.1f) else Color.Transparent
                             )
                         ) {
-                            Text(bait)
+                            Text(bait.getLocalizedBaitName())
                         }
                         if (index < availableBaitsForVoting.size - 1) {
                             Spacer(modifier = Modifier.height(4.dp))
@@ -654,13 +666,13 @@ fun CommunityBaitVotingDialog(
                         color = Color.White
                     )
                 } else {
-                    Text("Voter")
+                    Text(stringResource(R.string.fish_info_vote_button))
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annuler", color = Color.White)
+                Text(stringResource(R.string.action_cancel), color = Color.White)
             }
         }
     )
