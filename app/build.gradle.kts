@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.foundation)
+    implementation(libs.androidx.media3.common.ktx)
 
     // Tests
     testImplementation(libs.junit)

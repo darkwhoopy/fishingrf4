@@ -23,13 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.rf4.fishingrf4.R
+import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.Lake
+import com.rf4.fishingrf4.data.models.FavoriteSpot
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
@@ -37,8 +40,9 @@ import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 @Composable
 fun AddFavoriteSpotScreen(
     lake: Lake,
+    viewModel: FishingViewModel,
     onBack: () -> Unit,
-    onSaveSpot: (FavoriteSpot) -> Unit
+    onSaveSpot: (() -> Unit)? = null
 ) {
     // États pour la position
     var selectedPosition by remember { mutableStateOf("") }
@@ -53,6 +57,23 @@ fun AddFavoriteSpotScreen(
     // États pour les dialogs
     var showFishSelector by remember { mutableStateOf(false) }
     var showBaitSelector by remember { mutableStateOf(false) }
+
+    // Récupérer toutes les données depuis FishingData
+    val allFish = remember {
+        FishingData.getAllFish().sortedBy { it.name }
+    }
+    val allBaits = remember {
+        listOf(
+            "Ablette", "Asticot", "Blé", "Bouillettes", "Calamar", "Chironome",
+            "Chrysalide", "Crabe", "Crevette", "Cuiller", "Devon", "Épinoche",
+            "Fromage", "Gammare", "Graine de maïs", "Hareng", "Jig",
+            "Leurre souple", "Lombric", "Maïs", "Maquereau", "Mouche sèche",
+            "Nymphe", "Pain", "Pâte", "Pâte à l'ail", "Pellets", "Poisson vif",
+            "Popper", "Porte-bois", "Sardine", "Spinnerbait", "Sprat",
+            "Streamer", "Ver de terre", "Ver de vase", "Ver marin", "Ver rouge",
+            "Viande", "Wobbler"
+        ).sorted()
+    }
 
     val maxCoordinate = remember(lake.name) {
         when {
@@ -339,7 +360,7 @@ fun AddFavoriteSpotScreen(
                                     },
                                     label = {
                                         Text(
-                                            bait,
+                                            text = bait,
                                             color = Color.White,
                                             fontSize = 12.sp
                                         )
@@ -418,15 +439,15 @@ fun AddFavoriteSpotScreen(
             Button(
                 onClick = {
                     if (isValid) {
-                        val spot = FavoriteSpot(
+                        viewModel.addFavoriteSpot(
                             name = spotName,
                             position = selectedPosition,
-                            fish = selectedFish,
+                            lake = lake,
+                            fishNames = selectedFish.map { it.name },
                             baits = selectedBaits,
-                            distance = distance.toIntOrNull() ?: 0,
-                            lakeName = lake.name
+                            distance = distance.toIntOrNull() ?: 0
                         )
-                        onSaveSpot(spot)
+                        onSaveSpot?.invoke() ?: onBack()
                     }
                 },
                 enabled = isValid,
@@ -497,7 +518,7 @@ fun AddFavoriteSpotScreen(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(lake.availableFish) { fish ->
+                        items(allFish) { fish ->
                             val isSelected = selectedFish.contains(fish)
                             Card(
                                 modifier = Modifier
@@ -511,19 +532,29 @@ fun AddFavoriteSpotScreen(
                                     },
                                 colors = CardDefaults.cardColors(
                                     containerColor = if (isSelected)
-                                        Color(0xFF10B981) else Color(0xFF374151)
+                                        Color(fish.rarity.colorValue) else Color(0xFF374151)
                                 )
                             ) {
                                 Row(
                                     modifier = Modifier.padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = fish.name,
-                                        color = Color.White,
-                                        fontSize = 14.sp,
+                                    Column(
                                         modifier = Modifier.weight(1f)
-                                    )
+                                    ) {
+                                        Text(
+                                            text = fish.name,
+                                            color = Color.White,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = fish.scientificName,
+                                            color = Color.Gray,
+                                            fontSize = 12.sp,
+                                            fontStyle = FontStyle.Italic
+                                        )
+                                    }
                                     if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
@@ -566,12 +597,6 @@ fun AddFavoriteSpotScreen(
 
     // Dialog de sélection d'appâts (multi-sélection)
     if (showBaitSelector) {
-        val commonBaits = listOf(
-            "Ver de terre", "Ver de vase", "Asticot", "Maïs", "Pain",
-            "Lombric", "Chrysalide", "Blé", "Orge perlé", "Pâte",
-            "Pellets", "Bouillettes", "Fromage", "Viande", "Poisson mort"
-        )
-
         Dialog(onDismissRequest = { showBaitSelector = false }) {
             Card(
                 modifier = Modifier
@@ -595,7 +620,7 @@ fun AddFavoriteSpotScreen(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(commonBaits) { bait ->
+                        items(allBaits) { bait ->
                             val isSelected = selectedBaits.contains(bait)
                             Card(
                                 modifier = Modifier
@@ -662,13 +687,3 @@ fun AddFavoriteSpotScreen(
         }
     }
 }
-
-// Modèle de données pour un spot favori
-data class FavoriteSpot(
-    val name: String,
-    val position: String,
-    val fish: List<Fish>,
-    val baits: List<String>,
-    val distance: Int,
-    val lakeName: String
-)

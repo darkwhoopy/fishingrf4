@@ -25,6 +25,7 @@ firebaseBom = "34.2.0"
 # 🔥 Google Services - UNE SEULE VERSION
 playServicesAuth = "21.4.0"
 foundationVersion = "1.9.1"
+media3CommonKtx = "1.8.0"
 
 [libraries]
 # Android Core
@@ -67,6 +68,7 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 # 🔥 Google Services
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

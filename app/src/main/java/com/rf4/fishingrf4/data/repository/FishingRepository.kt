@@ -2,6 +2,7 @@ package com.rf4.fishingrf4.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.rf4.fishingrf4.data.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import com.rf4.fishingrf4.data.models.FavoriteSpot
 
 class FishingRepository(private val context: Context? = null) {
 
@@ -22,6 +24,12 @@ class FishingRepository(private val context: Context? = null) {
     val fishingEntries: StateFlow<List<FishingEntry>> = _fishingEntries.asStateFlow()
     private val _playerStats = MutableStateFlow(PlayerStats())
     val playerStats: StateFlow<PlayerStats> = _playerStats.asStateFlow()
+
+    private val KEY_FAVORITE_SPOTS = "favorite_spots"
+
+    // StateFlow pour les spots favoris
+    private val _favoriteSpots = MutableStateFlow<List<FavoriteSpot>>(emptyList())
+    val favoriteSpots: StateFlow<List<FavoriteSpot>> = _favoriteSpots.asStateFlow()
 
     companion object {
         private const val RECENT_BAITS_KEY = "recent_baits_ordered"
@@ -256,6 +264,86 @@ class FishingRepository(private val context: Context? = null) {
             .sortedByDescending { it.third }
             .take(10)
     }
+
+    suspend fun loadFavoriteSpots() {
+        withContext(Dispatchers.IO) {
+            try {
+                val spotsJson = prefs?.getString(KEY_FAVORITE_SPOTS, "[]")
+                val spots = Json.decodeFromString<List<FavoriteSpot>>(spotsJson ?: "[]")
+                _favoriteSpots.value = spots
+            } catch (e: Exception) {
+                Log.e("FishingRepository", "Erreur lors du chargement des spots favoris", e)
+                _favoriteSpots.value = emptyList()
+            }
+        }
+    }
+
+    /**
+     * Sauvegarde tous les spots favoris dans les préférences
+     */
+    private suspend fun saveFavoriteSpots() {
+        withContext(Dispatchers.IO) {
+            try {
+                val spotsJson = Json.encodeToString(_favoriteSpots.value)
+                prefs?.edit()?.putString(KEY_FAVORITE_SPOTS, spotsJson)?.apply()
+            } catch (e: Exception) {
+                Log.e("FishingRepository", "Erreur lors de la sauvegarde des spots favoris", e)
+            }
+        }
+    }
+
+    /**
+     * Ajoute un nouveau spot favori
+     */
+    suspend fun addFavoriteSpot(spot: FavoriteSpot) {
+        val currentSpots = _favoriteSpots.value.toMutableList()
+        currentSpots.add(spot)
+        _favoriteSpots.value = currentSpots
+        saveFavoriteSpots()
+    }
+
+    /**
+     * Supprime un spot favori par ID
+     */
+    suspend fun deleteFavoriteSpot(spotId: String) {
+        val currentSpots = _favoriteSpots.value.toMutableList()
+        currentSpots.removeAll { it.id == spotId }
+        _favoriteSpots.value = currentSpots
+        saveFavoriteSpots()
+    }
+
+    /**
+     * Met à jour un spot favori existant
+     */
+    suspend fun updateFavoriteSpot(updatedSpot: FavoriteSpot) {
+        val currentSpots = _favoriteSpots.value.toMutableList()
+        val index = currentSpots.indexOfFirst { it.id == updatedSpot.id }
+        if (index != -1) {
+            currentSpots[index] = updatedSpot
+            _favoriteSpots.value = currentSpots
+            saveFavoriteSpots()
+        }
+    }
+
+    /**
+     * Récupère les spots favoris pour un lac spécifique
+     */
+    fun getFavoriteSpotsForLake(lakeId: String): List<FavoriteSpot> {
+        return _favoriteSpots.value.filter { it.lakeId == lakeId }
+    }
+
+    /**
+     * Recherche des spots favoris par nom
+     */
+    fun searchFavoriteSpots(query: String): List<FavoriteSpot> {
+        return _favoriteSpots.value.filter { spot ->
+            spot.name.contains(query, ignoreCase = true) ||
+                    spot.lakeName.contains(query, ignoreCase = true) ||
+                    spot.fishNames.any { it.contains(query, ignoreCase = true) } ||
+                    spot.baits.any { it.contains(query, ignoreCase = true) }
+        }
+    }
+
 
     /**
      * Récupère le nombre total de poissons capturés par espèce aujourd'hui

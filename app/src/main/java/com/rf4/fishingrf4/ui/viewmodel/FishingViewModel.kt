@@ -3,9 +3,11 @@ package com.rf4.fishingrf4.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.FishingData
+import com.rf4.fishingrf4.data.models.FavoriteSpot
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.Lake
@@ -51,6 +53,7 @@ class FishingViewModel(context: Context) : ViewModel() {
     val recentBaits: StateFlow<List<String>> = _recentBaits.asStateFlow()
     val currentUser: StateFlow<FirebaseUser?> = _currentUser.asStateFlow()
     val gameTime: StateFlow<LocalTime> = GameTimeManager.gameTime
+    val favoriteSpots: StateFlow<List<FavoriteSpot>> = repository.favoriteSpots
 
     val startOfCurrentGameDayTimestamp: StateFlow<Long> =
         gameTime.map { currentGameTime ->
@@ -90,6 +93,7 @@ class FishingViewModel(context: Context) : ViewModel() {
         loadAllDataSources()
         viewModelScope.launch { GameTimeManager.start() }
         loadRecentBaits()
+        loadFavoriteSpots()
 
         // Écouter les changements d'authentification Firebase
         FirebaseAuth.getInstance().addAuthStateListener { auth ->
@@ -592,6 +596,75 @@ class FishingViewModel(context: Context) : ViewModel() {
             } catch (e: Exception) {
                 println("Erreur lors de la réinitialisation: ${e.message}")
             }
+        }
+    }
+    fun addFavoriteSpot(
+        name: String,
+        position: String,
+        lake: Lake,
+        fishNames: List<String>,
+        baits: List<String>,
+        distance: Int,
+        notes: String = ""
+    ) {
+        viewModelScope.launch {
+            try {
+                val spot = FavoriteSpot(
+                    name = name,
+                    position = position,
+                    lakeName = lake.name,
+                    lakeId = lake.id,
+                    fishNames = fishNames,
+                    baits = baits,
+                    distance = distance,
+                    notes = notes
+                )
+                repository.addFavoriteSpot(spot)
+            } catch (e: Exception) {
+                Log.e("FishingViewModel", "Erreur lors de l'ajout du spot favori", e)
+            }
+        }
+    }
+
+    /**
+     * Supprime un spot favori
+     */
+    fun deleteFavoriteSpot(spotId: String) {
+        viewModelScope.launch {
+            try {
+                repository.deleteFavoriteSpot(spotId)
+            } catch (e: Exception) {
+                Log.e("FishingViewModel", "Erreur lors de la suppression du spot favori", e)
+            }
+        }
+    }
+
+    /**
+     * Met à jour un spot favori
+     */
+    fun updateFavoriteSpot(spot: FavoriteSpot) {
+        viewModelScope.launch {
+            try {
+                repository.updateFavoriteSpot(spot)
+            } catch (e: Exception) {
+                Log.e("FishingViewModel", "Erreur lors de la mise à jour du spot favori", e)
+            }
+        }
+    }
+
+    /**
+     * Récupère les spots favoris pour un lac
+     */
+    fun getFavoriteSpotsForLake(lakeId: String): List<FavoriteSpot> {
+        return repository.getFavoriteSpotsForLake(lakeId)
+    }
+
+    /**
+     * Charge les spots favoris au démarrage
+     */
+    private fun loadFavoriteSpots() {
+        viewModelScope.launch {
+            repository.loadFavoriteSpots()
         }
     }
 
