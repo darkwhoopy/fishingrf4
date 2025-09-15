@@ -19,12 +19,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
@@ -35,7 +33,8 @@ fun PositionSelectionScreen(
     lake: Lake,
     viewModel: FishingViewModel,
     onPositionSelected: (String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onAddFavoriteSpot: () -> Unit = {} // Nouveau paramètre pour la navigation
 ) {
     var showCoordinateDialog by remember { mutableStateOf(false) }
     var showAddFavoriteDialog by remember { mutableStateOf(false) }
@@ -200,6 +199,7 @@ fun PositionSelectionScreen(
                 }
 
                 // Section - Spots favoris (placeholder pour future implémentation)
+                // Section - Spots favoris avec bouton ajouter
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -211,31 +211,55 @@ fun PositionSelectionScreen(
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 16.dp)
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
                             ) {
-                                Icon(
-                                    Icons.Default.Star,
-                                    contentDescription = null,
-                                    tint = Color(0xFFFBBF24),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "⭐ Spots favoris",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Star,
+                                        contentDescription = null,
+                                        tint = Color(0xFFFBBF24),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "⭐ Spots favoris",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+
+                                // BOUTON AJOUTER - C'EST ÇA QUI MANQUE
+                                IconButton(
+                                    onClick = { onAddFavoriteSpot() },
+                                    modifier = Modifier
+                                        .background(
+                                            Color(0xFF10B981),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = "Ajouter un spot favori",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
 
                             Text(
-                                text = "Sauvegardez vos meilleures positions pour y revenir facilement",
+                                text = "Sauvegardez vos meilleures positions avec les détails de pêche",
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
-                            // Placeholder pour les spots favoris
+                            // Liste des spots favoris (placeholder)
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -261,7 +285,7 @@ fun PositionSelectionScreen(
                                             color = Color.White
                                         )
                                         Text(
-                                            text = "Fonctionnalité à venir...",
+                                            text = "Cliquez sur + pour en ajouter un",
                                             fontSize = 12.sp,
                                             color = Color.Gray,
                                             modifier = Modifier.padding(top = 4.dp)
@@ -272,8 +296,6 @@ fun PositionSelectionScreen(
                         }
                     }
                 }
-
-                // Section - Méthode classique (quadrillage) pour compatibilité
 
 
                 // Spacer pour éviter que le contenu touche le bas

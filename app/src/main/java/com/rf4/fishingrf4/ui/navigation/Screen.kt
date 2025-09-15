@@ -14,7 +14,8 @@ enum class Screen {
 
     COMMUNITY,
     BUG_REPORT,
-    FISH_SUGGESTION
+    FISH_SUGGESTION,
+    ADD_FAVORITE_SPOT
 
 
 }
