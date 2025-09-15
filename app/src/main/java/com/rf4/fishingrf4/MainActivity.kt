@@ -14,13 +14,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
 import com.rf4.fishingrf4.ui.FishingRF4App
 import com.rf4.fishingrf4.utils.LanguageManager
+import com.rf4.fishingrf4.data.utils.GameTimeManager
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        // Appliquer la langue sauvegardée avant super.onCreate()
         LanguageManager.applyLanguage(this)
+        super.onCreate(savedInstanceState)
+
+        // ✅ NOUVEAU : Démarrer le GameTimeManager
+        lifecycleScope.launch {
+            GameTimeManager.start()
+        }
         setContent { MaterialTheme { FishingRF4App() }
             ScreenLockManager()
         }

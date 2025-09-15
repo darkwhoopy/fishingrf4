@@ -1,3 +1,8 @@
+// ==========================================
+// FICHIER: ui/screens/SettingsScreen.kt
+// Écran des paramètres avec gestionnaire d'heure
+// ==========================================
+
 package com.rf4.fishingrf4.ui.screens
 
 import androidx.compose.foundation.background
@@ -19,8 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.ui.components.BackButton
+import com.rf4.fishingrf4.ui.components.TimePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import com.rf4.fishingrf4.utils.LanguageManager
+import com.rf4.fishingrf4.data.utils.GameTimeManager
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -35,11 +42,10 @@ fun SettingsScreen(
     var keepScreenOn by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
-    // ✅ CORRECTION : Utiliser un state pour la langue actuelle
-    var currentLanguage by remember { mutableStateOf(LanguageManager.getCurrentLanguage(context)) }
+    val currentLanguage = LanguageManager.getCurrentLanguage(context)
 
-    // Temps de jeu simple
-    val gameTime = remember { mutableStateOf(LocalTime.now()) }
+    // ✅ CORRECTION : Utiliser le GameTimeManager au lieu d'un état local
+    val gameTime by GameTimeManager.gameTime.collectAsState()
 
     Box(
         modifier = Modifier
@@ -89,7 +95,7 @@ fun SettingsScreen(
                     Icon(
                         Icons.Default.Language,
                         contentDescription = stringResource(R.string.desc_language_icon),
-                        tint = Color.White
+                        tint = Color(0xFF10B981)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
@@ -99,12 +105,23 @@ fun SettingsScreen(
                             color = Color.White
                         )
                         Text(
-                            currentLanguage.displayName,
+                            stringResource(R.string.settings_language_desc),
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
                     }
-                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = currentLanguage.displayName,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+                    }
                 }
             }
 
@@ -146,13 +163,29 @@ fun SettingsScreen(
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
+                        // ✅ NOUVEAU : Affichage de la période de la journée
+                        Text(
+                            text = GameTimeManager.getTimeOfDay(gameTime),
+                            fontSize = 11.sp,
+                            color = Color(0xFF10B981),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
                     }
-                    Text(
-                        gameTime.value.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            text = gameTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "⚙️ Régler",
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
 
@@ -175,7 +208,11 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.PhoneAndroid, contentDescription = null, tint = Color.White)
+                    Icon(
+                        Icons.Default.PhoneAndroid,
+                        contentDescription = null,
+                        tint = Color(0xFF10B981)
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -193,8 +230,8 @@ fun SettingsScreen(
                         checked = keepScreenOn,
                         onCheckedChange = { keepScreenOn = it },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF10B981)
+                            checkedThumbColor = Color(0xFF10B981),
+                            checkedTrackColor = Color(0xFF064E3B)
                         )
                     )
                 }
@@ -222,7 +259,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        Icons.Default.Delete,
+                        Icons.Default.DeleteSweep,
                         contentDescription = stringResource(R.string.desc_reset_icon),
                         tint = Color(0xFFEF4444)
                     )
@@ -258,54 +295,57 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151))
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    ) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF10B981))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.settings_version),
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text("0.5.0", fontSize = 12.sp, color = Color.Gray)
-                        }
-                    }
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF10B981))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFF10B981)
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.settings_developer),
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text("DarkWhoopy", fontSize = 12.sp, color = Color.Gray)
-                        }
+                        Text(
+                            text = "RF4 Assistant",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.version, "1.0.0"),
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "Assistant pour Russian Fishing 4",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
                 }
             }
         }
     }
 
-    // ✅ DIALOG DE LANGUE CORRIGÉ
+    // ==========================================
+    // DIALOGS
+    // ==========================================
+
+    // Dialog de sélection de langue
     if (showLanguageDialog) {
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
-            title = { Text(stringResource(R.string.settings_language_section)) },
+            title = { Text(stringResource(R.string.settings_language)) },
             text = {
                 Column {
+                    // Option Français
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // ✅ CORRECTION : Mettre à jour le state local immédiatement
-                                currentLanguage = LanguageManager.Language.FRENCH
                                 LanguageManager.setAppLanguage(context, LanguageManager.Language.FRENCH)
                                 showLanguageDialog = false
                             },
@@ -324,12 +364,11 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Option English
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // ✅ CORRECTION : Mettre à jour le state local immédiatement
-                                currentLanguage = LanguageManager.Language.ENGLISH
                                 LanguageManager.setAppLanguage(context, LanguageManager.Language.ENGLISH)
                                 showLanguageDialog = false
                             },
@@ -364,7 +403,7 @@ fun SettingsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // TODO: Implémenter la fonction de reset
+                        // TODO: Implémenter la fonction de reset via viewModel
                         showResetDialog = false
                     }
                 ) {
@@ -379,17 +418,15 @@ fun SettingsScreen(
         )
     }
 
-    // Dialog de sélection d'heure
+    // ✅ NOUVEAU : Dialog de sélection d'heure avec TimePickerDialog
     if (showTimePickerDialog) {
-        AlertDialog(
-            onDismissRequest = { showTimePickerDialog = false },
-            title = { Text(stringResource(R.string.dialog_time_picker_title)) },
-            text = { Text("Fonctionnalité à implémenter") },
-            confirmButton = {
-                TextButton(onClick = { showTimePickerDialog = false }) {
-                    Text(stringResource(R.string.ok))
-                }
-            }
+        TimePickerDialog(
+            currentTime = gameTime,
+            onTimeSelected = { newTime ->
+                // Appeler la méthode du ViewModel pour ajuster l'heure
+                viewModel?.adjustInGameTime(newTime)
+            },
+            onDismiss = { showTimePickerDialog = false }
         )
     }
 }

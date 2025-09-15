@@ -740,5 +740,11 @@
     <string name="update_feature_4_desc">Nouveau popup de connexion non-intrusif</string>
 
     <string name="button_close">Fermer</string>
+
+
+    <!-- Gestion du temps -->
+
+
+
 </resources>
 
