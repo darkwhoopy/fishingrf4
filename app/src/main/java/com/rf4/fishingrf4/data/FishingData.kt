@@ -1526,12 +1526,7 @@ object FishingData {
             description = "Nouveau lac 2025 avec 19 espèces nord-américaines et système porte-cannes bateau.",
             unlockLevel = 1, // ✅ CHANGÉ de 18 à 1 (lac gratuit)
             coordinates = mapOf(
-                "120:110" to "Baie nord - Truites et achigans",
-                "95:135" to "Îlot central - Bass et dorés",
-                "80:95" to "Anse sud - Brochets et maskinongés",
-                "110:125" to "Chenal - Ombles et crapets",
-                "75:85" to "Structure rocheuse - Bass techniques",
-                "105:140" to "Zone profonde - Gars préhistoriques"
+
             )
         ),
 

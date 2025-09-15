@@ -1,31 +1,34 @@
+// ==========================================
+// FICHIER: ui/screens/PositionSelectionScreen.kt
+// Écran de sélection de position avec coordonnées
+// ==========================================
+
 package com.rf4.fishingrf4.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Lake
-import com.rf4.fishingrf4.data.models.UserSpot
 import com.rf4.fishingrf4.ui.components.BackButton
+import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
-import com.rf4.fishingrf4.utils.getLocalizedName
 
 @Composable
 fun PositionSelectionScreen(
@@ -34,319 +37,521 @@ fun PositionSelectionScreen(
     onPositionSelected: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    var selectedLetter by remember { mutableStateOf<String?>(null) }
-    var selectedNumber by remember { mutableStateOf<String?>(null) }
-    var showAddSpotDialog by remember { mutableStateOf(false) }
+    var showCoordinateDialog by remember { mutableStateOf(false) }
+    var showAddFavoriteDialog by remember { mutableStateOf(false) }
+    var selectedPosition by remember { mutableStateOf("100:100") }
 
-    val userSpots by viewModel.userSpots.collectAsState()
-    val userSpotsForThisLake = remember(userSpots, lake.id) {
-        userSpots.filter { it.lakeId == lake.id }
-    }
+    // États pour le dialog d'ajout de spot favori
+    var selectedFish by remember { mutableStateOf("") }
+    var selectedBait by remember { mutableStateOf("") }
+    var distance by remember { mutableStateOf("") }
+    var showFishSelector by remember { mutableStateOf(false) }
+    var showBaitSelector by remember { mutableStateOf(false) }
 
-    val completePosition = if (selectedLetter != null && selectedNumber != null) {
-        "${selectedLetter}${selectedNumber}"
-    } else null
-
-    // Top zones du jour (en ligne) pour ce lac
-    var topZones by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
-    LaunchedEffect(lake.id) {
-        viewModel.fetchTop5PositionsForLakeToday(lake.id) { zones ->
-            topZones = zones
+    // Calculer le max de coordonnées selon le lac (exemple de logique)
+    val maxCoordinate = remember(lake.name) {
+        when {
+            lake.name.contains("Mosquito", ignoreCase = true) -> 150
+            lake.name.contains("Bear", ignoreCase = true) -> 120
+            lake.name.contains("Amber", ignoreCase = true) -> 180
+            else -> 200 // Valeur par défaut pour les grands lacs
         }
     }
 
-    if (showAddSpotDialog) {
-        AddSpotDialog(
-            onDismiss = { showAddSpotDialog = false },
-            onConfirm = { position, comment ->
-                viewModel.addUserSpot(UserSpot(lakeId = lake.id, position = position, comment = comment))
-                showAddSpotDialog = false
-            }
-        )
-    }
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0D1B2A))
-            .padding(16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            BackButton(onClick = onBack)
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = lake.getLocalizedName(), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Text("📍 Choisissez votre position", fontSize = 14.sp, color = Color(0xFFE2E8F0))
-            }
-        }
-
-        if (completePosition != null) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF10B981))
+            // Header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 24.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Position : $completePosition", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Button(onClick = { onPositionSelected(completePosition) }) {
-                        Icon(Icons.Default.Check, contentDescription = "Confirmer")
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Confirmer")
+                BackButton(onClick = onBack)
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = lake.name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "📍 Choisissez votre position",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Section principale - Coordonnées communautaires
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.LocationOn,
+                                    contentDescription = null,
+                                    tint = Color(0xFF10B981),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "🎯 Position par coordonnées",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+
+                            Text(
+                                text = "Utilisez le format standard de la communauté RF4 (ex: 80:95)",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+
+                            // Bouton principal pour ouvrir le sélecteur
+                            Button(
+                                onClick = { showCoordinateDialog = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF10B981)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.MyLocation,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Choisir les coordonnées",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Affichage de la position actuelle
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Position actuelle",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                        Text(
+                                            text = selectedPosition,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF10B981)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { onPositionSelected(selectedPosition) },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF3B82F6)
+                                        ),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(
+                                            text = "Utiliser",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
+                }
+
+                // Section - Spots favoris (placeholder pour future implémentation)
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFBBF24),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "⭐ Spots favoris",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+
+                            Text(
+                                text = "Sauvegardez vos meilleures positions pour y revenir facilement",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+
+                            // Placeholder pour les spots favoris
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "📌",
+                                            fontSize = 32.sp
+                                        )
+                                        Text(
+                                            text = "Aucun spot favori",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                        Text(
+                                            text = "Fonctionnalité à venir...",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Section - Méthode classique (quadrillage) pour compatibilité
+
+
+                // Spacer pour éviter que le contenu touche le bas
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
+    }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Lettres
-            item {
-                Text("🔤 Sélectionnez une lettre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val letters = ('A'..'J').map { it.toString() }
-                    items(letters) { letter ->
-                        GridButton(
-                            text = letter,
-                            isSelected = selectedLetter == letter,
-                            onClick = {
-                                selectedLetter = if (selectedLetter == letter) null else letter
-                            }
-                        )
-                    }
-                }
-            }
+    // ==========================================
+    // DIALOGS
+    // ==========================================
 
-            // Chiffres
-            item {
-                Text("🔢 Sélectionnez un chiffre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val numbers = (1..10).map { it.toString() }
-                    items(numbers) { number ->
-                        GridButton(
-                            text = number,
-                            isSelected = selectedNumber == number,
-                            onClick = {
-                                selectedNumber = if (selectedNumber == number) null else number
-                            }
-                        )
-                    }
-                }
-            }
+    // Dialog de sélection de coordonnées RF4
+    if (showCoordinateDialog) {
+        CoordinatePickerDialog(
+            lakeName = lake.name,
+            maxCoordinate = maxCoordinate,
+            onCoordinateSelected = { x, y ->
+                selectedPosition = "$x:$y"
+            },
+            onDismiss = { showCoordinateDialog = false }
+        )
+    }
 
-            // Top zones du jour (online)
-            if (topZones.isNotEmpty()) {
-                item {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "🔥 Top zones du jour (communauté)",
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-                items(topZones) { (pos, count) ->
+    // Dialog d'ajout de spot favori
+    if (showAddFavoriteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAddFavoriteDialog = false
+                selectedFish = ""
+                selectedBait = ""
+                distance = ""
+            },
+            title = {
+                Text(
+                    text = "Ajouter un spot favori",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Position actuelle
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 6.dp)
-                            .clickable { onPositionSelected(pos) },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2455AF)),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(pos, color = Color.White)
-                            AssistChip(
-                                onClick = { onPositionSelected(pos) },
-                                label = { Text("$count", color = Color.White) },
-                                colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF3B82F6))
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = null,
+                                tint = Color(0xFF10B981),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    text = "Position",
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                                Text(
+                                    text = selectedPosition,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF10B981)
+                                )
+                            }
+                        }
+                    }
+
+                    // Sélection du poisson
+                    OutlinedTextField(
+                        value = selectedFish,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Poisson cible", color = Color.Gray) },
+                        placeholder = { Text("Choisir un poisson", color = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = { showFishSelector = true }) {
+                                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.Gray)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    // Sélection de l'appât
+                    OutlinedTextField(
+                        value = selectedBait,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Appât recommandé", color = Color.Gray) },
+                        placeholder = { Text("Choisir un appât", color = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = { showBaitSelector = true }) {
+                                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.Gray)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    // Distance en mètres
+                    OutlinedTextField(
+                        value = distance,
+                        onValueChange = {
+                            if (it.length <= 3 && it.all { char -> char.isDigit() }) {
+                                distance = it
+                            }
+                        },
+                        label = { Text("Distance (mètres)", color = Color.Gray) },
+                        placeholder = { Text("30", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.NumberPassword
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        ),
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                val isValid = selectedFish.isNotEmpty() &&
+                        selectedBait.isNotEmpty() &&
+                        distance.isNotEmpty()
+
+                Button(
+                    onClick = {
+                        if (isValid) {
+                            // TODO: Sauvegarder le spot favori
+                            showAddFavoriteDialog = false
+                            selectedFish = ""
+                            selectedBait = ""
+                            distance = ""
+                        }
+                    },
+                    enabled = isValid,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF10B981),
+                        disabledContainerColor = Color.Gray
+                    )
+                ) {
+                    Text(
+                        text = "Ajouter",
+                        color = if (isValid) Color.White else Color.Gray
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAddFavoriteDialog = false
+                        selectedFish = ""
+                        selectedBait = ""
+                        distance = ""
+                    }
+                ) {
+                    Text(
+                        text = "Annuler",
+                        color = Color.Gray
+                    )
+                }
+            },
+            containerColor = Color(0xFF1F2937)
+        )
+    }
+
+    // Sélecteur de poissons
+    if (showFishSelector) {
+        AlertDialog(
+            onDismissRequest = { showFishSelector = false },
+            title = { Text("Choisir un poisson", color = Color.White) },
+            text = {
+                LazyColumn(
+                    modifier = Modifier.height(300.dp)
+                ) {
+                    items(lake.availableFish) { fish ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedFish = fish.name
+                                    showFishSelector = false
+                                }
+                                .padding(vertical = 2.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (selectedFish == fish.name)
+                                    Color(0xFF10B981) else Color(0xFF374151)
+                            )
+                        ) {
+                            Text(
+                                text = fish.name,
+                                modifier = Modifier.padding(12.dp),
+                                color = Color.White,
+                                fontSize = 14.sp
                             )
                         }
                     }
                 }
-            }
+            },
+            confirmButton = {
+                TextButton(onClick = { showFishSelector = false }) {
+                    Text("Fermer", color = Color.Gray)
+                }
+            },
+            containerColor = Color(0xFF1F2937)
+        )
+    }
 
-            // En-tête “Positions recommandées”
-            item {
-                if (lake.coordinates.isNotEmpty() || userSpotsForThisLake.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("⭐ Positions recommandées", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        IconButton(onClick = { showAddSpotDialog = true }) {
-                            Icon(Icons.Default.Add, contentDescription = "Ajouter un spot", tint = Color(0xFF4CAF50))
+    // Sélecteur d'appâts
+    if (showBaitSelector) {
+        val commonBaits = listOf(
+            "Ver de terre", "Ver de vase", "Asticot", "Maïs", "Pain",
+            "Lombric", "Chrysalide", "Blé", "Orge perlé", "Pâte"
+        )
+
+        AlertDialog(
+            onDismissRequest = { showBaitSelector = false },
+            title = { Text("Choisir un appât", color = Color.White) },
+            text = {
+                LazyColumn(
+                    modifier = Modifier.height(300.dp)
+                ) {
+                    items(commonBaits) { bait ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedBait = bait
+                                    showBaitSelector = false
+                                }
+                                .padding(vertical = 2.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (selectedBait == bait)
+                                    Color(0xFF10B981) else Color(0xFF374151)
+                            )
+                        ) {
+                            Text(
+                                text = bait,
+                                modifier = Modifier.padding(12.dp),
+                                color = Color.White,
+                                fontSize = 14.sp
+                            )
                         }
                     }
                 }
-            }
-
-            // Spots “built-in”
-            items(lake.coordinates.toList()) { (position, description) ->
-                RecommendedPositionCard(
-                    position = position,
-                    description = description,
-                    onClick = { onPositionSelected(position) }
-                )
-            }
-
-            // Spots perso utilisateur
-            items(userSpotsForThisLake) { spot ->
-                UserPositionCard(
-                    spot = spot,
-                    onClick = { onPositionSelected(spot.position) },
-                    onDelete = { viewModel.deleteUserSpot(spot.id) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun GridButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .size(50.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF3B82F6) else Color(0xFF475569)
-        ),
-        border = if (isSelected) BorderStroke(2.dp, Color.White) else null
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text(text = text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-        }
-    }
-}
-
-@Composable
-fun UserPositionCard(
-    spot: UserSpot,
-    onClick: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF3B82F6)),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(spot.position, color = Color.White, fontWeight = FontWeight.Bold)
-                Text(spot.comment, color = Color(0xFFE2E8F0), fontSize = 14.sp)
-            }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Supprimer le spot", tint = Color(0xFFE57373))
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddSpotDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (position: String, comment: String) -> Unit
-) {
-    var position by remember { mutableStateOf("") }
-    var comment by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Ajouter un spot personnel") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = position,
-                    onValueChange = { position = it },
-                    label = { Text("Position (ex: 45:55)") }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = comment,
-                    onValueChange = { comment = it },
-                    label = { Text("Commentaire (ex: Trophées brèmes)") }
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(position, comment) },
-                enabled = position.isNotBlank() && comment.isNotBlank()
-            ) { Text("Ajouter") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } }
-    )
-}
-
-@Composable
-fun RecommendedPositionCard(
-    position: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF059669)),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = position,
-                    color = Color(0xFF059669),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = description, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
-            }
-
-            Text(text = "→", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        }
+            },
+            confirmButton = {
+                TextButton(onClick = { showBaitSelector = false }) {
+                    Text("Fermer", color = Color.Gray)
+                }
+            },
+            containerColor = Color(0xFF1F2937)
+        )
     }
 }

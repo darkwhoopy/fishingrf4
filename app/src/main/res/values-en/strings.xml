@@ -741,7 +741,25 @@
     <string name="update_feature_4_desc">New non-intrusive connection popup</string>
 
     <!-- Time management -->
-
+    <string name="position_selection_title">Choose your position</string>
+    <string name="position_coordinates_title">Position by coordinates</string>
+    <string name="position_coordinates_desc">Use the standard RF4 community format (e.g: 80:95)</string>
+    <string name="position_choose_coordinates">Choose coordinates</string>
+    <string name="position_current">Current position</string>
+    <string name="position_use">Use</string>
+    <string name="position_favorite_spots">Favorite spots</string>
+    <string name="position_favorite_desc">Save your best positions to return easily</string>
+    <string name="position_no_favorites">No favorite spots</string>
+    <string name="position_classic_method">Classic method</string>
+    <string name="position_classic_desc">Old method by letters and numbers (A1, B2, etc.)</string>
+    <string name="position_use_grid">Use grid</string>
+    <string name="position_confirm">Confirm position</string>
+    <string name="position_random">Random</string>
+    <string name="position_coordinate_format">Coordinate format: X:Y (0-%d)</string>
+    <string name="position_coordinate_x">X Coordinate</string>
+    <string name="position_coordinate_y">Y Coordinate</string>
+    <string name="position_selected">Selected position</string>
+    <string name="position_fishing_spot">Fishing spot</string>
 
 
 

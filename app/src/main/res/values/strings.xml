@@ -743,6 +743,26 @@
 
 
     <!-- Gestion du temps -->
+    <!-- Sélection de position -->
+    <string name="position_selection_title">Choisissez votre position</string>
+    <string name="position_coordinates_title">Position par coordonnées</string>
+    <string name="position_coordinates_desc">Utilisez le format standard de la communauté RF4 (ex: 80:95)</string>
+    <string name="position_choose_coordinates">Choisir les coordonnées</string>
+    <string name="position_current">Position actuelle</string>
+    <string name="position_use">Utiliser</string>
+    <string name="position_favorite_spots">Spots favoris</string>
+    <string name="position_favorite_desc">Sauvegardez vos meilleures positions pour y revenir facilement</string>
+    <string name="position_no_favorites">Aucun spot favori</string>
+    <string name="position_classic_method">Méthode classique</string>
+    <string name="position_classic_desc">Ancienne méthode par lettres et chiffres (A1, B2, etc.)</string>
+    <string name="position_use_grid">Utiliser le quadrillage</string>
+    <string name="position_confirm">Confirmer la position</string>
+    <string name="position_random">Aléatoire</string>
+    <string name="position_coordinate_format">Format de coordonnées : X:Y (0-%d)</string>
+    <string name="position_coordinate_x">Coordonnée X</string>
+    <string name="position_coordinate_y">Coordonnée Y</string>
+    <string name="position_selected">Position sélectionnée</string>
+    <string name="position_fishing_spot">Spot de pêche</string>
 
 
 
