@@ -721,24 +721,27 @@
     <string name="button_close">Closed</string>
 
     <!-- Update popup -->
+    <!-- Patch Notes v0.8D - Position improvements and spot sharing -->
+
+    <!-- Update popup -->
     <string name="update_title">🎉 Update %s available!</string>
     <string name="update_subtitle">Discover the new features</string>
     <string name="update_whats_new">✨ What\'s new?</string>
     <string name="update_button_continue">Continue fishing! 🎣</string>
     <string name="update_thanks_message">Thank you for being part of the Fishing RF4 community! Your feedback helps us improve the experience.</string>
 
-    <!-- Update features -->
-    <string name="update_feature_1_title">Multilingual interface</string>
-    <string name="update_feature_1_desc">App fully translated in French and English</string>
+    <!-- Version 0.8D features -->
+    <string name="update_feature_1_title">🎯 Enhanced position selection</string>
+    <string name="update_feature_1_desc">New selector with RF4 coordinates, manual grid and community top zones</string>
 
-    <string name="update_feature_2_title">Translated baits</string>
-    <string name="update_feature_2_desc">All bait names adapt to your language</string>
+    <string name="update_feature_2_title">⭐ Enriched spot sharing</string>
+    <string name="update_feature_2_desc">Share your favorite spots with target fish, recommended baits and fishing distance</string>
 
-    <string name="update_feature_3_title">International lakes</string>
-    <string name="update_feature_3_desc">Lake names and descriptions translated</string>
+    <string name="update_feature_3_title">🐟 Complete database</string>
+    <string name="update_feature_3_desc">Access to all fish and baits in the game, sorted alphabetically</string>
 
-    <string name="update_feature_4_title">Improved connection</string>
-    <string name="update_feature_4_desc">New non-intrusive connection popup</string>
+    <string name="update_feature_4_title">🔧 Optimized interface</string>
+    <string name="update_feature_4_desc">Better navigation between spots and addition of advanced options</string>
 
     <!-- Time management -->
     <string name="position_selection_title">Choose your position</string>

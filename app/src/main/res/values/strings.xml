@@ -719,6 +719,8 @@
     <string name="bait_pellets">Pellets</string>
     <string name="bait_other">Autre</string>
 
+    <!-- Patch Notes v0.8D - Amélioration des positions et partage de spots -->
+
     <!-- Popup de mise à jour -->
     <string name="update_title">🎉 Mise à jour %s disponible !</string>
     <string name="update_subtitle">Découvrez les nouvelles fonctionnalités</string>
@@ -726,18 +728,18 @@
     <string name="update_button_continue">Continuer à pêcher ! 🎣</string>
     <string name="update_thanks_message">Merci de faire partie de la communauté Fishing RF4 ! Vos retours nous aident à améliorer l\'expérience.</string>
 
-    <!-- Fonctionnalités de la mise à jour -->
-    <string name="update_feature_1_title">Interface multilingue</string>
-    <string name="update_feature_1_desc">Application entièrement traduite en français et anglais</string>
+    <!-- Fonctionnalités de la version 0.8D -->
+    <string name="update_feature_1_title">🎯 Sélection de position améliorée</string>
+    <string name="update_feature_1_desc">Nouveau sélecteur avec coordonnées RF4, grille manuelle et top zones communautaires</string>
 
-    <string name="update_feature_2_title">Appâts traduits</string>
-    <string name="update_feature_2_desc">Tous les noms d\'appâts s\'adaptent à votre langue</string>
+    <string name="update_feature_2_title">⭐ Partage de spots enrichi</string>
+    <string name="update_feature_2_desc">Partagez vos spots favoris avec poissons cibles, appâts recommandés et distance de pêche</string>
 
-    <string name="update_feature_3_title">Lacs internationaux</string>
-    <string name="update_feature_3_desc">Noms et descriptions des lacs traduits</string>
+    <string name="update_feature_3_title">🐟 Base de données complète</string>
+    <string name="update_feature_3_desc">Accès à tous les poissons et appâts du jeu, triés par ordre alphabétique</string>
 
-    <string name="update_feature_4_title">Connexion améliorée</string>
-    <string name="update_feature_4_desc">Nouveau popup de connexion non-intrusif</string>
+    <string name="update_feature_4_title">🔧 Interface optimisée</string>
+    <string name="update_feature_4_desc">Meilleure navigation entre les spots et ajout d\'options avancées</string>
 
     <string name="button_close">Fermer</string>
 
