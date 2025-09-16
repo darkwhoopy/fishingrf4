@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,13 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.data.models.UserSpot
+import com.rf4.fishingrf4.data.repository.CommunityRepository
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun PositionSelectionScreen(
@@ -40,6 +44,13 @@ fun PositionSelectionScreen(
     // États pour le sélecteur manuel de coordonnées
     var selectedLetter by remember { mutableStateOf<String?>(null) }
     var selectedNumber by remember { mutableStateOf<String?>(null) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var spotToShare by remember { mutableStateOf<UserSpot?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val communityRepo = remember { CommunityRepository() }
+    var shareMessage by remember { mutableStateOf("") }
+    var showShareMessage by remember { mutableStateOf(false) }
+
 
     // États pour le dialog de coordonnées RF4
     var showCoordinateDialog by remember { mutableStateOf(false) }
@@ -412,7 +423,11 @@ fun PositionSelectionScreen(
                     UserPositionCard(
                         spot = spot,
                         onClick = { onPositionSelected(spot.position) },
-                        onDelete = { viewModel.deleteUserSpot(spot.id) }
+                        onDelete = { viewModel.deleteUserSpot(spot.id) },
+                        onShare = { userSpot ->
+                            spotToShare = userSpot
+                            showShareDialog = true
+                        }
                     )
                 }
 
@@ -476,6 +491,346 @@ fun PositionSelectionScreen(
                 selectedPosition = "$x:$y"
             },
             onDismiss = { showCoordinateDialog = false }
+        )
+    }
+    // À la fin de PositionSelectionScreen, avant la fermeture
+    if (showShareDialog && spotToShare != null) {
+        // États pour les détails supplémentaires
+        var selectedFish by remember { mutableStateOf<List<String>>(emptyList()) }
+        var selectedBaits by remember { mutableStateOf<List<String>>(emptyList()) }
+        var distance by remember { mutableStateOf("") }
+        var showFishSelector by remember { mutableStateOf(false) }
+        var showBaitSelector by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = {
+                showShareDialog = false
+                spotToShare = null
+            },
+            title = {
+                Text("Partager ce spot", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Informations du spot
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                "Position ${spotToShare!!.position}",
+                                color = Color(0xFF10B981),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                spotToShare!!.comment,
+                                color = Color.Gray,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    Text(
+                        "Ajoutez des détails pour enrichir votre partage :",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    // Poissons cibles
+                    OutlinedTextField(
+                        value = if (selectedFish.isEmpty()) "" else selectedFish.joinToString(", "),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Poissons cibles (optionnel)", color = Color.Gray) },
+                        placeholder = { Text("Aucun poisson sélectionné", color = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = { showFishSelector = true }) {
+                                Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        ),
+                        maxLines = 2
+                    )
+
+                    // Appâts recommandés
+                    OutlinedTextField(
+                        value = if (selectedBaits.isEmpty()) "" else selectedBaits.joinToString(", "),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Appâts recommandés (optionnel)", color = Color.Gray) },
+                        placeholder = { Text("Aucun appât sélectionné", color = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = { showBaitSelector = true }) {
+                                Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        ),
+                        maxLines = 2
+                    )
+
+                    // Distance de pêche
+                    OutlinedTextField(
+                        value = distance,
+                        onValueChange = {
+                            if (it.length <= 3 && it.all { char -> char.isDigit() }) {
+                                distance = it
+                            }
+                        },
+                        label = { Text("Distance de pêche en mètres (optionnel)", color = Color.Gray) },
+                        placeholder = { Text("30", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFF10B981),
+                            unfocusedBorderColor = Color.Gray
+                        ),
+                        singleLine = true,
+                        suffix = { Text("m", color = Color.Gray) }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                communityRepo.shareSpotToCommunity(
+                                    userSpot = spotToShare!!,
+                                    lakeName = lake.name,
+                                    description = spotToShare!!.comment.ifEmpty { "Spot partagé depuis mes favoris" },
+                                    fishNames = selectedFish, // ✅ Maintenant avec les vraies données
+                                    baits = selectedBaits,    // ✅ Maintenant avec les vraies données
+                                    distance = distance.toIntOrNull() ?: 0 // ✅ Maintenant avec la vraie distance
+                                )
+                                shareMessage = "Spot partagé avec succès !"
+                                showShareMessage = true
+                                showShareDialog = false
+                                spotToShare = null
+                            } catch (e: Exception) {
+                                shareMessage = when {
+                                    e.message?.contains("déjà partagé", ignoreCase = true) == true ->
+                                        "Vous avez déjà partagé ce spot !"
+                                    e.message?.contains("connecté", ignoreCase = true) == true ->
+                                        "Vous devez être connecté pour partager"
+                                    e.message?.contains("permission", ignoreCase = true) == true ->
+                                        "Permissions insuffisantes"
+                                    else -> "Erreur lors du partage : ${e.message}"
+                                }
+                                showShareMessage = true
+                                showShareDialog = false
+                                spotToShare = null
+                                android.util.Log.e("ShareSpot", "Erreur partage: ${e.message}", e)
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                ) {
+                    Text("Partager")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showShareDialog = false
+                    spotToShare = null
+                }) {
+                    Text("Annuler", color = Color.Gray)
+                }
+            },
+            containerColor = Color(0xFF1F2937)
+        )
+
+        // ==========================================
+        // SÉLECTEURS DE POISSONS ET APPÂTS
+        // ==========================================
+
+        // Sélecteur de poissons
+        if (showFishSelector) {
+            AlertDialog(
+                onDismissRequest = { showFishSelector = false },
+                title = { Text("Sélectionner les poissons", color = Color.White) },
+                text = {
+                    LazyColumn(modifier = Modifier.height(300.dp)) {
+                        items(lake.availableFish) { fish ->
+                            val isSelected = selectedFish.contains(fish.name)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedFish = if (isSelected) {
+                                            selectedFish - fish.name
+                                        } else {
+                                            selectedFish + fish.name
+                                        }
+                                    }
+                                    .padding(vertical = 2.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) Color(0xFF10B981) else Color(0xFF374151)
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = fish.name,
+                                        color = Color.White,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (isSelected) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = "Sélectionné",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showFishSelector = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                    ) {
+                        Text("Valider (${selectedFish.size})")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showFishSelector = false }) {
+                        Text("Annuler", color = Color.Gray)
+                    }
+                },
+                containerColor = Color(0xFF1F2937)
+            )
+        }
+
+        // Sélecteur d'appâts
+        if (showBaitSelector) {
+            val commonBaits = listOf(
+                "Ver de terre", "Ver de vase", "Asticot", "Maïs", "Pain",
+                "Lombric", "Chrysalide", "Blé", "Orge perlé", "Pâte",
+                "Bouillettes", "Pellets", "Fromage", "Viande", "Crevette"
+            )
+
+            AlertDialog(
+                onDismissRequest = { showBaitSelector = false },
+                title = { Text("Sélectionner les appâts", color = Color.White) },
+                text = {
+                    LazyColumn(modifier = Modifier.height(300.dp)) {
+                        items(commonBaits) { bait ->
+                            val isSelected = selectedBaits.contains(bait)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedBaits = if (isSelected) {
+                                            selectedBaits - bait
+                                        } else {
+                                            selectedBaits + bait
+                                        }
+                                    }
+                                    .padding(vertical = 2.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) Color(0xFF3B82F6) else Color(0xFF374151)
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = bait,
+                                        color = Color.White,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (isSelected) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = "Sélectionné",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showBaitSelector = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                    ) {
+                        Text("Valider (${selectedBaits.size})")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showBaitSelector = false }) {
+                        Text("Annuler", color = Color.Gray)
+                    }
+                },
+                containerColor = Color(0xFF1F2937)
+            )
+        }
+    }
+
+// ==========================================
+// ✅ NOUVEAU DIALOG pour afficher les messages
+// ==========================================
+
+    if (showShareMessage) {
+        AlertDialog(
+            onDismissRequest = { showShareMessage = false },
+            title = {
+                Text(
+                    text = if (shareMessage.contains("succès")) "Succès" else "Information",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = shareMessage,
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showShareMessage = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (shareMessage.contains("succès"))
+                            Color(0xFF10B981) else Color(0xFF3B82F6)
+                    )
+                ) {
+                    Text("OK")
+                }
+            },
+            containerColor = Color(0xFF1F2937)
         )
     }
 }
@@ -560,7 +915,8 @@ private fun RecommendedPositionCard(
 private fun UserPositionCard(
     spot: UserSpot,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onShare: (UserSpot) -> Unit = {} // Nouveau paramètre pour partager
 ) {
     Card(
         modifier = Modifier
@@ -602,21 +958,45 @@ private fun UserPositionCard(
                 )
             }
 
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier
-                    .background(
-                        Color(0xFFEF4444),
-                        RoundedCornerShape(6.dp)
-                    )
-                    .size(32.dp)
+            // Boutons d'actions
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Supprimer",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
+                // Bouton Partager
+                IconButton(
+                    onClick = { onShare(spot) },
+                    modifier = Modifier
+                        .background(
+                            Color(0xFF10B981),
+                            RoundedCornerShape(6.dp)
+                        )
+                        .size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = "Partager ce spot",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // Bouton Supprimer
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .background(
+                            Color(0xFFEF4444),
+                            RoundedCornerShape(6.dp)
+                        )
+                        .size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Supprimer",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
         }
     }

@@ -142,3 +142,66 @@ data class SuggestionComment(
     val isAdmin: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()
 )
+
+// ==========================================
+// À AJOUTER dans data/models/CommunityModels.kt
+// Modèles pour les spots communautaires
+// ==========================================
+
+/**
+ * Spot communautaire partagé par un utilisateur
+ */
+data class CommunitySpot(
+    val id: String = "",
+    val userId: String = "",
+    val userName: String = "",
+    val lakeName: String = "",
+    val lakeId: String = "",
+    val position: String = "",
+    val name: String = "",
+    val description: String = "",
+    val fishNames: List<String> = emptyList(),
+    val baits: List<String> = emptyList(),
+    val distance: Int = 0,
+    val votes: Long = 0,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
+) {
+    fun toFirestoreMap(): Map<String, Any> {
+        return mapOf(
+            "userId" to userId,
+            "userName" to userName,
+            "lakeName" to lakeName,
+            "lakeId" to lakeId,
+            "position" to position,
+            "name" to name,
+            "description" to description,
+            "fishNames" to fishNames,
+            "baits" to baits,
+            "distance" to distance,
+            "votes" to votes,
+            "createdAt" to com.google.firebase.Timestamp(java.util.Date(createdAt)),
+            "updatedAt" to com.google.firebase.Timestamp(java.util.Date(updatedAt))
+        )
+    }
+}
+
+/**
+ * Vote pour un spot communautaire
+ */
+data class SpotVote(
+    val id: String = "",
+    val userId: String = "",
+    val spotId: String = "",
+    val voteType: VoteType = VoteType.UPVOTE,
+    val createdAt: Long = System.currentTimeMillis()
+) {
+    fun toFirestoreMap(): Map<String, Any> {
+        return mapOf(
+            "userId" to userId,
+            "spotId" to spotId,
+            "voteType" to voteType.name,
+            "createdAt" to com.google.firebase.Timestamp(java.util.Date(createdAt))
+        )
+    }
+}

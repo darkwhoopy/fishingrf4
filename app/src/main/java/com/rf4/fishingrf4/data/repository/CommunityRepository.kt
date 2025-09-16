@@ -26,12 +26,17 @@ class CommunityRepository(
     private val fishSuggestions = db.collection("fish_suggestions")
     private val fishVotes = db.collection("fish_votes")
     private val suggestionComments = db.collection("suggestion_comments")
+    private val communitySpots = db.collection("community_spots")
+    private val spotVotes = db.collection("spot_votes")
 
     // Utilitaires d'authentification
     private fun uid(): String = auth.currentUser?.uid.orEmpty()
     private fun displayName(): String =
         auth.currentUser?.displayName ?: auth.currentUser?.email ?: "Anonyme"
     private fun userEmail(): String = auth.currentUser?.email.orEmpty()
+
+
+
 
     // ==========================================
     // GESTION DES SIGNALEMENTS DE BUGS
@@ -446,6 +451,181 @@ class CommunityRepository(
         "adminNotes" to adminNotes
     )
 
+    suspend fun shareSpotToCommunity(
+        userSpot: UserSpot,
+        lakeName: String,
+        description: String = "",
+        fishNames: List<String> = emptyList(),
+        baits: List<String> = emptyList(),
+        distance: Int = 0
+    ) {
+        val userId = uid()
+        if (userId.isBlank()) throw Exception("Vous devez être connecté pour partager un spot")
+
+        val userName = auth.currentUser?.displayName
+            ?: auth.currentUser?.email?.substringBefore("@")
+            ?: "Anonyme"
+
+        // Vérifier si ce spot n'est pas déjà partagé par cet utilisateur
+        val existingSpot = communitySpots
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("lakeId", userSpot.lakeId)
+            .whereEqualTo("position", userSpot.position)
+            .get()
+            .await()
+
+        if (!existingSpot.isEmpty) {
+            throw Exception("Vous avez déjà partagé ce spot !")
+        }
+
+        val communitySpot = CommunitySpot(
+            userId = userId,
+            userName = userName,
+            lakeName = lakeName,
+            lakeId = userSpot.lakeId,
+            position = userSpot.position,
+            name = userSpot.comment.ifEmpty { "Spot ${userSpot.position}" },
+            description = description,
+            fishNames = fishNames,
+            baits = baits,
+            distance = distance,
+            votes = 0
+        )
+
+        communitySpots.add(communitySpot.toFirestoreMap()).await()
+    }
+
+    /**
+     * Récupère les meilleurs spots du mois pour tous les lacs
+     */
+    suspend fun getTopCommunitySpots(limit: Int = 20): List<CommunitySpot> {
+        return try {
+            val snapshot = communitySpots
+                .orderBy("votes", Query.Direction.DESCENDING)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get()
+                .await()
+            android.util.Log.d("CommunityRepo", "Documents trouvés: ${snapshot.documents.size}")
+
+            snapshot.documents.mapNotNull { doc ->
+                android.util.Log.d("CommunityRepo", "Traitement document: ${doc.id}")
+                try {
+                    doc.data?.let { data ->
+                        CommunitySpot(
+                            id = doc.id,
+                            userId = data["userId"] as? String ?: "",
+                            userName = data["userName"] as? String ?: "Anonyme",
+                            lakeName = data["lakeName"] as? String ?: "",
+                            lakeId = data["lakeId"] as? String ?: "",
+                            position = data["position"] as? String ?: "",
+                            name = data["name"] as? String ?: "",
+                            description = data["description"] as? String ?: "",
+                            fishNames = (data["fishNames"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                            baits = (data["baits"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                            distance = (data["distance"] as? Long)?.toInt() ?: 0,
+                            votes = data["votes"] as? Long ?: 0,
+                            createdAt = (data["createdAt"] as? com.google.firebase.Timestamp)?.toDate()?.time ?: System.currentTimeMillis(),
+                            updatedAt = (data["updatedAt"] as? com.google.firebase.Timestamp)?.toDate()?.time ?: System.currentTimeMillis()
+                        )
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("CommunityRepo", "Erreur traitement spot ${doc.id}: ${e.message}")
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("CommunityRepo", "Erreur getTopCommunitySpots: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * Vote pour un spot communautaire
+     */
+    suspend fun voteForCommunitySpot(spotId: String, voteType: VoteType) {
+        val userId = uid()
+        if (userId.isBlank()) throw Exception("Vous devez être connecté pour voter")
+        android.util.Log.d("Vote", "Début vote - User: $userId, Spot: $spotId, Type: $voteType")
+        // Vérifier si l'utilisateur a déjà voté pour ce spot
+        val existingVote = spotVotes
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("spotId", spotId)
+            .get()
+            .await()
+
+        if (!existingVote.isEmpty) {
+            throw Exception("Vous avez déjà voté pour ce spot")
+        }
+
+        // Ajouter le vote
+        val vote = SpotVote(
+            userId = userId,
+            spotId = spotId,
+            voteType = voteType
+        )
+        android.util.Log.d("Vote", "Création vote: ${vote.toFirestoreMap()}")
+        spotVotes.add(vote.toFirestoreMap()).await()
+        android.util.Log.d("Vote", "Vote créé avec succès")
+
+        // Mettre à jour le compteur de votes du spot
+        updateSpotVoteCount(spotId)
+    }
+
+    /**
+     * Met à jour le nombre de votes d'un spot
+     */
+    private suspend fun updateSpotVoteCount(spotId: String) {
+        val upvotes = spotVotes
+            .whereEqualTo("spotId", spotId)
+            .whereEqualTo("voteType", "UPVOTE")
+            .get()
+            .await()
+            .size()
+
+        val downvotes = spotVotes
+            .whereEqualTo("spotId", spotId)
+            .whereEqualTo("voteType", "DOWNVOTE")
+            .get()
+            .await()
+            .size()
+
+        val totalVotes = upvotes - downvotes
+
+        communitySpots.document(spotId)
+            .update("votes", totalVotes.toLong())
+            .await()
+    }
+
+    /**
+     * Récupère les votes de spots d'un utilisateur
+     */
+    suspend fun getUserSpotVotes(userId: String): List<SpotVote> {
+        return try {
+            val snapshot = spotVotes
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.data?.let { data ->
+                        SpotVote(
+                            id = doc.id,
+                            userId = data["userId"] as? String ?: "",
+                            spotId = data["spotId"] as? String ?: "",
+                            voteType = VoteType.valueOf(data["voteType"] as? String ?: "UPVOTE"),
+                            createdAt = (data["createdAt"] as? com.google.firebase.Timestamp)?.toDate()?.time ?: System.currentTimeMillis()
+                        )
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
     /**
      * Convertit un FishVote en Map pour Firestore
      */
