@@ -190,10 +190,8 @@ fun FishingRF4App() {
                         positionToInteract = position
                         viewModel.navigateTo(Screen.FISH_SELECTION)
                     },
-                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) },
-                    onAddFavoriteSpot = {
-                        viewModel.navigateTo(Screen.ADD_FAVORITE_SPOT)
-                    }
+                    onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) }
+                    // ✅ Supprimé onAddFavoriteSpot car maintenant intégré dans l'écran
                 )
             }
             Screen.ADD_FAVORITE_SPOT -> {

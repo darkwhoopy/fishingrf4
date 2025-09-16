@@ -1,6 +1,6 @@
 // ==========================================
 // FICHIER: ui/screens/AddFavoriteSpotScreen.kt
-// Écran d'ajout de zone favori
+// Écran d'ajout de zone favori - VALIDATION SIMPLIFIÉE
 // ==========================================
 
 package com.rf4.fishingrf4.ui.screens
@@ -44,11 +44,11 @@ fun AddFavoriteSpotScreen(
     onBack: () -> Unit,
     onSaveSpot: (() -> Unit)? = null
 ) {
-    // États pour la position
+    // États pour la position (OBLIGATOIRE)
     var selectedPosition by remember { mutableStateOf("") }
     var showCoordinateDialog by remember { mutableStateOf(false) }
 
-    // États pour les sélections multiples
+    // États pour les sélections multiples (OPTIONNELS)
     var selectedFish by remember { mutableStateOf<List<Fish>>(emptyList()) }
     var selectedBaits by remember { mutableStateOf<List<String>>(emptyList()) }
     var distance by remember { mutableStateOf("") }
@@ -95,7 +95,9 @@ fun AddFavoriteSpotScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header
+            // ==========================================
+            // HEADER
+            // ==========================================
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 24.dp)
@@ -117,7 +119,9 @@ fun AddFavoriteSpotScreen(
                 }
             }
 
-            // Nom du spot
+            // ==========================================
+            // POSITION (OBLIGATOIRE)
+            // ==========================================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -126,13 +130,97 @@ fun AddFavoriteSpotScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "📍 Informations du spot",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    ) {
+                        Text(
+                            text = "🎯 Position",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        // Indicateur obligatoire
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFEF4444)),
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text(
+                                text = "OBLIGATOIRE",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+
+                    Button(
+                        onClick = { showCoordinateDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedPosition.isEmpty())
+                                Color(0xFFEF4444) else Color(0xFF10B981)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (selectedPosition.isEmpty())
+                                "🚨 Choisir les coordonnées" else "📍 $selectedPosition",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ==========================================
+            // NOM DU SPOT (OPTIONNEL)
+            // ==========================================
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    ) {
+                        Text(
+                            text = "📍 Nom du spot",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        // Indicateur optionnel
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF6B7280)),
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text(
+                                text = "OPTIONNEL",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
 
                     OutlinedTextField(
                         value = spotName,
@@ -153,51 +241,9 @@ fun AddFavoriteSpotScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Position
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "🎯 Position",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    Button(
-                        onClick = { showCoordinateDialog = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF10B981)
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.LocationOn,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (selectedPosition.isEmpty()) "Choisir les coordonnées" else selectedPosition,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Poissons cibles
+            // ==========================================
+            // POISSONS CIBLES (OPTIONNEL)
+            // ==========================================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -213,12 +259,27 @@ fun AddFavoriteSpotScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "🐟 Poissons cibles",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "🐟 Poissons cibles",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF6B7280)),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "OPTIONNEL",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                         IconButton(
                             onClick = { showFishSelector = true },
                             modifier = Modifier
@@ -249,7 +310,7 @@ fun AddFavoriteSpotScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Aucun poisson sélectionné",
+                                    text = "Aucun poisson sélectionné (optionnel)",
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -291,7 +352,9 @@ fun AddFavoriteSpotScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Appâts recommandés
+            // ==========================================
+            // APPÂTS RECOMMANDÉS (OPTIONNEL)
+            // ==========================================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -307,12 +370,27 @@ fun AddFavoriteSpotScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "🎣 Appâts recommandés",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "🎣 Appâts recommandés",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF6B7280)),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "OPTIONNEL",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                         IconButton(
                             onClick = { showBaitSelector = true },
                             modifier = Modifier
@@ -343,7 +421,7 @@ fun AddFavoriteSpotScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Aucun appât sélectionné",
+                                    text = "Aucun appât sélectionné (optionnel)",
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -385,7 +463,9 @@ fun AddFavoriteSpotScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Distance de pêche
+            // ==========================================
+            // DISTANCE DE PÊCHE (OPTIONNEL)
+            // ==========================================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -394,13 +474,30 @@ fun AddFavoriteSpotScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "📏 Distance de pêche",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    ) {
+                        Text(
+                            text = "📏 Distance de pêche",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF6B7280)),
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text(
+                                text = "OPTIONNEL",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
 
                     OutlinedTextField(
                         value = distance,
@@ -429,23 +526,23 @@ fun AddFavoriteSpotScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Bouton de sauvegarde
-            val isValid = spotName.isNotEmpty() &&
-                    selectedPosition.isNotEmpty() &&
-                    selectedFish.isNotEmpty() &&
-                    selectedBaits.isNotEmpty() &&
-                    distance.isNotEmpty()
+            // ==========================================
+            // BOUTON DE SAUVEGARDE - VALIDATION SIMPLIFIÉE
+            // ==========================================
+
+            // ✅ NOUVELLE VALIDATION : Seules les coordonnées sont obligatoires
+            val isValid = selectedPosition.isNotEmpty()
 
             Button(
                 onClick = {
                     if (isValid) {
                         viewModel.addFavoriteSpot(
-                            name = spotName,
+                            name = spotName.ifEmpty { "Spot $selectedPosition" }, // Nom par défaut si vide
                             position = selectedPosition,
                             lake = lake,
-                            fishNames = selectedFish.map { it.name },
-                            baits = selectedBaits,
-                            distance = distance.toIntOrNull() ?: 0
+                            fishNames = selectedFish.map { it.name }, // Peut être vide
+                            baits = selectedBaits, // Peut être vide
+                            distance = distance.toIntOrNull() ?: 0 // 0 si vide
                         )
                         onSaveSpot?.invoke() ?: onBack()
                     }
@@ -455,7 +552,7 @@ fun AddFavoriteSpotScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF10B981),
+                    containerColor = if (isValid) Color(0xFF10B981) else Color.Gray,
                     disabledContainerColor = Color.Gray
                 ),
                 shape = RoundedCornerShape(12.dp)
@@ -467,10 +564,38 @@ fun AddFavoriteSpotScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Sauvegarder le spot",
+                    text = if (isValid) "✅ Sauvegarder le spot" else "🚨 Position requise",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            // Message d'aide
+            if (!isValid) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0x33EF4444)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Les coordonnées sont obligatoires pour sauvegarder",
+                            color = Color(0xFFEF4444),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -478,7 +603,7 @@ fun AddFavoriteSpotScreen(
     }
 
     // ==========================================
-    // DIALOGS
+    // DIALOGS (INCHANGÉS)
     // ==========================================
 
     // Dialog de sélection de coordonnées
