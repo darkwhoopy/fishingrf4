@@ -1,6 +1,6 @@
 // ==========================================
 // FICHIER: ui/screens/PositionSelectionScreen.kt
-// Écran de sélection de position - AFFICHAGE DES USERSPOT
+// Écran de sélection de position avec navigation vers AddFavoriteSpotScreen
 // ==========================================
 
 package com.rf4.fishingrf4.ui.screens
@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -22,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.data.models.Lake
@@ -36,12 +34,12 @@ fun PositionSelectionScreen(
     lake: Lake,
     viewModel: FishingViewModel,
     onPositionSelected: (String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onAddFavoriteSpot: () -> Unit // ← Paramètre pour navigation vers AddFavoriteSpotScreen
 ) {
     // États pour le sélecteur manuel de coordonnées
     var selectedLetter by remember { mutableStateOf<String?>(null) }
     var selectedNumber by remember { mutableStateOf<String?>(null) }
-    var showAddSpotDialog by remember { mutableStateOf(false) }
 
     // États pour le dialog de coordonnées RF4
     var showCoordinateDialog by remember { mutableStateOf(false) }
@@ -378,9 +376,9 @@ fun PositionSelectionScreen(
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
-                        // BOUTON + POUR AJOUTER UN SPOT
+                        // BOUTON + POUR NAVIGUER VERS AddFavoriteSpotScreen
                         IconButton(
-                            onClick = { showAddSpotDialog = true },
+                            onClick = onAddFavoriteSpot, // ← Navigation vers l'écran complet
                             modifier = Modifier
                                 .background(
                                     Color(0xFF10B981),
@@ -408,7 +406,7 @@ fun PositionSelectionScreen(
                 }
 
                 // ==========================================
-                // SPOTS PERSONNELS DE L'UTILISATEUR - ICI LE FIX !
+                // SPOTS PERSONNELS DE L'UTILISATEUR
                 // ==========================================
                 items(userSpotsForThisLake) { spot ->
                     UserPositionCard(
@@ -468,10 +466,8 @@ fun PositionSelectionScreen(
     }
 
     // ==========================================
-    // DIALOGS
+    // DIALOG DE COORDONNÉES RF4
     // ==========================================
-
-    // Dialog de sélection de coordonnées RF4
     if (showCoordinateDialog) {
         CoordinatePickerDialog(
             lakeName = lake.name,
@@ -480,17 +476,6 @@ fun PositionSelectionScreen(
                 selectedPosition = "$x:$y"
             },
             onDismiss = { showCoordinateDialog = false }
-        )
-    }
-
-    // Dialog d'ajout de spot favori simple
-    if (showAddSpotDialog) {
-        AddSpotDialog(
-            onDismiss = { showAddSpotDialog = false },
-            onConfirm = { position, comment ->
-                viewModel.addUserSpot(UserSpot(lakeId = lake.id, position = position, comment = comment))
-                showAddSpotDialog = false
-            }
         )
     }
 }
@@ -635,102 +620,4 @@ private fun UserPositionCard(
             }
         }
     }
-}
-
-// ==========================================
-// DIALOG D'AJOUT DE SPOT SIMPLE
-// ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddSpotDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (position: String, comment: String) -> Unit
-) {
-    var position by remember { mutableStateOf("") }
-    var comment by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Ajouter un spot favori",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Position
-                OutlinedTextField(
-                    value = position,
-                    onValueChange = { newValue ->
-                        // Limiter à 4 caractères et format acceptable (ex: A1, B10, etc.)
-                        if (newValue.length <= 4) {
-                            position = newValue.uppercase()
-                        }
-                    },
-                    label = { Text("Position (ex: A1, B5)", color = Color.Gray) },
-                    placeholder = { Text("A1", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF10B981),
-                        unfocusedBorderColor = Color.Gray
-                    ),
-                    singleLine = true
-                )
-
-                // Commentaire
-                OutlinedTextField(
-                    value = comment,
-                    onValueChange = { comment = it },
-                    label = { Text("Commentaire", color = Color.Gray) },
-                    placeholder = { Text("Mon meilleur spot pour...", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF10B981),
-                        unfocusedBorderColor = Color.Gray
-                    ),
-                    maxLines = 3
-                )
-            }
-        },
-        confirmButton = {
-            val isValid = position.isNotEmpty() && comment.isNotEmpty()
-
-            Button(
-                onClick = {
-                    if (isValid) {
-                        onConfirm(position, comment)
-                    }
-                },
-                enabled = isValid,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF10B981),
-                    disabledContainerColor = Color.Gray
-                )
-            ) {
-                Text(
-                    text = "Ajouter",
-                    color = if (isValid) Color.White else Color.Gray
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "Annuler",
-                    color = Color.Gray
-                )
-            }
-        },
-        containerColor = Color(0xFF1F2937)
-    )
 }

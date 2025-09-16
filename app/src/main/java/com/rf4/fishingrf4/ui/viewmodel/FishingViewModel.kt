@@ -651,7 +651,22 @@ class FishingViewModel(context: Context) : ViewModel() {
             }
         }
     }
-
+    fun addFavoriteSpot(
+        name: String,
+        position: String,
+        lake: Lake,
+        fishNames: List<String>,
+        baits: List<String>,
+        distance: Int
+    ) {
+        // Convertir en UserSpot simple pour l'instant
+        val spot = UserSpot(
+            lakeId = lake.id,
+            position = position,
+            comment = name
+        )
+        addUserSpot(spot)
+    }
     /**
      * Récupère les spots favoris pour un lac
      */
