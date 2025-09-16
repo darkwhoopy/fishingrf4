@@ -32,6 +32,7 @@ import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import kotlinx.coroutines.launch
+import com.rf4.fishingrf4.data.FishingData
 
 @Composable
 fun PositionSelectionScreen(
@@ -669,7 +670,7 @@ fun PositionSelectionScreen(
                 title = { Text("Sélectionner les poissons", color = Color.White) },
                 text = {
                     LazyColumn(modifier = Modifier.height(300.dp)) {
-                        items(lake.availableFish) { fish ->
+                        items(viewModel.getAllAvailableFish().sortedBy { it.name }) { fish ->
                             val isSelected = selectedFish.contains(fish.name)
                             Card(
                                 modifier = Modifier
@@ -728,11 +729,7 @@ fun PositionSelectionScreen(
 
         // Sélecteur d'appâts
         if (showBaitSelector) {
-            val commonBaits = listOf(
-                "Ver de terre", "Ver de vase", "Asticot", "Maïs", "Pain",
-                "Lombric", "Chrysalide", "Blé", "Orge perlé", "Pâte",
-                "Bouillettes", "Pellets", "Fromage", "Viande", "Crevette"
-            )
+            val commonBaits = FishingData.ALL_BAITS.sorted()
 
             AlertDialog(
                 onDismissRequest = { showBaitSelector = false },
