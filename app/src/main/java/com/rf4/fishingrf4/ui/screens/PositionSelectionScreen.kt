@@ -1,6 +1,7 @@
 // ==========================================
 // FICHIER: ui/screens/PositionSelectionScreen.kt
 // Écran de sélection de position avec navigation vers AddFavoriteSpotScreen
+// + NOUVEAU: Historique des 5 derniers spots utilisés par le joueur
 // ==========================================
 
 package com.rf4.fishingrf4.ui.screens
@@ -52,10 +53,9 @@ fun PositionSelectionScreen(
     var shareMessage by remember { mutableStateOf("") }
     var showShareMessage by remember { mutableStateOf(false) }
 
-
     // États pour le dialog de coordonnées RF4
     var showCoordinateDialog by remember { mutableStateOf(false) }
-    var selectedPosition by remember { mutableStateOf("100:100") }
+    var selectedPosition by remember { mutableStateOf("0:0") }
 
     // Récupération des spots utilisateur pour ce lac
     val userSpots by viewModel.userSpots.collectAsState()
@@ -75,6 +75,23 @@ fun PositionSelectionScreen(
         }
     }
 
+    // ==========================================
+    // 🆕 NOUVEAU: Historique des 5 derniers spots utilisés par le joueur
+    // ==========================================
+    var recentPositions by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+    LaunchedEffect(lake.id) {
+        viewModel.getRecentUserPositionsForLake(lake.id) { positions ->
+            recentPositions = positions
+        }
+    }
+    val handlePositionSelection = { position: String ->
+        // Enregistrer l'usage de la position
+        viewModel.recordPositionUsage(lake.id, position)
+        android.util.Log.d("PositionSelection", "Position enregistrée: $position pour lac: ${lake.id}")
+
+        // Appeler le callback original
+        onPositionSelected(position)
+    }
     // Calculer le max de coordonnées selon le lac
     val maxCoordinate = remember(lake.name) {
         when {
@@ -204,7 +221,7 @@ fun PositionSelectionScreen(
                                             )
                                         }
                                         Button(
-                                            onClick = { onPositionSelected(completePosition) },
+                                            onClick = { handlePositionSelection(completePosition) },
                                             colors = ButtonDefaults.buttonColors(
                                                 containerColor = Color(0xFF3B82F6)
                                             ),
@@ -317,7 +334,7 @@ fun PositionSelectionScreen(
                                         )
                                     }
                                     Button(
-                                        onClick = { onPositionSelected(selectedPosition) },
+                                        onClick = { handlePositionSelection(selectedPosition) },
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color(0xFF3B82F6)
                                         ),
@@ -351,7 +368,7 @@ fun PositionSelectionScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onPositionSelected(pos) },
+                                .clickable { handlePositionSelection(pos) },
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF2455AF)),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -364,7 +381,7 @@ fun PositionSelectionScreen(
                             ) {
                                 Text(pos, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 AssistChip(
-                                    onClick = { onPositionSelected(pos) },
+                                    onClick = { handlePositionSelection(pos) },
                                     label = { Text("$count captures", color = Color.White, fontSize = 12.sp) },
                                     colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF3B82F6))
                                 )
@@ -374,7 +391,83 @@ fun PositionSelectionScreen(
                 }
 
                 // ==========================================
-                // SECTION 4 - SPOTS FAVORIS ET POSITIONS RECOMMANDÉES
+                // 🆕 SECTION 4 - HISTORIQUE DES DERNIERS SPOTS UTILISÉS
+                // ==========================================
+                if (recentPositions.isNotEmpty()) {
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.History,
+                                contentDescription = null,
+                                tint = Color(0xFFFBBF24),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "📈 Mes derniers spots utilisés",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+
+                    items(recentPositions) { (position, lastUsed) ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { handlePositionSelection(position) },
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF065F46)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color(0xFFFBBF24))
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = position,
+                                        color = Color.White,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Dernière fois: $lastUsed",
+                                        color = Color(0xFFFBBF24),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = null,
+                                        tint = Color(0xFFFBBF24),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "Revisiter",
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ==========================================
+                // SECTION 5 - SPOTS FAVORIS ET POSITIONS RECOMMANDÉES
                 // ==========================================
                 item {
                     Row(
@@ -413,7 +506,7 @@ fun PositionSelectionScreen(
                     RecommendedPositionCard(
                         position = position,
                         description = description,
-                        onClick = { onPositionSelected(position) }
+                        onClick = { handlePositionSelection(position) }
                     )
                 }
 
@@ -423,7 +516,7 @@ fun PositionSelectionScreen(
                 items(userSpotsForThisLake) { spot ->
                     UserPositionCard(
                         spot = spot,
-                        onClick = { onPositionSelected(spot.position) },
+                        onClick = { handlePositionSelection(spot.position) },
                         onDelete = { viewModel.deleteUserSpot(spot.id) },
                         onShare = { userSpot ->
                             spotToShare = userSpot
@@ -494,6 +587,7 @@ fun PositionSelectionScreen(
             onDismiss = { showCoordinateDialog = false }
         )
     }
+
     // À la fin de PositionSelectionScreen, avant la fermeture
     if (showShareDialog && spotToShare != null) {
         // États pour les détails supplémentaires

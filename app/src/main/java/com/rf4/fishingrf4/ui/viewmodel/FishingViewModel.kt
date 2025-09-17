@@ -682,7 +682,58 @@ class FishingViewModel(context: Context) : ViewModel() {
             repository.loadFavoriteSpots()
         }
     }
+    fun getRecentUserPositionsForLake(
+        lakeId: String,
+        callback: (List<Pair<String, String>>) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val recentPositions = onlineRepo.getRecentUserPositionsForLake(lakeId, 5)
+                callback(recentPositions)
+            } catch (e: Exception) {
+                android.util.Log.e("FishingViewModel", "Erreur récupération positions récentes: ${e.message}")
+                callback(emptyList())
+            }
+        }
+    }
 
+    /**
+     * 🆕 Enregistre l'utilisation d'une position par l'utilisateur
+     * Cette méthode doit être appelée quand l'utilisateur sélectionne une position
+     * @param lakeId ID du lac
+     * @param position Position utilisée (ex: "80:95")
+     */
+    fun recordPositionUsage(lakeId: String, position: String) {
+        viewModelScope.launch {
+            try {
+                onlineRepo.recordUserPositionUsage(lakeId, position)
+            } catch (e: Exception) {
+                android.util.Log.e("FishingViewModel", "Erreur enregistrement position: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * 🆕 Récupère les statistiques d'utilisation d'une position par l'utilisateur
+     * @param lakeId ID du lac
+     * @param position Position à analyser
+     * @param callback Callback avec (nombre d'utilisations, dernière utilisation)
+     */
+    fun getPositionUsageStats(
+        lakeId: String,
+        position: String,
+        callback: (Pair<Int, String>) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val stats = onlineRepo.getUserPositionStats(lakeId, position)
+                callback(stats)
+            } catch (e: Exception) {
+                android.util.Log.e("FishingViewModel", "Erreur stats position: ${e.message}")
+                callback(0 to "Jamais")
+            }
+        }
+    }
     // ==========================================
     // DATA CLASS UI STATE
     // ==========================================

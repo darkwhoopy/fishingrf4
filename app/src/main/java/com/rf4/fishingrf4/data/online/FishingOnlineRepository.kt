@@ -2,8 +2,10 @@ package com.rf4.fishingrf4.data.online
 
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 
 /** Document Firestore "entries" (prises) */
@@ -31,7 +33,7 @@ class FishingOnlineRepository(
 ) {
     private val entries = db.collection("entries")
     private val baitsVotes = db.collection("baits_votes") // structure: baits_votes/{fishId}/votes/{bait}
-
+    private val positionUsage = db.collection("position_usage")
     private fun uid(): String = auth.currentUser?.uid.orEmpty()
     private fun displayName(): String =
         auth.currentUser?.displayName ?: auth.currentUser?.email ?: "Inconnu"
@@ -87,7 +89,207 @@ class FishingOnlineRepository(
             )
         }
     }
+    /**
+     * 🆕 Enregistre l'utilisation d'une position par l'utilisateur
+     * @param lakeId ID du lac
+     * @param position Position utilisée (ex: "80:95")
+     */
+    suspend fun recordUserPositionUsage(lakeId: String, position: String) {
+        val u = uid()
+        if (u.isBlank()) return
 
+        val docId = "${u}_${lakeId}_${position}" // ID unique par utilisateur/lac/position
+
+        val doc = hashMapOf(
+            "userId" to u,
+            "userName" to displayName(),
+            "lakeId" to lakeId,
+            "position" to position,
+            "lastUsed" to Timestamp.now(),
+            "usageCount" to FieldValue.increment(1) // Incrémente le compteur à chaque utilisation
+        )
+
+        try {
+            // Utilise merge pour créer ou mettre à jour
+            positionUsage.document(docId).set(doc, SetOptions.merge()).await()
+        } catch (e: Exception) {
+            android.util.Log.e("FishingOnlineRepository", "Erreur enregistrement position: ${e.message}")
+            throw e
+        }
+    }
+
+    /**
+     * 🆕 Récupère les dernières positions utilisées par l'utilisateur pour un lac
+     * @param lakeId ID du lac
+     * @param limit Nombre maximum de positions à retourner (par défaut 5)
+     * @return Liste de paires (position, date relative)
+     */
+    suspend fun getRecentUserPositionsForLake(lakeId: String, limit: Int = 5): List<Pair<String, String>> {
+        val u = uid()
+        if (u.isBlank()) return emptyList()
+
+        try {
+            val snap = positionUsage
+                .whereEqualTo("userId", u)
+                .whereEqualTo("lakeId", lakeId)
+                .orderBy("lastUsed", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get().await()
+
+            return snap.documents.mapNotNull { doc ->
+                val position = doc.getString("position") ?: return@mapNotNull null
+                val lastUsed = doc.getTimestamp("lastUsed") ?: return@mapNotNull null
+
+                val relativeTime = getRelativeTimeString(lastUsed.toDate().time)
+                position to relativeTime
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FishingOnlineRepository", "Erreur récupération positions récentes: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    /**
+     * 🆕 Récupère les statistiques d'usage d'une position pour l'utilisateur
+     * @param lakeId ID du lac
+     * @param position Position à analyser
+     * @return Paire (nombre d'utilisations, dernière utilisation formatée)
+     */
+    suspend fun getUserPositionStats(lakeId: String, position: String): Pair<Int, String> {
+        val u = uid()
+        if (u.isBlank()) return 0 to "Jamais"
+
+        val docId = "${u}_${lakeId}_${position}"
+
+        try {
+            val doc = positionUsage.document(docId).get().await()
+
+            if (!doc.exists()) {
+                return 0 to "Jamais"
+            }
+
+            val usageCount = doc.getLong("usageCount")?.toInt() ?: 0
+            val lastUsed = doc.getTimestamp("lastUsed")
+
+            val lastUsedString = if (lastUsed != null) {
+                getRelativeTimeString(lastUsed.toDate().time)
+            } else {
+                "Jamais"
+            }
+
+            return usageCount to lastUsedString
+        } catch (e: Exception) {
+            android.util.Log.e("FishingOnlineRepository", "Erreur stats position: ${e.message}")
+            return 0 to "Erreur"
+        }
+    }
+
+    /**
+     * 🆕 Récupère les positions les plus utilisées par l'utilisateur pour un lac
+     * @param lakeId ID du lac
+     * @param limit Nombre maximum de positions à retourner
+     * @return Liste de triplets (position, nombre d'utilisations, dernière utilisation)
+     */
+    suspend fun getMostUsedPositionsForLake(lakeId: String, limit: Int = 10): List<Triple<String, Int, String>> {
+        val u = uid()
+        if (u.isBlank()) return emptyList()
+
+        try {
+            val snap = positionUsage
+                .whereEqualTo("userId", u)
+                .whereEqualTo("lakeId", lakeId)
+                .orderBy("usageCount", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get().await()
+
+            return snap.documents.mapNotNull { doc ->
+                val position = doc.getString("position") ?: return@mapNotNull null
+                val usageCount = doc.getLong("usageCount")?.toInt() ?: 0
+                val lastUsed = doc.getTimestamp("lastUsed")
+
+                val lastUsedString = if (lastUsed != null) {
+                    getRelativeTimeString(lastUsed.toDate().time)
+                } else {
+                    "Jamais"
+                }
+
+                Triple(position, usageCount, lastUsedString)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FishingOnlineRepository", "Erreur positions les plus utilisées: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    /**
+     * 🆕 Formate une date en temps relatif (ex: "il y a 2 heures", "hier", etc.)
+     * @param timeMs Timestamp en millisecondes
+     * @return Chaîne formatée du temps relatif
+     */
+    private fun getRelativeTimeString(timeMs: Long): String {
+        val now = System.currentTimeMillis()
+        val diffMs = now - timeMs
+
+        return when {
+            diffMs < 60_000L -> "À l'instant" // Moins d'une minute
+            diffMs < 3600_000L -> { // Moins d'une heure
+                val minutes = (diffMs / 60_000L).toInt()
+                "Il y a ${minutes}min"
+            }
+            diffMs < 86400_000L -> { // Moins d'un jour
+                val hours = (diffMs / 3600_000L).toInt()
+                "Il y a ${hours}h"
+            }
+            diffMs < 172800_000L -> "Hier" // Moins de 2 jours
+            diffMs < 604800_000L -> { // Moins d'une semaine
+                val days = (diffMs / 86400_000L).toInt()
+                "Il y a ${days}j"
+            }
+            diffMs < 2592000_000L -> { // Moins d'un mois
+                val weeks = (diffMs / 604800_000L).toInt()
+                "Il y a ${weeks}sem"
+            }
+            diffMs < 31536000_000L -> { // Moins d'un an
+                val months = (diffMs / 2592000_000L).toInt()
+                "Il y a ${months}mois"
+            }
+            else -> {
+                val years = (diffMs / 31536000_000L).toInt()
+                "Il y a ${years}an${if (years > 1) "s" else ""}"
+            }
+        }
+    }
+
+    /**
+     * 🆕 Nettoie l'historique des positions anciennes (optionnel)
+     * Supprime les entrées plus anciennes qu'un certain nombre de jours
+     * @param olderThanDays Supprimer les entrées plus anciennes que X jours
+     */
+    suspend fun cleanOldPositionUsage(olderThanDays: Int = 90) {
+        val u = uid()
+        if (u.isBlank()) return
+
+        val cutoffTime = Timestamp(System.currentTimeMillis() / 1000 - (olderThanDays * 24 * 60 * 60), 0)
+
+        try {
+            val snap = positionUsage
+                .whereEqualTo("userId", u)
+                .whereLessThan("lastUsed", cutoffTime)
+                .get().await()
+
+            val batch = db.batch()
+            snap.documents.forEach { doc ->
+                batch.delete(doc.reference)
+            }
+
+            if (snap.documents.isNotEmpty()) {
+                batch.commit().await()
+                android.util.Log.d("FishingOnlineRepository", "Nettoyé ${snap.documents.size} anciennes positions")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FishingOnlineRepository", "Erreur nettoyage positions: ${e.message}")
+        }
+    }
     private fun getCurrentLanguage(): String {
         return java.util.Locale.getDefault().language // "fr", "en", etc.
     }
@@ -460,6 +662,8 @@ class FishingOnlineRepository(
             emptyMap()
         }
     }
+
+
 
     suspend fun debugBaitsInEntries(): String {
         return try {
