@@ -30,7 +30,13 @@ import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.platform.LocalContext
+import com.rf4.fishingrf4.data.models.getLocalizedName
 
+/**
+ * ÉCRAN PRINCIPAL DE LA COMMUNAUTÉ
+ * Permet de voir les appâts populaires, spots partagés, signaler des bugs et suggérer des poissons
+ */
 @Composable
 fun CommunityScreen(
     viewModel: FishingViewModel,
@@ -46,11 +52,11 @@ fun CommunityScreen(
     var isLoadingNewFeatures by remember { mutableStateOf(true) }
     var userVotes by remember { mutableStateOf<Set<String>>(emptySet()) }
 
-    // ✅ CORRECTION : États pour les spots déplacés au niveau principal
+    // États pour les spots (déplacés au niveau principal pour éviter les problèmes de scope)
     var selectedSpotForDetails by remember { mutableStateOf<CommunitySpot?>(null) }
     var showSpotDetailsDialog by remember { mutableStateOf(false) }
 
-    // Charger les nouvelles données
+    // Charger les nouvelles données au démarrage
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
@@ -80,7 +86,7 @@ fun CommunityScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // HEADER
+            // HEADER - En-tête avec titre et sous-titre
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -109,6 +115,7 @@ fun CommunityScreen(
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
+                // Bouton Signaler un Bug
                 Button(
                     onClick = {
                         viewModel.navigateTo(com.rf4.fishingrf4.ui.navigation.Screen.BUG_REPORT)
@@ -126,6 +133,7 @@ fun CommunityScreen(
                     Text(stringResource(R.string.bug_short_label), fontSize = 11.sp)
                 }
 
+                // Bouton Suggérer un Poisson
                 Button(
                     onClick = {
                         viewModel.navigateTo(com.rf4.fishingrf4.ui.navigation.Screen.FISH_SUGGESTION)
@@ -144,13 +152,14 @@ fun CommunityScreen(
                 }
             }
 
-            // ONGLETS
+            // ONGLETS PRINCIPAUX
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Onglet Appâts
                 CommunityFeatureCard(
                     title = stringResource(R.string.community_tab_baits_title),
                     subtitle = stringResource(R.string.community_tab_baits_subtitle),
@@ -159,6 +168,7 @@ fun CommunityScreen(
                     modifier = Modifier.weight(1f)
                 ) { currentTab = 0 }
 
+                // Onglet Lacs
                 CommunityFeatureCard(
                     title = stringResource(R.string.community_tab_lakes_title),
                     subtitle = stringResource(R.string.community_tab_lakes_subtitle),
@@ -167,6 +177,7 @@ fun CommunityScreen(
                     modifier = Modifier.weight(1f)
                 ) { currentTab = 1 }
 
+                // Onglet Bugs
                 CommunityFeatureCard(
                     title = stringResource(R.string.community_tab_bugs_title),
                     subtitle = stringResource(R.string.community_tab_bugs_subtitle),
@@ -175,6 +186,7 @@ fun CommunityScreen(
                     modifier = Modifier.weight(1f)
                 ) { currentTab = 2 }
 
+                // Onglet Suggestions
                 CommunityFeatureCard(
                     title = stringResource(R.string.community_tab_suggestions_title),
                     subtitle = stringResource(R.string.community_tab_suggestions_subtitle),
@@ -184,11 +196,12 @@ fun CommunityScreen(
                 ) { currentTab = 3 }
             }
 
-            // CONTENU SELON L'ONGLET
+            // CONTENU SELON L'ONGLET SÉLECTIONNÉ
             when (currentTab) {
                 0 -> CommunityBaitsTab(viewModel = viewModel)
+
                 1 -> {
-                    // ✅ CORRECTION : Onglet Lacs avec états locaux séparés
+                    // Onglet Lacs avec états locaux séparés
                     var communitySpots by remember { mutableStateOf<List<CommunitySpot>>(emptyList()) }
                     var userSpotVotes by remember { mutableStateOf<Set<String>>(emptySet()) }
                     var isLoading by remember { mutableStateOf(true) }
@@ -262,7 +275,9 @@ fun CommunityScreen(
                         }
                     }
                 }
+
                 2 -> {
+                    // Onglet Bugs
                     if (isLoadingNewFeatures) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(color = Color(0xFFEF4444))
@@ -280,7 +295,9 @@ fun CommunityScreen(
                         )
                     }
                 }
+
                 3 -> {
+                    // Onglet Suggestions
                     if (isLoadingNewFeatures) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(color = Color(0xFF10B981))
@@ -308,7 +325,7 @@ fun CommunityScreen(
         }
     }
 
-    // ✅ DIALOG DÉPLACÉ HORS DU WHEN pour être accessible partout
+    // DIALOG POUR LES DÉTAILS DES SPOTS (accessible partout)
     if (showSpotDetailsDialog && selectedSpotForDetails != null) {
         SpotDetailsDialog(
             spot = selectedSpotForDetails!!,
@@ -320,8 +337,6 @@ fun CommunityScreen(
                 coroutineScope.launch {
                     try {
                         communityRepo.voteForCommunitySpot(spotId, voteType)
-                        // Note: Ici on ne peut pas rafraîchir facilement la liste
-                        // car elle est dans un scope différent
                     } catch (e: Exception) {
                         android.util.Log.e("CommunitySpot", "Erreur vote: ${e.message}")
                     }
@@ -334,7 +349,9 @@ fun CommunityScreen(
     }
 }
 
-// ✅ DIALOG DÉTAILS COMPLET
+/**
+ * DIALOG POUR AFFICHER LES DÉTAILS COMPLETS D'UN SPOT
+ */
 @Composable
 fun SpotDetailsDialog(
     spot: CommunitySpot,
@@ -356,7 +373,7 @@ fun SpotDetailsDialog(
                     .padding(20.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                // Header
+                // Header avec nom du lac et position
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -377,6 +394,7 @@ fun SpotDetailsDialog(
                         )
                     }
 
+                    // Badge de votes
                     if (spot.votes > 0) {
                         Card(
                             colors = CardDefaults.cardColors(
@@ -401,6 +419,7 @@ fun SpotDetailsDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Nom du spot
                 Text(
                     text = spot.name,
                     fontSize = 18.sp,
@@ -408,6 +427,7 @@ fun SpotDetailsDialog(
                     color = Color.White
                 )
 
+                // Description si présente
                 if (spot.description.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -419,25 +439,27 @@ fun SpotDetailsDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Sections détaillées
+                // Section Poissons cibles
                 if (spot.fishNames.isNotEmpty()) {
                     DetailSection(
-                        title = "🐟 Poissons cibles",
+                        title = stringResource(R.string.fish_short_label),
                         items = spot.fishNames,
                         color = Color(0xFF10B981)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
+                // Section Appâts recommandés
                 if (spot.baits.isNotEmpty()) {
                     DetailSection(
-                        title = "🎣 Appâts recommandés",
+                        title = stringResource(R.string.add_spot_target_fish),
                         items = spot.baits,
                         color = Color(0xFFE11D48)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
+                // Distance de pêche
                 if (spot.distance > 0) {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -450,7 +472,7 @@ fun SpotDetailsDialog(
                             Text(text = "📏", fontSize = 16.sp)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Distance de pêche : ${spot.distance}m",
+                                text = "stringResource(R.string.add_spot_fishing_distance) : ${spot.distance}m",
                                 fontSize = 14.sp,
                                 color = Color(0xFF3B82F6),
                                 fontWeight = FontWeight.Medium
@@ -460,7 +482,7 @@ fun SpotDetailsDialog(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                // Auteur
+                // Informations sur l'auteur
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
                     shape = RoundedCornerShape(8.dp)
@@ -482,7 +504,7 @@ fun SpotDetailsDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Boutons
+                // Boutons d'action
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -520,6 +542,9 @@ fun SpotDetailsDialog(
     }
 }
 
+/**
+ * COMPOSANT POUR AFFICHER UNE SECTION DE DÉTAILS AVEC UNE LISTE D'ÉLÉMENTS
+ */
 @Composable
 fun DetailSection(
     title: String,
@@ -561,7 +586,10 @@ fun DetailSection(
         }
     }
 }
-// ✅ FONCTION COMMUNITYFEATURECARD TRADUITE
+
+/**
+ * CARTE POUR LES ONGLETS DE FONCTIONNALITÉS COMMUNAUTAIRES
+ */
 @Composable
 fun CommunityFeatureCard(
     title: String,
@@ -603,9 +631,9 @@ fun CommunityFeatureCard(
     }
 }
 
-
-
-// ✅ ONGLET DES SIGNALEMENTS DE BUGS TRADUIT
+/**
+ * ONGLET POUR AFFICHER LES SIGNALEMENTS DE BUGS
+ */
 @Composable
 fun BugReportsTab(
     bugReports: List<BugReport>,
@@ -636,7 +664,7 @@ fun BugReportsTab(
         }
 
         if (bugReports.isEmpty()) {
-            // État vide traduit
+            // État vide
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -680,7 +708,9 @@ fun BugReportsTab(
     }
 }
 
-// ✅ ONGLET DES SUGGESTIONS DE POISSONS TRADUIT
+/**
+ * ONGLET POUR AFFICHER LES SUGGESTIONS DE POISSONS
+ */
 @Composable
 fun FishSuggestionsTab(
     suggestions: List<FishSuggestion>,
@@ -688,7 +718,7 @@ fun FishSuggestionsTab(
     onVote: (String, VoteType) -> Unit
 ) {
     Column {
-        // Header traduit
+        // Header
         Text(
             text = stringResource(R.string.community_fish_suggestions_title),
             fontSize = 16.sp,
@@ -698,7 +728,7 @@ fun FishSuggestionsTab(
         )
 
         if (suggestions.isEmpty()) {
-            // État vide traduit
+            // État vide
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
@@ -746,7 +776,9 @@ fun FishSuggestionsTab(
     }
 }
 
-// ✅ CARTE D'AFFICHAGE D'UN SIGNALEMENT DE BUG TRADUITE
+/**
+ * CARTE POUR AFFICHER UN SIGNALEMENT DE BUG
+ */
 @Composable
 fun BugReportCard(bugReport: BugReport) {
     Card(
@@ -833,7 +865,9 @@ fun BugReportCard(bugReport: BugReport) {
     }
 }
 
-// ✅ CARTE D'AFFICHAGE D'UNE SUGGESTION DE POISSON TRADUITE
+/**
+ * CARTE POUR AFFICHER UNE SUGGESTION DE POISSON
+ */
 @Composable
 fun FishSuggestionCard(
     suggestion: FishSuggestion,
@@ -899,7 +933,7 @@ fun FishSuggestionCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            // Informations supplémentaires traduites
+            // Informations supplémentaires
             if (suggestion.suggestedLakes.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -927,7 +961,7 @@ fun FishSuggestionCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Footer avec votes et boutons traduits
+            // Footer avec votes et boutons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -956,7 +990,7 @@ fun FishSuggestionCard(
                     }
                 }
 
-                // Boutons de vote traduits
+                // Boutons de vote
                 if (!hasVoted && suggestion.status == SuggestionStatus.PENDING) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         IconButton(
@@ -995,7 +1029,9 @@ fun FishSuggestionCard(
     }
 }
 
-// ✅ BADGE DE STATUT RÉUTILISABLE
+/**
+ * BADGE DE STATUT RÉUTILISABLE
+ */
 @Composable
 fun StatusBadge(
     status: String,
@@ -1015,15 +1051,20 @@ fun StatusBadge(
     }
 }
 
-// ✅ FORMATEUR DE DATE
+/**
+ * FORMATEUR DE DATE POUR AFFICHAGE
+ */
 fun formatDate(timestamp: Long): String {
     val format = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     return format.format(Date(timestamp))
 }
 
-// ✅ ONGLET DES APPÂTS COMMUNAUTAIRES TRADUIT
+/**
+ * ONGLET APPÂTS COMMUNAUTAIRES - AFFICHE LES APPÂTS LES PLUS VOTÉS PAR POISSON
+ */
 @Composable
 fun CommunityBaitsTab(viewModel: FishingViewModel) {
+    val context = LocalContext.current
     var communityBaitsByFish by remember { mutableStateOf<Map<Fish, List<Pair<String, Long>>>>(emptyMap()) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -1039,9 +1080,11 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
 
                 // Trier les poissons par nombre total de votes reçus
                 val sortedBaitData = baitData.toList()
-                    .sortedByDescending { (_, baits) ->
-                        baits.sumOf { it.second }
-                    }
+                    .sortedWith(compareByDescending<Pair<Fish, List<Pair<String, Long>>>> { (_, baits) ->
+                        baits.sumOf { it.second } // Tri principal par votes
+                    }.thenBy { (fish, _) ->
+                        fish.getLocalizedName(context).lowercase() // Tri secondaire alphabétique
+                    })
                     .toMap()
 
                 communityBaitsByFish = sortedBaitData
@@ -1103,8 +1146,12 @@ fun CommunityBaitsTab(viewModel: FishingViewModel) {
     }
 }
 
+/**
+ * CARTE POUR AFFICHER LES APPÂTS COMMUNAUTAIRES D'UN POISSON
+ */
 @Composable
 fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
+    val context = LocalContext.current
     val totalVotes = topBaits.sumOf { it.second }
 
     Card(
@@ -1119,7 +1166,7 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                 modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text(
-                    text = fish.name,
+                    text = fish.getLocalizedName(context),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -1150,12 +1197,12 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
                 }
 
                 RarityBadge(
-                    text = fish.rarity.displayName,
+                    text = stringResource(fish.rarity.stringResId),
                     color = Color(fish.rarity.colorValue)
                 )
             }
 
-            // Top 3 des appâts traduits
+            // Top 3 des appâts
             if (topBaits.isNotEmpty()) {
                 topBaits.forEachIndexed { index, (baitName, voteCount) ->
                     Row(
@@ -1200,342 +1247,4 @@ fun FishCommunityBaitCard(fish: Fish, topBaits: List<Pair<String, Long>>) {
     }
 }
 
-// ✅ BADGE DE RARETÉ RÉUTILISABLE (suppression du doublon)
-
-
-// ✅ ONGLET LACS TRADUIT
-@Composable
-fun CommunityLakesTab() {
-    var communitySpots by remember { mutableStateOf<List<CommunitySpot>>(emptyList()) }
-    var userSpotVotes by remember { mutableStateOf<Set<String>>(emptySet()) }
-    var isLoading by remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
-    val communityRepo = remember { CommunityRepository() }
-
-    // Charger les données
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            try {
-                communitySpots = communityRepo.getTopCommunitySpots(50)
-
-                val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                if (currentUser != null) {
-                    val votes = communityRepo.getUserSpotVotes(currentUser.uid)
-                    userSpotVotes = votes.map { it.spotId }.toSet()
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("CommunityLakesTab", "Erreur chargement: ${e.message}")
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    Column {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "🏆 Meilleurs spots communautaires",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "Partagés et votés par la communauté",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    coroutineScope.launch {
-                        isLoading = true
-                        try {
-                            communitySpots = communityRepo.getTopCommunitySpots(50)
-                        } catch (e: Exception) {
-                            // Gérer l'erreur silencieusement
-                        } finally {
-                            isLoading = false
-                        }
-                    }
-                }
-            ) {
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = "Actualiser",
-                    tint = Color.Gray
-                )
-            }
-        }
-
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Color(0xFF0EA5E9))
-            }
-        } else if (communitySpots.isEmpty()) {
-            // État vide
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF374151)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "Aucun spot partagé",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Soyez le premier à partager un spot avec la communauté !",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        } else {
-            // Liste des spots communautaires
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(communitySpots) { spot ->
-                    CommunitySpotCard(
-                        spot = spot,
-                        hasVoted = spot.id in userSpotVotes,
-                        onVote = { spotId, voteType ->
-                            coroutineScope.launch {
-                                try {
-                                    communityRepo.voteForCommunitySpot(spotId, voteType)
-                                    // Rafraîchir les données
-                                    communitySpots = communityRepo.getTopCommunitySpots(50)
-                                    val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                                    if (currentUser != null) {
-                                        val votes = communityRepo.getUserSpotVotes(currentUser.uid)
-                                        userSpotVotes = votes.map { it.spotId }.toSet()
-                                    }
-                                } catch (e: Exception) {
-                                    // TODO: Afficher un message d'erreur à l'utilisateur
-                                    android.util.Log.e("CommunityLakesTab", "Erreur vote: ${e.message}")
-                                }
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-// ==========================================
-// CARTE D'AFFICHAGE D'UN SPOT COMMUNAUTAIRE
-// ==========================================
-
-@Composable
-fun CommunitySpotCard(
-    spot: CommunitySpot,
-    hasVoted: Boolean,
-    onVote: (String, VoteType) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A5F)),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header avec lac et position
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "${spot.lakeName} - ${spot.position}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = spot.name,
-                        fontSize = 14.sp,
-                        color = Color(0xFF0EA5E9),
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                // Badge de votes
-                if (spot.votes > 0) {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = when {
-                                spot.votes >= 10 -> Color(0xFFFFD700) // Or
-                                spot.votes >= 5 -> Color(0xFFC0C0C0)  // Argent
-                                else -> Color(0xFFCD7F32)             // Bronze
-                            }
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = "${spot.votes} vote(s)",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-            }
-
-            // Description si présente
-            if (spot.description.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = spot.description,
-                    fontSize = 13.sp,
-                    color = Color.Gray
-                )
-            }
-
-            // Informations supplémentaires
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Poissons
-            if (spot.fishNames.isNotEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "🐟",
-                        fontSize = 12.sp
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = spot.fishNames.take(3).joinToString(", ") +
-                                if (spot.fishNames.size > 3) "..." else "",
-                        fontSize = 11.sp,
-                        color = Color(0xFF10B981)
-                    )
-                }
-            }
-
-            // Appâts
-            if (spot.baits.isNotEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "🎣",
-                        fontSize = 12.sp
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = spot.baits.take(3).joinToString(", ") +
-                                if (spot.baits.size > 3) "..." else "",
-                        fontSize = 11.sp,
-                        color = Color(0xFFE11D48)
-                    )
-                }
-            }
-
-            // Distance
-            if (spot.distance > 0) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "📏",
-                        fontSize = 12.sp
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${spot.distance}m",
-                        fontSize = 11.sp,
-                        color = Color(0xFF3B82F6)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Footer avec auteur et boutons de vote
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Informations sur l'auteur
-                Column {
-                    Text(
-                        text = "Par ${spot.userName}",
-                        fontSize = 11.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = formatDate(spot.createdAt),
-                        fontSize = 10.sp,
-                        color = Color.Gray
-                    )
-                }
-
-                // Boutons de vote
-                if (!hasVoted) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        IconButton(
-                            onClick = { onVote(spot.id, VoteType.UPVOTE) },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.ThumbUp,
-                                contentDescription = "Voter pour",
-                                tint = Color(0xFF10B981),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = { onVote(spot.id, VoteType.DOWNVOTE) },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.ThumbDown,
-                                contentDescription = "Voter contre",
-                                tint = Color(0xFFEF4444),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                } else {
-                    Text(
-                        text = "✅ Voté",
-                        fontSize = 11.sp,
-                        color = Color(0xFF10B981),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
+// RarityBadge supprimé car déjà défini ailleurs dans le projet

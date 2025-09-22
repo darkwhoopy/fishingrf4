@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.stringResource
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.FishingData
 import com.rf4.fishingrf4.data.models.Fish
@@ -106,7 +107,7 @@ fun AddFavoriteSpotScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "Nouveau spot favori",
+                        text = stringResource(R.string.add_spot_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -135,7 +136,7 @@ fun AddFavoriteSpotScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
                         Text(
-                            text = "🎯 Position",
+                            text = stringResource(R.string.add_spot_position),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -147,7 +148,7 @@ fun AddFavoriteSpotScreen(
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                text = "OBLIGATOIRE",
+                                text = stringResource(R.string.add_spot_required),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -175,7 +176,9 @@ fun AddFavoriteSpotScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = if (selectedPosition.isEmpty())
-                                "🚨 Choisir les coordonnées" else "📍 $selectedPosition",
+                                stringResource(R.string.add_spot_choose_coordinates)
+                            else
+                                stringResource(R.string.add_spot_position_selected, selectedPosition),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -201,7 +204,7 @@ fun AddFavoriteSpotScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
                         Text(
-                            text = "📍 Nom du spot",
+                            text = stringResource(R.string.add_spot_name),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -213,7 +216,7 @@ fun AddFavoriteSpotScreen(
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                text = "OPTIONNEL",
+                                text = stringResource(R.string.add_spot_optional),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -225,8 +228,8 @@ fun AddFavoriteSpotScreen(
                     OutlinedTextField(
                         value = spotName,
                         onValueChange = { spotName = it },
-                        label = { Text("Nom du spot", color = Color.Gray) },
-                        placeholder = { Text("Ex: Zone aux brèmes", color = Color.Gray) },
+                        label = { Text(stringResource(R.string.add_spot_name_label), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.add_spot_name_placeholder), color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,
@@ -261,7 +264,7 @@ fun AddFavoriteSpotScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "🐟 Poissons cibles",
+                                text = stringResource(R.string.add_spot_target_fish),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -272,7 +275,7 @@ fun AddFavoriteSpotScreen(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "OPTIONNEL",
+                                    text = stringResource(R.string.add_spot_optional),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
@@ -290,7 +293,7 @@ fun AddFavoriteSpotScreen(
                         ) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = "Ajouter un poisson",
+                                contentDescription = stringResource(R.string.add_spot_add_fish),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -310,7 +313,7 @@ fun AddFavoriteSpotScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Aucun poisson sélectionné (optionnel)",
+                                    text = stringResource(R.string.add_spot_no_fish_selected),
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -335,7 +338,7 @@ fun AddFavoriteSpotScreen(
                                     trailingIcon = {
                                         Icon(
                                             Icons.Default.Close,
-                                            contentDescription = "Retirer",
+                                            contentDescription = stringResource(R.string.add_spot_remove),
                                             modifier = Modifier.size(16.dp),
                                             tint = Color.White
                                         )
@@ -372,7 +375,7 @@ fun AddFavoriteSpotScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "🎣 Appâts recommandés",
+                                text = stringResource(R.string.add_spot_recommended_baits),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -383,7 +386,7 @@ fun AddFavoriteSpotScreen(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "OPTIONNEL",
+                                    text = stringResource(R.string.add_spot_optional),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
@@ -401,7 +404,7 @@ fun AddFavoriteSpotScreen(
                         ) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = "Ajouter un appât",
+                                contentDescription = stringResource(R.string.add_spot_add_bait),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -421,7 +424,7 @@ fun AddFavoriteSpotScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Aucun appât sélectionné (optionnel)",
+                                    text = stringResource(R.string.add_spot_no_baits_selected),
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -446,7 +449,7 @@ fun AddFavoriteSpotScreen(
                                     trailingIcon = {
                                         Icon(
                                             Icons.Default.Close,
-                                            contentDescription = "Retirer",
+                                            contentDescription = stringResource(R.string.add_spot_remove),
                                             modifier = Modifier.size(16.dp),
                                             tint = Color.White
                                         )
@@ -479,7 +482,7 @@ fun AddFavoriteSpotScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
                         Text(
-                            text = "📏 Distance de pêche",
+                            text = stringResource(R.string.add_spot_fishing_distance),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -490,7 +493,7 @@ fun AddFavoriteSpotScreen(
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                text = "OPTIONNEL",
+                                text = stringResource(R.string.add_spot_optional),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -506,8 +509,8 @@ fun AddFavoriteSpotScreen(
                                 distance = it
                             }
                         },
-                        label = { Text("Distance en mètres", color = Color.Gray) },
-                        placeholder = { Text("30", color = Color.Gray) },
+                        label = { Text(stringResource(R.string.add_spot_distance_label), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.add_spot_distance_placeholder), color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.NumberPassword
@@ -564,7 +567,10 @@ fun AddFavoriteSpotScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (isValid) "✅ Sauvegarder le spot" else "🚨 Position requise",
+                    text = if (isValid)
+                        stringResource(R.string.add_spot_save)
+                    else
+                        stringResource(R.string.add_spot_position_required),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -590,7 +596,7 @@ fun AddFavoriteSpotScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Les coordonnées sont obligatoires pour sauvegarder",
+                            text = stringResource(R.string.add_spot_coordinates_required),
                             color = Color(0xFFEF4444),
                             fontSize = 12.sp
                         )
@@ -603,7 +609,7 @@ fun AddFavoriteSpotScreen(
     }
 
     // ==========================================
-    // DIALOGS (INCHANGÉS)
+    // DIALOGS
     // ==========================================
 
     // Dialog de sélection de coordonnées
@@ -632,7 +638,7 @@ fun AddFavoriteSpotScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Sélectionner les poissons",
+                        text = stringResource(R.string.add_spot_select_fish),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -683,7 +689,7 @@ fun AddFavoriteSpotScreen(
                                     if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
-                                            contentDescription = "Sélectionné",
+                                            contentDescription = stringResource(R.string.add_spot_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -703,7 +709,7 @@ fun AddFavoriteSpotScreen(
                             onClick = { showFishSelector = false },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Annuler", color = Color.Gray)
+                            Text(stringResource(R.string.cancel), color = Color.Gray)
                         }
                         Button(
                             onClick = { showFishSelector = false },
@@ -712,7 +718,7 @@ fun AddFavoriteSpotScreen(
                                 containerColor = Color(0xFF10B981)
                             )
                         ) {
-                            Text("Valider (${selectedFish.size})")
+                            Text(stringResource(R.string.add_spot_validate_count, selectedFish.size))
                         }
                     }
                 }
@@ -734,7 +740,7 @@ fun AddFavoriteSpotScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Sélectionner les appâts",
+                        text = stringResource(R.string.add_spot_select_baits),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -775,7 +781,7 @@ fun AddFavoriteSpotScreen(
                                     if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
-                                            contentDescription = "Sélectionné",
+                                            contentDescription = stringResource(R.string.add_spot_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -795,7 +801,7 @@ fun AddFavoriteSpotScreen(
                             onClick = { showBaitSelector = false },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Annuler", color = Color.Gray)
+                            Text(stringResource(R.string.cancel), color = Color.Gray)
                         }
                         Button(
                             onClick = { showBaitSelector = false },
@@ -804,7 +810,7 @@ fun AddFavoriteSpotScreen(
                                 containerColor = Color(0xFF3B82F6)
                             )
                         ) {
-                            Text("Valider (${selectedBaits.size})")
+                            Text(stringResource(R.string.add_spot_validate_count, selectedBaits.size))
                         }
                     }
                 }
