@@ -106,7 +106,7 @@
          SÉLECTION D'APPÂT
          ========================================== -->
     <string name="bait_selection_title">Choisir un appât</string>
-    <string name="bait_recommended">Recommandés</string>
+    <string name="bait_recommended">🎣Recommandés</string>
     <string name="bait_recent">Récents</string>
 
     <string name="bait_custom">Appât personnalisé</string>
@@ -557,7 +557,7 @@
 
 
 
-    <string name="app_version">v0.6</string>
+    <string name="app_version">v0.8.1</string>
     <string name="status_online">ONLINE</string>
     <string name="status_offline">OFFLINE</string>
 
@@ -729,8 +729,8 @@
     <string name="update_thanks_message">Merci de faire partie de la communauté Fishing RF4 ! Vos retours nous aident à améliorer l\'expérience.</string>
 
     <!-- Fonctionnalités de la version 0.8D -->
-    <string name="update_feature_1_title">🎯 Sélection de position améliorée</string>
-    <string name="update_feature_1_desc">Nouveau sélecteur avec coordonnées RF4, grille manuelle et top zones communautaires</string>
+    <string name="update_feature_1_title">🎯 Mis à jour des traductions</string>
+    <string name="update_feature_1_desc">plusieurs écrans de traduits</string>
 
     <string name="update_feature_2_title">⭐ Partage de spots enrichi</string>
     <string name="update_feature_2_desc">Partagez vos spots favoris avec poissons cibles, appâts recommandés et distance de pêche</string>
@@ -766,6 +766,98 @@
     <string name="position_selected">Position sélectionnée</string>
     <string name="position_fishing_spot">Spot de pêche</string>
 
+    <!-- ProfileScreen - Google Account -->
+    <string name="profile_google_account">Compte Google</string>
+    <string name="profile_login_message">Connecte-toi pour sauvegarder en ligne et participer aux Top 5.</string>
+    <string name="profile_login_button">Se connecter avec Google</string>
+    <string name="profile_logged_as">Connecté en tant que :</string>
+    <string name="profile_unknown_user">Utilisateur</string>
+    <string name="profile_logout">Se déconnecter</string>
+    <string name="profile_change_account">Changer de compte</string>
+
+    <!-- ProfileScreen - Statistics -->
+    <string name="profile_catches">Prises</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_favorite_spot">Spot favori</string>
+    <string name="profile_fish_by_rarity">🌟 Poissons par rareté</string>
+
+
+
+    <string name="add_spot_add_fish">Ajouter un poisson</string>
+    <string name="add_spot_add_bait">Ajouter un appât</string>
+    <string name="add_spot_remove">Retirer</string>
+    <string name="add_spot_selected">Sélectionné</string>
+    <string name="add_spot_validate_count">Valider (%d)</string>
+
+    <!-- AddFavoriteSpotScreen -->
+    <string name="add_spot_title">Nouveau spot favori</string>
+    <string name="add_spot_position">🎯 Position</string>
+    <string name="add_spot_required">OBLIGATOIRE</string>
+    <string name="add_spot_optional">OPTIONNEL</string>
+    <string name="add_spot_choose_coordinates">🚨 Choisir les coordonnées</string>
+    <string name="add_spot_position_selected">📍 %s</string>
+    <string name="add_spot_name">📍 Nom du spot</string>
+    <string name="add_spot_name_label">Nom du spot</string>
+    <string name="add_spot_name_placeholder">Ex: Zone aux brèmes</string>
+    <string name="add_spot_target_fish">🐟 Poissons cibles</string>
+    <string name="add_spot_recommended_baits">🎣 Appâts recommandés</string>
+    <string name="add_spot_fishing_distance">📏 Distance de pêche</string>
+    <string name="add_spot_distance_label">Distance en mètres</string>
+    <string name="add_spot_distance_placeholder">30</string>
+    <string name="add_spot_save">✅ Sauvegarder le spot</string>
+    <string name="add_spot_position_required">🚨 Position requise</string>
+    <string name="add_spot_coordinates_required">Les coordonnées sont obligatoires pour sauvegarder</string>
+    <string name="add_spot_no_fish_selected">Aucun poisson sélectionné (optionnel)</string>
+    <string name="add_spot_no_baits_selected">Aucun appât sélectionné (optionnel)</string>
+    <string name="add_spot_select_fish">Sélectionner les poissons</string>
+    <string name="add_spot_select_baits">Sélectionner les appâts</string>
+
+    <!-- PositionSelectionScreen -->
+    <string name="position_choose_title">📍 Choisissez votre position</string>
+    <string name="position_manual_coordinates">🎯 Coordonnées manuelles</string>
+    <string name="position_select_letter">🔤 Sélectionnez une lettre</string>
+    <string name="position_select_number">🔢 Sélectionnez un chiffre</string>
+    <string name="position_generated">Position générée</string>
+
+    <string name="position_rf4_coordinates">🎯 Position par coordonnées RF4</string>
+    <string name="position_rf4_format_desc">Utilisez le format standard de la communauté RF4 (ex: 80:95)</string>
+
+    <string name="position_top_zones_today">🔥 Top zones du jour (communauté)</string>
+    <string name="position_captures_count">%d captures</string>
+    <string name="position_recent_spots">📈 Mes derniers spots utilisés</string>
+    <string name="position_last_time">Dernière fois: %s</string>
+    <string name="position_revisit">Revisiter</string>
+
+    <string name="position_add_favorite_spot">Ajouter un spot favori</string>
+    <string name="position_no_favorite_spots">Aucun spot favori</string>
+    <string name="position_add_one_hint">Cliquez sur + pour en ajouter un</string>
+
+    <!-- Position Sharing Dialog -->
+    <string name="position_share_spot">Partager ce spot</string>
+    <string name="position_spot_position">Position %s</string>
+    <string name="position_add_details_hint">Ajoutez des détails pour enrichir votre partage :</string>
+    <string name="position_target_fish_optional">Poissons cibles (optionnel)</string>
+    <string name="position_no_fish_selected">Aucun poisson sélectionné</string>
+    <string name="position_recommended_baits_optional">Appâts recommandés (optionnel)</string>
+    <string name="position_no_baits_selected">Aucun appât sélectionné</string>
+    <string name="position_fishing_distance_optional">Distance de pêche en mètres (optionnel)</string>
+    <string name="position_share">Partager</string>
+    <string name="position_shared_from_favorites">Spot partagé depuis mes favoris</string>
+    <string name="position_share_success">Spot partagé avec succès !</string>
+    <string name="position_already_shared">Vous avez déjà partagé ce spot !</string>
+    <string name="position_login_required">Vous devez être connecté pour partager</string>
+    <string name="position_insufficient_permissions">Permissions insuffisantes</string>
+    <string name="position_share_error">Erreur lors du partage : %s</string>
+    <string name="position_information">Information</string>
+    <string name="position_select_fish">Sélectionner les poissons</string>
+    <string name="position_select_baits">Sélectionner les appâts</string>
+    <string name="position_partagé">Position partagé par :  !</string>
+    <string name="position_validate_count">Valider (%d)</string>
+    <string name="position_share_this_spot">Partager ce spot</string>
+
+
+
+    <!-- Clés manquantes pour PositionSelectionScreen -->
 
 
 </resources>

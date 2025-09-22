@@ -731,8 +731,8 @@
     <string name="update_thanks_message">Thank you for being part of the Fishing RF4 community! Your feedback helps us improve the experience.</string>
 
     <!-- Version 0.8D features -->
-    <string name="update_feature_1_title">🎯 Enhanced position selection</string>
-    <string name="update_feature_1_desc">New selector with RF4 coordinates, manual grid and community top zones</string>
+    <string name="update_feature_1_title">🎯🎯 Updated translations</string>
+    <string name="update_feature_1_desc">Several screens have been translated</string>
 
     <string name="update_feature_2_title">⭐ Enriched spot sharing</string>
     <string name="update_feature_2_desc">Share your favorite spots with target fish, recommended baits and fishing distance</string>
@@ -764,6 +764,98 @@
     <string name="position_selected">Selected position</string>
     <string name="position_fishing_spot">Fishing spot</string>
 
+    <!-- ProfileScreen - Google Account -->
+    <string name="profile_google_account">Google Account</string>
+    <string name="profile_login_message">Sign in to save online and participate in Top 5.</string>
+    <string name="profile_login_button">Sign in with Google</string>
+    <string name="profile_logged_as">Logged in as:</string>
+    <string name="profile_unknown_user">User</string>
+    <string name="profile_logout">Sign out</string>
+    <string name="profile_change_account">Change account</string>
+
+    <!-- ProfileScreen - Statistics -->
+    <string name="profile_catches">Catches</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_favorite_spot">Favorite spot</string>
+    <string name="profile_fish_by_rarity">🌟 Fish by rarity</string>
+
+    <!-- AddFavoriteSpotScreen -->
+    <string name="add_spot_title">New favorite spot</string>
+    <string name="add_spot_position">🎯 Position</string>
+    <string name="add_spot_required">REQUIRED</string>
+    <string name="add_spot_optional">OPTIONAL</string>
+    <string name="add_spot_choose_coordinates">🚨 Choose coordinates</string>
+    <string name="add_spot_position_selected">📍 %s</string>
+    <string name="add_spot_name">📍 Spot name</string>
+    <string name="add_spot_name_label">Spot name</string>
+    <string name="add_spot_name_placeholder">Ex: Bream zone</string>
+    <string name="add_spot_target_fish">🐟 Target fish</string>
+    <string name="add_spot_recommended_baits">🎣 Recommended baits</string>
+    <string name="add_spot_fishing_distance">📏 Fishing distance</string>
+    <string name="add_spot_distance_label">Distance in meters</string>
+    <string name="add_spot_distance_placeholder">30</string>
+    <string name="add_spot_save">✅ Save spot</string>
+    <string name="add_spot_position_required">🚨 Position required</string>
+    <string name="add_spot_coordinates_required">Coordinates are required to save</string>
+    <string name="add_spot_no_fish_selected">No fish selected (optional)</string>
+    <string name="add_spot_no_baits_selected">No baits selected (optional)</string>
+    <string name="add_spot_select_fish">Select fish</string>
+    <string name="add_spot_select_baits">Select baits</string>
+    <string name="add_spot_validate_count">Validate (%d)</string>
 
 
-   </resources>
+    <!-- AddFavoriteSpotScreen - Additional keys -->
+
+    <string name="add_spot_add_fish">Add a fish</string>
+    <string name="add_spot_add_bait">Add a bait</string>
+    <string name="add_spot_remove">Remove</string>
+    <string name="add_spot_selected">Selected</string>
+
+    <!-- PositionSelectionScreen -->
+    <string name="position_choose_title">📍 Choose your position</string>
+    <string name="position_manual_coordinates">🎯 Manual coordinates</string>
+    <string name="position_select_letter">🔤 Select a letter</string>
+    <string name="position_select_number">🔢 Select a number</string>
+    <string name="position_generated">Generated position</string>
+
+    <string name="position_rf4_coordinates">🎯 Position by RF4 coordinates</string>
+    <string name="position_rf4_format_desc">Use the standard RF4 community format (e.g: 80:95)</string>
+
+    <string name="position_top_zones_today">🔥 Top zones today (community)</string>
+    <string name="position_captures_count">%d catches</string>
+    <string name="position_recent_spots">📈 My recent spots used</string>
+    <string name="position_last_time">Last time: %s</string>
+    <string name="position_revisit">Revisit</string>
+
+    <string name="position_add_favorite_spot">Add favorite spot</string>
+    <string name="position_no_favorite_spots">No favorite spots</string>
+    <string name="position_add_one_hint">Click + to add one</string>
+
+    <!-- Position Sharing Dialog -->
+    <string name="position_share_spot">Share this spot</string>
+    <string name="position_spot_position">Position %s</string>
+    <string name="position_add_details_hint">Add details to enrich your sharing:</string>
+    <string name="position_target_fish_optional">Target fish (optional)</string>
+    <string name="position_no_fish_selected">No fish selected</string>
+    <string name="position_recommended_baits_optional">Recommended baits (optional)</string>
+    <string name="position_no_baits_selected">No baits selected</string>
+    <string name="position_fishing_distance_optional">Fishing distance in meters (optional)</string>
+    <string name="position_share">Share</string>
+    <string name="position_shared_from_favorites">Spot shared from my favorites</string>
+    <string name="position_share_success">Spot shared successfully!</string>
+    <string name="position_already_shared">You already shared this spot!</string>
+    <string name="position_login_required">You must be logged in to share</string>
+    <string name="position_insufficient_permissions">Insufficient permissions</string>
+    <string name="position_share_error">Sharing error: %s</string>
+    <string name="position_information">Information</string>
+    <string name="position_select_fish">Select fish</string>
+    <string name="position_select_baits">Select baits</string>
+
+    <string name="position_validate_count">Validate (%d)</string>
+    <string name="position_share_this_spot">Share this spot</string>
+
+    <string name="position_partagé">Position shared by :  !</string>
+
+
+
+</resources>
