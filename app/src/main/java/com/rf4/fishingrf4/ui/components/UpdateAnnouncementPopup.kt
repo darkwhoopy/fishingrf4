@@ -123,23 +123,23 @@ fun UpdateAnnouncementPopup(
                             description = stringResource(R.string.update_feature_1_desc)
                         )
 
-                        UpdateFeature(
-                            icon = "🎣",
-                            title = stringResource(R.string.update_feature_2_title),
-                            description = stringResource(R.string.update_feature_2_desc)
-                        )
+                        //UpdateFeature(
+                          //  icon = "🎣",
+                           // title = stringResource(R.string.update_feature_2_title),
+                           // description = stringResource(R.string.update_feature_2_desc)
+                        //)//
 
-                        UpdateFeature(
-                            icon = "🏞️",
-                            title = stringResource(R.string.update_feature_3_title),
-                            description = stringResource(R.string.update_feature_3_desc)
-                        )
+                       // UpdateFeature(
+                          //  icon = "🏞️",
+                         //   title = stringResource(R.string.update_feature_3_title),
+                         //   description = stringResource(R.string.update_feature_3_desc)
+                       // )
 
-                        UpdateFeature(
-                            icon = "🔧",
-                            title = stringResource(R.string.update_feature_4_title),
-                            description = stringResource(R.string.update_feature_4_desc)
-                        )
+                       // UpdateFeature(
+                          //  icon = "🔧",
+                         //   title = stringResource(R.string.update_feature_4_title),
+                         //   description = stringResource(R.string.update_feature_4_desc)
+                       // )// Ajoutez d'autres caractéristiques selon vos besoins
                     }
                 }
 

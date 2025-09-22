@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Lake
 import com.rf4.fishingrf4.data.models.UserSpot
 import com.rf4.fishingrf4.data.repository.CommunityRepository
@@ -34,6 +36,7 @@ import com.rf4.fishingrf4.ui.components.CoordinatePickerDialog
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import kotlinx.coroutines.launch
 import com.rf4.fishingrf4.data.FishingData
+import com.rf4.fishingrf4.utils.getLocalizedName
 
 @Composable
 fun PositionSelectionScreen(
@@ -123,13 +126,13 @@ fun PositionSelectionScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = lake.name,
+                        text = lake.getLocalizedName(),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "📍 Choisissez votre position",
+                        text = stringResource(R.string.position_choose_title),
                         fontSize = 16.sp,
                         color = Color.Gray
                     )
@@ -153,7 +156,7 @@ fun PositionSelectionScreen(
                             modifier = Modifier.padding(20.dp)
                         ) {
                             Text(
-                                text = "🎯 Coordonnées manuelles",
+                                text = stringResource(R.string.position_manual_coordinates),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -161,7 +164,12 @@ fun PositionSelectionScreen(
                             )
 
                             // Lettres
-                            Text("🔤 Sélectionnez une lettre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(
+                                text = stringResource(R.string.position_select_letter),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 val letters = ('A'..'J').map { it.toString() }
@@ -179,7 +187,12 @@ fun PositionSelectionScreen(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Chiffres
-                            Text("🔢 Sélectionnez un chiffre", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(
+                                text = stringResource(R.string.position_select_number),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 val numbers = (1..10).map { it.toString() }
@@ -209,7 +222,7 @@ fun PositionSelectionScreen(
                                     ) {
                                         Column {
                                             Text(
-                                                text = "Position générée",
+                                                text = stringResource(R.string.position_generated),
                                                 fontSize = 12.sp,
                                                 color = Color.Gray
                                             )
@@ -234,7 +247,7 @@ fun PositionSelectionScreen(
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
                                             Text(
-                                                text = "Utiliser",
+                                                text = stringResource(R.string.position_use),
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold
                                             )
@@ -270,7 +283,7 @@ fun PositionSelectionScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "🎯 Position par coordonnées RF4",
+                                    text = stringResource(R.string.position_rf4_coordinates),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -278,7 +291,7 @@ fun PositionSelectionScreen(
                             }
 
                             Text(
-                                text = "Utilisez le format standard de la communauté RF4 (ex: 80:95)",
+                                text = stringResource(R.string.position_rf4_format_desc),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(bottom = 16.dp)
@@ -301,7 +314,7 @@ fun PositionSelectionScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Choisir les coordonnées",
+                                    text = stringResource(R.string.position_choose_coordinates),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -322,7 +335,7 @@ fun PositionSelectionScreen(
                                 ) {
                                     Column {
                                         Text(
-                                            text = "Position actuelle",
+                                            text = stringResource(R.string.position_current),
                                             fontSize = 12.sp,
                                             color = Color.Gray
                                         )
@@ -341,7 +354,7 @@ fun PositionSelectionScreen(
                                         shape = RoundedCornerShape(8.dp)
                                     ) {
                                         Text(
-                                            text = "Utiliser",
+                                            text = stringResource(R.string.position_use),
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -358,7 +371,7 @@ fun PositionSelectionScreen(
                 if (topZones.isNotEmpty()) {
                     item {
                         Text(
-                            "🔥 Top zones du jour (communauté)",
+                            text = stringResource(R.string.position_top_zones_today),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -382,7 +395,13 @@ fun PositionSelectionScreen(
                                 Text(pos, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 AssistChip(
                                     onClick = { handlePositionSelection(pos) },
-                                    label = { Text("$count captures", color = Color.White, fontSize = 12.sp) },
+                                    label = {
+                                        Text(
+                                            text = stringResource(R.string.position_captures_count, count),
+                                            color = Color.White,
+                                            fontSize = 12.sp
+                                        )
+                                    },
                                     colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF3B82F6))
                                 )
                             }
@@ -407,7 +426,7 @@ fun PositionSelectionScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "📈 Mes derniers spots utilisés",
+                                text = stringResource(R.string.position_recent_spots),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -439,7 +458,7 @@ fun PositionSelectionScreen(
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = "Dernière fois: $lastUsed",
+                                        text = stringResource(R.string.position_last_time, lastUsed),
                                         color = Color(0xFFFBBF24),
                                         fontSize = 12.sp
                                     )
@@ -455,7 +474,7 @@ fun PositionSelectionScreen(
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Text(
-                                        text = "Revisiter",
+                                        text = stringResource(R.string.position_revisit),
                                         color = Color.White,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
@@ -476,7 +495,7 @@ fun PositionSelectionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "⭐ Mes spots favoris",
+                            text = stringResource(R.string.position_favorite_spots),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -493,7 +512,7 @@ fun PositionSelectionScreen(
                         ) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = "Ajouter un spot favori",
+                                contentDescription = stringResource(R.string.position_add_favorite_spot),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -549,13 +568,13 @@ fun PositionSelectionScreen(
                                         fontSize = 32.sp
                                     )
                                     Text(
-                                        text = "Aucun spot favori",
+                                        text = stringResource(R.string.position_no_favorite_spots),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White
                                     )
                                     Text(
-                                        text = "Cliquez sur + pour en ajouter un",
+                                        text = stringResource(R.string.position_add_one_hint),
                                         fontSize = 12.sp,
                                         color = Color.Gray,
                                         modifier = Modifier.padding(top = 4.dp)
@@ -603,7 +622,12 @@ fun PositionSelectionScreen(
                 spotToShare = null
             },
             title = {
-                Text("Partager ce spot", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.position_share_spot),
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
             },
             text = {
                 Column(
@@ -617,12 +641,12 @@ fun PositionSelectionScreen(
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                "Position ${spotToShare!!.position}",
+                                text = stringResource(R.string.position_spot_position, spotToShare!!.position),
                                 color = Color(0xFF10B981),
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                spotToShare!!.comment,
+                                text = spotToShare!!.comment,
                                 color = Color.Gray,
                                 fontSize = 12.sp
                             )
@@ -630,7 +654,7 @@ fun PositionSelectionScreen(
                     }
 
                     Text(
-                        "Ajoutez des détails pour enrichir votre partage :",
+                        text = stringResource(R.string.position_add_details_hint),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -641,8 +665,8 @@ fun PositionSelectionScreen(
                         value = if (selectedFish.isEmpty()) "" else selectedFish.joinToString(", "),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Poissons cibles (optionnel)", color = Color.Gray) },
-                        placeholder = { Text("Aucun poisson sélectionné", color = Color.Gray) },
+                        label = { Text(stringResource(R.string.position_target_fish_optional), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.position_no_fish_selected), color = Color.Gray) },
                         trailingIcon = {
                             IconButton(onClick = { showFishSelector = true }) {
                                 Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
@@ -663,8 +687,8 @@ fun PositionSelectionScreen(
                         value = if (selectedBaits.isEmpty()) "" else selectedBaits.joinToString(", "),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Appâts recommandés (optionnel)", color = Color.Gray) },
-                        placeholder = { Text("Aucun appât sélectionné", color = Color.Gray) },
+                        label = { Text(stringResource(R.string.position_recommended_baits_optional), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.position_no_baits_selected), color = Color.Gray) },
                         trailingIcon = {
                             IconButton(onClick = { showBaitSelector = true }) {
                                 Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
@@ -688,7 +712,7 @@ fun PositionSelectionScreen(
                                 distance = it
                             }
                         },
-                        label = { Text("Distance de pêche en mètres (optionnel)", color = Color.Gray) },
+                        label = { Text(stringResource(R.string.position_fishing_distance_optional), color = Color.Gray) },
                         placeholder = { Text("30", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -704,6 +728,13 @@ fun PositionSelectionScreen(
                 }
             },
             confirmButton = {
+                // Stocker les messages AVANT le coroutineScope
+                val successMessage = stringResource(R.string.position_share_success)
+                val alreadySharedMessage = stringResource(R.string.position_already_shared)
+                val loginRequiredMessage = stringResource(R.string.position_login_required)
+                val insufficientPermissionsMessage = stringResource(R.string.position_insufficient_permissions)
+                val defaultDescription = stringResource(R.string.position_shared_from_favorites)
+
                 Button(
                     onClick = {
                         coroutineScope.launch {
@@ -711,24 +742,24 @@ fun PositionSelectionScreen(
                                 communityRepo.shareSpotToCommunity(
                                     userSpot = spotToShare!!,
                                     lakeName = lake.name,
-                                    description = spotToShare!!.comment.ifEmpty { "Spot partagé depuis mes favoris" },
-                                    fishNames = selectedFish, // ✅ Maintenant avec les vraies données
-                                    baits = selectedBaits,    // ✅ Maintenant avec les vraies données
-                                    distance = distance.toIntOrNull() ?: 0 // ✅ Maintenant avec la vraie distance
+                                    description = spotToShare!!.comment.ifEmpty { defaultDescription },
+                                    fishNames = selectedFish,
+                                    baits = selectedBaits,
+                                    distance = distance.toIntOrNull() ?: 0
                                 )
-                                shareMessage = "Spot partagé avec succès !"
+                                shareMessage = successMessage
                                 showShareMessage = true
                                 showShareDialog = false
                                 spotToShare = null
                             } catch (e: Exception) {
                                 shareMessage = when {
                                     e.message?.contains("déjà partagé", ignoreCase = true) == true ->
-                                        "Vous avez déjà partagé ce spot !"
+                                        alreadySharedMessage
                                     e.message?.contains("connecté", ignoreCase = true) == true ->
-                                        "Vous devez être connecté pour partager"
+                                        loginRequiredMessage
                                     e.message?.contains("permission", ignoreCase = true) == true ->
-                                        "Permissions insuffisantes"
-                                    else -> "Erreur lors du partage : ${e.message}"
+                                        insufficientPermissionsMessage
+                                    else -> "Erreur lors du partage : ${e.message ?: ""}"
                                 }
                                 showShareMessage = true
                                 showShareDialog = false
@@ -739,7 +770,7 @@ fun PositionSelectionScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                 ) {
-                    Text("Partager")
+                    Text(stringResource(R.string.position_share))
                 }
             },
             dismissButton = {
@@ -747,7 +778,7 @@ fun PositionSelectionScreen(
                     showShareDialog = false
                     spotToShare = null
                 }) {
-                    Text("Annuler", color = Color.Gray)
+                    Text(stringResource(R.string.cancel), color = Color.Gray)
                 }
             },
             containerColor = Color(0xFF1F2937)
@@ -761,7 +792,7 @@ fun PositionSelectionScreen(
         if (showFishSelector) {
             AlertDialog(
                 onDismissRequest = { showFishSelector = false },
-                title = { Text("Sélectionner les poissons", color = Color.White) },
+                title = { Text(stringResource(R.string.position_select_fish), color = Color.White) },
                 text = {
                     LazyColumn(modifier = Modifier.height(300.dp)) {
                         items(viewModel.getAllAvailableFish().sortedBy { it.name }) { fish ->
@@ -794,7 +825,7 @@ fun PositionSelectionScreen(
                                     if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
-                                            contentDescription = "Sélectionné",
+                                            contentDescription = stringResource(R.string.position_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -809,12 +840,12 @@ fun PositionSelectionScreen(
                         onClick = { showFishSelector = false },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                     ) {
-                        Text("Valider (${selectedFish.size})")
+                        Text(stringResource(R.string.position_validate_count, selectedFish.size))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showFishSelector = false }) {
-                        Text("Annuler", color = Color.Gray)
+                        Text(stringResource(R.string.cancel), color = Color.Gray)
                     }
                 },
                 containerColor = Color(0xFF1F2937)
@@ -827,7 +858,7 @@ fun PositionSelectionScreen(
 
             AlertDialog(
                 onDismissRequest = { showBaitSelector = false },
-                title = { Text("Sélectionner les appâts", color = Color.White) },
+                title = { Text(stringResource(R.string.position_select_baits), color = Color.White) },
                 text = {
                     LazyColumn(modifier = Modifier.height(300.dp)) {
                         items(commonBaits) { bait ->
@@ -860,7 +891,7 @@ fun PositionSelectionScreen(
                                     if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
-                                            contentDescription = "Sélectionné",
+                                            contentDescription = stringResource(R.string.position_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -875,12 +906,12 @@ fun PositionSelectionScreen(
                         onClick = { showBaitSelector = false },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
                     ) {
-                        Text("Valider (${selectedBaits.size})")
+                        Text(stringResource(R.string.position_validate_count, selectedBaits.size))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showBaitSelector = false }) {
-                        Text("Annuler", color = Color.Gray)
+                        Text(stringResource(R.string.cancel), color = Color.Gray)
                     }
                 },
                 containerColor = Color(0xFF1F2937)
@@ -897,7 +928,7 @@ fun PositionSelectionScreen(
             onDismissRequest = { showShareMessage = false },
             title = {
                 Text(
-                    text = if (shareMessage.contains("succès")) "Succès" else "Information",
+                    text = if (shareMessage.contains("succès")) stringResource(R.string.success) else stringResource(R.string.position_information),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -918,7 +949,7 @@ fun PositionSelectionScreen(
                             Color(0xFF10B981) else Color(0xFF3B82F6)
                     )
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             containerColor = Color(0xFF1F2937)
@@ -1065,7 +1096,7 @@ private fun UserPositionCard(
                 ) {
                     Icon(
                         Icons.Default.Share,
-                        contentDescription = "Partager ce spot",
+                        contentDescription = stringResource(R.string.position_share_this_spot),
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
@@ -1083,7 +1114,7 @@ private fun UserPositionCard(
                 ) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Supprimer",
+                        contentDescription = stringResource(R.string.delete),
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
