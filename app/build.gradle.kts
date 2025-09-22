@@ -25,8 +25,8 @@ android {
         applicationId = "com.rf4.fishingrf4"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "0.8D"
+        versionCode = 18
+        versionName = "0.8.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // ✅ AJOUT : Support multilingue pour AAB
@@ -36,7 +36,9 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            // Enables resource shrinking.
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

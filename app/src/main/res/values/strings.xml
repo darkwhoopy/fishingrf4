@@ -732,8 +732,8 @@
     <string name="update_feature_1_title">🎯 Mis à jour des traductions</string>
     <string name="update_feature_1_desc">plusieurs écrans de traduits</string>
 
-    <string name="update_feature_2_title">⭐ Partage de spots enrichi</string>
-    <string name="update_feature_2_desc">Partagez vos spots favoris avec poissons cibles, appâts recommandés et distance de pêche</string>
+    <string name="update_feature_2_title">⭐ amélioration de la recherche des appats</string>
+    <string name="update_feature_2_desc">Recherche par appats amélioré avec le détail complet</string>
 
     <string name="update_feature_3_title">🐟 Base de données complète</string>
     <string name="update_feature_3_desc">Accès à tous les poissons et appâts du jeu, triés par ordre alphabétique</string>

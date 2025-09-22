@@ -12,31 +12,29 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.R
-import com.rf4.fishingrf4.data.models.Difficulty
-import com.rf4.fishingrf4.data.models.Fish
-import com.rf4.fishingrf4.data.models.FishRarity
-import com.rf4.fishingrf4.data.models.FishingEntry
-import com.rf4.fishingrf4.data.models.Lake
-import com.rf4.fishingrf4.data.models.LakeType
+import com.rf4.fishingrf4.data.models.*
 import com.rf4.fishingrf4.ui.components.BackButton
-import androidx.compose.ui.platform.LocalContext
-import com.rf4.fishingrf4.data.models.getLocalizedName
 import com.rf4.fishingrf4.utils.getLocalizedName
 
 // Classe locale pour les statistiques de capture dans la recherche
@@ -55,18 +53,6 @@ enum class SearchTab(val displayNameRes: Int, val emoji: String) {
     FISH(R.string.search_tab_fish, "🐟"),
     BAITS(R.string.search_tab_baits, "🎣")
 }
-
-// Classe de données pour les appâts
-data class BaitInfo(
-    val name: String,
-    val englishName: String,
-    val category: String,
-    val description: String,
-    val effectiveness: String,
-    val targetFish: List<String>,
-    val acquisition: String,
-    val tips: String
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -467,175 +453,500 @@ fun FishSearchContent(
 @Composable
 fun BaitSearchContent() {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedSearchType by remember { mutableStateOf("Nom") }
+    var selectedCategory by remember { mutableStateOf("Toutes") }
+    var selectedTimeOfDay by remember { mutableStateOf("Tous") }
+    var selectedWaterType by remember { mutableStateOf("Tous") }
+    var showAdvancedFilters by remember { mutableStateOf(false) }
 
-    // Base de données d'appâts
-    val baitsDatabase = remember {
-        listOf(
-            BaitInfo(
-                name = "Ver de terre",
-                englishName = "Worm",
-                category = "Appâts naturels",
-                description = "C'est l'appât de base par excellence. Il peut être acheté ou obtenu gratuitement en creusant avec une pelle.",
-                effectiveness = "Particulièrement efficace la nuit (de 20:00 à 6:00) pour attraper une grande variété de poissons de petite et moyenne taille.",
-                targetFish = listOf("Gardon", "Ablette", "Carassin", "Brème"),
-                acquisition = "Achat ou creusage avec pelle",
-                tips = "Appât universel parfait pour débuter"
-            ),
-            BaitInfo(
-                name = "Ver de vase",
-                englishName = "Bloodworm",
-                category = "Appâts naturels",
-                description = "Petite larve rouge, extrêmement efficace.",
-                effectiveness = "L'appât le plus rentable pour gagner de l'expérience de jour (6h-20h).",
-                targetFish = listOf("Gardon", "Ablette", "Carassin"),
-                acquisition = "Achat",
-                tips = "Idéal pour l'expérience et les petits poissons"
-            ),
-            BaitInfo(
-                name = "Casticot",
-                englishName = "Caster",
-                category = "Appâts naturels",
-                description = "Larve de mouche, très attractive.",
-                effectiveness = "Une excellente alternative au ver de vase, particulièrement pour la brème.",
-                targetFish = listOf("Brème", "Gardon", "Ide"),
-                acquisition = "Achat",
-                tips = "Très efficace sur les cyprinidés"
-            ),
-            BaitInfo(
-                name = "Vif",
-                englishName = "Baitfish",
-                category = "Appâts vivants",
-                description = "Petit poisson utilisé comme appât vivant.",
-                effectiveness = "Nécessite un montage spécifique. Un vif légèrement avarié est parfois meilleur.",
-                targetFish = listOf("Brochet", "Silure", "Lotte", "Sandre"),
-                acquisition = "Pêche (Goujon, Ablette, etc.)",
-                tips = "Incontournable pour les gros prédateurs"
-            ),
-            BaitInfo(
-                name = "Boulette de pain",
-                englishName = "Bread",
-                category = "Appâts fabriqués",
-                description = "Le premier appât que l'on apprend à fabriquer.",
-                effectiveness = "Excellent moyen de faire progresser la compétence au tout début.",
-                targetFish = listOf("Carpe", "Gardon", "Brème"),
-                acquisition = "Fabrication (pain + eau)",
-                tips = "Parfait pour débuter la fabrication d'appâts"
-            ),
-            BaitInfo(
-                name = "Cube de pomme de terre",
-                englishName = "Potato Cubes",
-                category = "Appâts fabriqués",
-                description = "Un des meilleurs appâts pour la carpe.",
-                effectiveness = "Extrêmement efficace sur les carpes de toutes tailles.",
-                targetFish = listOf("Carpe", "Carpe miroir", "Carpe cuir"),
-                acquisition = "Fabrication (pommes de terre du marché fermier)",
-                tips = "Voyage au Ruisselet qui Serpente nécessaire"
-            ),
-            BaitInfo(
-                name = "Grenouille",
-                englishName = "Frog",
-                category = "Appâts vivants",
-                description = "Appât spécifique pour certains prédateurs.",
-                effectiveness = "Se pêche avec un petit hameçon (taille 20) et une mouche près des nénuphars.",
-                targetFish = listOf("Brochet", "Silure"),
-                acquisition = "Pêche près des nénuphars",
-                tips = "Technique de pêche particulière requise"
-            ),
-            BaitInfo(
-                name = "Ver de nuit",
-                englishName = "Nightcrawler",
-                category = "Appâts vivants",
-                description = "Appât spécifique pour certains prédateurs.",
-                effectiveness = "À utiliser pour filtrer les petites prises et cibler les beaux spécimens",
-                targetFish = listOf("Brème", "Tanche", "Carpe", "Carassin"),
-                acquisition = "Achat, Pelle",
-                tips = "Parfait pour les gros spécimens"
-            ),
-            BaitInfo(
-                name = "Orge perlé",
-                englishName = "Pearl Barley",
-                category = "Appâts fabriqués",
-                description = "Très efficace sur la brème et d'autres cyprinidés.",
-                effectiveness = "Ne pas confondre avec l'orge perlé vendu comme additif pour amorce.",
-                targetFish = listOf("Brème", "Gardon", "Carassin"),
-                acquisition = "Fabrication (orge perlé de l'épicerie)",
-                tips = "Attention à ne pas acheter l'additif pour amorce"
-            )
-        )
-    }
+    // Types de recherche disponibles
+    val searchTypes = listOf("Nom", "Poisson", "Catégorie")
+    val categories = listOf("Toutes") + BaitDatabase.getAllCategories()
+    val timeOptions = listOf("Tous", "Jour", "Nuit", "Crépuscule")
+    val waterTypes = listOf("Tous", "Eau douce", "Mer", "Saumâtre")
 
-    val filteredBaits = remember(searchQuery) {
-        if (searchQuery.isBlank()) {
-            baitsDatabase
-        } else {
-            baitsDatabase.filter { bait ->
-                bait.name.contains(searchQuery, ignoreCase = true) ||
-                        bait.englishName.contains(searchQuery, ignoreCase = true) ||
-                        bait.category.contains(searchQuery, ignoreCase = true) ||
-                        bait.targetFish.any { it.contains(searchQuery, ignoreCase = true) }
+    // Logique de filtrage avec tri alphabétique
+    val filteredBaits = remember(searchQuery, selectedSearchType, selectedCategory, selectedTimeOfDay, selectedWaterType) {
+        val results = when {
+            searchQuery.isEmpty() && selectedCategory == "Toutes" &&
+                    selectedTimeOfDay == "Tous" && selectedWaterType == "Tous" -> BaitDatabase.allBaits
+
+            else -> {
+                val searchResults = when (selectedSearchType) {
+                    "Nom" -> BaitDatabase.searchByName(searchQuery)
+                    "Poisson" -> BaitDatabase.searchByFish(searchQuery)
+                    "Catégorie" -> BaitDatabase.searchByCategory(searchQuery)
+                    else -> BaitDatabase.allBaits
+                }
+
+                // Appliquer les filtres additionnels
+                searchResults.filter { bait ->
+                    (selectedCategory == "Toutes" || bait.category.contains(selectedCategory, ignoreCase = true)) &&
+                            (selectedTimeOfDay == "Tous" || bait.timeOfDay.contains(selectedTimeOfDay, ignoreCase = true)) &&
+                            (selectedWaterType == "Tous" || bait.waterType.contains(selectedWaterType, ignoreCase = true))
+                }
             }
         }
+
+        // Tri alphabétique par nom d'appât
+        results.sortedBy { it.name }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Barre de recherche appâts
-        Column(
-            modifier = Modifier
-                .background(Color(0xFF0F172A))
-                .padding(horizontal = 16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Section de recherche compacte
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text(stringResource(R.string.bait_search_placeholder), color = Color.Gray) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.desc_search), tint = Color.Gray) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedBorderColor = Color(0xFF10B981),
-                    unfocusedBorderColor = Color.Gray
-                ),
-                singleLine = true
-            )
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                // Type de recherche - Plus compact
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(searchTypes) { type ->
+                        FilterChip(
+                            onClick = { selectedSearchType = type },
+                            label = { Text(type, fontSize = 12.sp) },
+                            selected = selectedSearchType == type,
+                            modifier = Modifier.height(32.dp),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = when (type) {
+                                        "Nom" -> Icons.Default.Search
+                                        "Poisson" -> Icons.Default.SetMeal
+                                        "Catégorie" -> Icons.Default.Category
+                                        else -> Icons.Default.Search
+                                    },
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        )
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // Compteur
-            Text(
-                stringResource(R.string.bait_results_count, filteredBaits.size),
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
+                // Barre de recherche compacte
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = {
+                        Text(
+                            text = when (selectedSearchType) {
+                                "Nom" -> "Nom d'appât..."
+                                "Poisson" -> "Nom de poisson..."
+                                "Catégorie" -> "Catégorie..."
+                                else -> "Rechercher..."
+                            },
+                            color = Color.Gray,
+                            fontSize = 14.sp
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Rechercher",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    trailingIcon = {
+                        Row {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Effacer",
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                            IconButton(onClick = { showAdvancedFilters = !showAdvancedFilters }) {
+                                Icon(
+                                    imageVector = Icons.Default.Tune,
+                                    contentDescription = "Filtres",
+                                    tint = if (selectedCategory != "Toutes" || selectedTimeOfDay != "Tous" || selectedWaterType != "Tous")
+                                        Color(0xFF10B981) else Color.Gray,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color(0xFF10B981),
+                        unfocusedBorderColor = Color.Gray
+                    ),
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
+                )
+
+                // Filtres avancés compacts
+                AnimatedVisibility(visible = showAdvancedFilters) {
+                    Column {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Filtres en lignes compactes
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Catégorie
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Catégorie",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.Gray
+                                )
+                                FilterChip(
+                                    onClick = {
+                                        selectedCategory = if (selectedCategory == "Toutes") categories[1] else "Toutes"
+                                    },
+                                    label = {
+                                        Text(
+                                            text = selectedCategory.split(" - ").lastOrNull() ?: selectedCategory,
+                                            fontSize = 10.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    },
+                                    selected = selectedCategory != "Toutes",
+                                    modifier = Modifier.fillMaxWidth().height(28.dp)
+                                )
+                            }
+
+                            // Moment
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Moment",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.Gray
+                                )
+                                FilterChip(
+                                    onClick = {
+                                        val currentIndex = timeOptions.indexOf(selectedTimeOfDay)
+                                        selectedTimeOfDay = timeOptions[(currentIndex + 1) % timeOptions.size]
+                                    },
+                                    label = { Text(selectedTimeOfDay, fontSize = 10.sp) },
+                                    selected = selectedTimeOfDay != "Tous",
+                                    modifier = Modifier.fillMaxWidth().height(28.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Liste des appâts
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(filteredBaits) { bait ->
-                BaitCard(bait = bait)
+        // Compteur de résultats compact
+        if (searchQuery.isNotEmpty() || selectedCategory != "Toutes" || selectedTimeOfDay != "Tous") {
+            Text(
+                text = "${filteredBaits.size} appât(s) trouvé(s)",
+                color = Color.Gray,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // Résultats - Liste compacte avec bulles expansibles
+        if (filteredBaits.isEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF7F1D1D))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.SearchOff,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Aucun appât trouvé",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items(filteredBaits) { bait ->
+                    CompactBaitCard(bait = bait)
+                }
             }
         }
     }
 }
 
-// Carte d'information pour un appât
+@Composable
+fun CompactBaitCard(bait: BaitInfo) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column {
+            // En-tête compact - toujours visible
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = bait.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+
+                    // Catégorie en plus petit
+                    Text(
+                        text = bait.category.split(" - ").lastOrNull() ?: bait.category,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF10B981),
+                        fontSize = 12.sp
+                    )
+
+                    // Poissons principaux (max 2)
+                    if (bait.targetFish.isNotEmpty()) {
+                        Text(
+                            text = bait.targetFish.take(2).joinToString(", ") +
+                                    if (bait.targetFish.size > 2) "..." else "",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
+                // Indicateur d'expansion
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expanded) "Réduire" else "Développer",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            // Contenu étendu - bulle qui se déplie
+            AnimatedVisibility(visible = expanded) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    HorizontalDivider(
+                        color = Color(0xFF374151),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    // Description
+                    Text(
+                        text = bait.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Poissons cibles complets
+                    Text(
+                        text = "Poissons cibles :",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF10B981),
+                        fontSize = 12.sp
+                    )
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        items(bait.targetFish) { fish ->
+                            Surface(
+                                color = Color(0xFF064E3B),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = fish,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF10B981),
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Efficacité et acquisition compacts
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        CompactDetailRow(
+                            title = "Efficacité",
+                            content = bait.effectiveness,
+                            icon = Icons.Default.TrendingUp
+                        )
+
+                        CompactDetailRow(
+                            title = "Acquisition",
+                            content = bait.acquisition,
+                            icon = Icons.Default.ShoppingCart
+                        )
+
+                        CompactDetailRow(
+                            title = "Conseils",
+                            content = bait.tips,
+                            icon = Icons.Default.Lightbulb
+                        )
+                    }
+
+                    // Infos techniques si disponibles - très compact
+                    if (bait.price.isNotEmpty() || bait.timeOfDay.isNotEmpty() ||
+                        bait.waterType.isNotEmpty() || bait.depth.isNotEmpty()) {
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (bait.price.isNotEmpty()) {
+                                item {
+                                    CompactTechChip("Prix", bait.price)
+                                }
+                            }
+                            if (bait.timeOfDay.isNotEmpty()) {
+                                item {
+                                    CompactTechChip("Moment", bait.timeOfDay)
+                                }
+                            }
+                            if (bait.waterType.isNotEmpty()) {
+                                item {
+                                    CompactTechChip("Eau", bait.waterType)
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactDetailRow(
+    title: String,
+    content: String,
+    icon: ImageVector
+) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = Color(0xFF10B981)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF10B981),
+                fontSize = 11.sp
+            )
+        }
+
+        Text(
+            text = content,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            modifier = Modifier.padding(start = 20.dp, top = 2.dp)
+        )
+    }
+}
+
+@Composable
+fun CompactTechChip(label: String, value: String) {
+    Surface(
+        color = Color(0xFF374151),
+        shape = RoundedCornerShape(6.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                fontSize = 9.sp
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                color = Color.White,
+                fontSize = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
 @Composable
 fun BaitCard(bait: BaitInfo) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-        shape = RoundedCornerShape(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // En-tête
+            // En-tête de la carte
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -644,95 +955,298 @@ fun BaitCard(bait: BaitInfo) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = bait.name,
-                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color(0xFF10B981)
                     )
                     Text(
-                        text = "${bait.englishName} • ${bait.category}",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                        text = bait.englishName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF3B82F6),
+                        fontStyle = FontStyle.Italic
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Catégorie avec badge
+                    Surface(
+                        color = Color(0xFF374151),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(
+                            text = bait.category.split(" - ").lastOrNull() ?: bait.category,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.White
+                        )
+                    }
                 }
 
-                // Badge d'acquisition
-                Surface(
-                    color = when {
-                        bait.acquisition.contains("Achat") -> Color(0xFF10B981)
-                        bait.acquisition.contains("Fabrication") -> Color(0xFF3B82F6)
-                        bait.acquisition.contains("Pêche") -> Color(0xFFF59E0B)
-                        else -> Color(0xFF6B7280)
-                    },
-                    shape = RoundedCornerShape(6.dp)
-                ) {
-                    Text(
-                        text = bait.acquisition.split(" ")[0],
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                // Icône d'expansion
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expanded) "Réduire" else "Développer",
+                        tint = Color.White
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Description
+            // Description courte
             Text(
                 text = bait.description,
-                fontSize = 14.sp,
-                color = Color.White,
-                lineHeight = 20.sp
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = if (expanded) Int.MAX_VALUE else 2,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Gray
             )
 
-            if (bait.effectiveness.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "💡 ${bait.effectiveness}",
-                    fontSize = 13.sp,
-                    color = Color(0xFF10B981),
-                    lineHeight = 18.sp
-                )
-            }
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Poissons cibles
-            if (bait.targetFish.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = stringResource(R.string.bait_target_fish_label),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray
-                )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    items(bait.targetFish) { fish ->
+            // Poissons cibles (toujours visibles)
+            Text(
+                text = "Poissons cibles :",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF10B981)
+            )
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                items(bait.targetFish.take(if (expanded) bait.targetFish.size else 3)) { fish ->
+                    Surface(
+                        color = Color(0xFF064E3B),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = fish,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF10B981)
+                        )
+                    }
+                }
+
+                if (!expanded && bait.targetFish.size > 3) {
+                    item {
                         Surface(
-                            color = Color(0xFF3B82F6),
+                            color = Color(0xFF374151),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Text(
-                                text = fish,
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                text = "+${bait.targetFish.size - 3}",
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.Gray
                             )
                         }
                     }
                 }
             }
 
-            // Conseil
-            if (bait.tips.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+            // Détails étendus
+            AnimatedVisibility(visible = expanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Efficacité
+                    DetailSection(
+                        title = "Efficacité",
+                        content = bait.effectiveness,
+                        icon = Icons.Default.TrendingUp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Acquisition
+                    DetailSection(
+                        title = "Acquisition",
+                        content = bait.acquisition,
+                        icon = Icons.Default.ShoppingCart
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Conseils
+                    DetailSection(
+                        title = "Conseils",
+                        content = bait.tips,
+                        icon = Icons.Default.Lightbulb
+                    )
+
+                    // Informations techniques si disponibles
+                    if (bait.price.isNotEmpty() || bait.timeOfDay.isNotEmpty() ||
+                        bait.waterType.isNotEmpty() || bait.depth.isNotEmpty()) {
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        HorizontalDivider(color = Color(0xFF374151))
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Informations techniques",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF10B981)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.height(intrinsicSize = IntrinsicSize.Min)
+                        ) {
+                            if (bait.price.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Prix",
+                                        value = bait.price,
+                                        icon = Icons.Default.AttachMoney
+                                    )
+                                }
+                            }
+
+                            if (bait.timeOfDay.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Moment",
+                                        value = bait.timeOfDay,
+                                        icon = Icons.Default.Schedule
+                                    )
+                                }
+                            }
+
+                            if (bait.waterType.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Eau",
+                                        value = bait.waterType,
+                                        icon = Icons.Default.Water
+                                    )
+                                }
+                            }
+
+                            if (bait.depth.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Profondeur",
+                                        value = bait.depth,
+                                        icon = Icons.Default.Straighten
+                                    )
+                                }
+                            }
+
+                            if (bait.hookSize.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Hameçon",
+                                        value = bait.hookSize,
+                                        icon = Icons.Default.Anchor
+                                    )
+                                }
+                            }
+
+                            if (bait.level.isNotEmpty()) {
+                                item {
+                                    TechnicalInfoChip(
+                                        label = "Niveau",
+                                        value = bait.level,
+                                        icon = Icons.Default.Star
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailSection(
+    title: String,
+    content: String,
+    icon: ImageVector
+) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = Color(0xFF10B981)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF10B981)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = content,
+            style = MaterialTheme.typography.bodyMedium,
+            lineHeight = 20.sp,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+fun TechnicalInfoChip(
+    label: String,
+    value: String,
+    icon: ImageVector
+) {
+    Surface(
+        color = Color(0xFF374151),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = Color.Gray
+                )
                 Text(
-                    text = "⭐ ${bait.tips}",
-                    fontSize = 12.sp,
-                    color = Color(0xFFF59E0B),
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
                 )
             }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White
+            )
         }
     }
 }

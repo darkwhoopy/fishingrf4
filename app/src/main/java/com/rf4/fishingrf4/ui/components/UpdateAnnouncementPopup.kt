@@ -123,11 +123,11 @@ fun UpdateAnnouncementPopup(
                             description = stringResource(R.string.update_feature_1_desc)
                         )
 
-                        //UpdateFeature(
-                          //  icon = "🎣",
-                           // title = stringResource(R.string.update_feature_2_title),
-                           // description = stringResource(R.string.update_feature_2_desc)
-                        //)//
+                       UpdateFeature(
+                           icon = "🎣",
+                            title = stringResource(R.string.update_feature_2_title),
+                            description = stringResource(R.string.update_feature_2_desc),
+                        )
 
                        // UpdateFeature(
                           //  icon = "🏞️",

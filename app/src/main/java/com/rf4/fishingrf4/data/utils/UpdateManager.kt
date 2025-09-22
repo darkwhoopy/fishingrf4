@@ -15,7 +15,7 @@ class UpdateManager(context: Context) {
 
     companion object {
         private const val KEY_LAST_SHOWN_VERSION = "last_shown_update_version"
-        const val CURRENT_VERSION = "v0.8.1" // Mettre à jour à chaque release
+        const val CURRENT_VERSION = "v0.8.2" // Mettre à jour à chaque release
     }
 
     /**
