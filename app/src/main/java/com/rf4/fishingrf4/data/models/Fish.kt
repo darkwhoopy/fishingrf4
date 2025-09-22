@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.Serializable
 import com.rf4.fishingrf4.utils.LanguageManager
+import com.rf4.fishingrf4.R
 
 @Serializable
 data class Fish(
@@ -25,7 +26,8 @@ data class Fish(
 
     // ⏰ HORAIRES - Double format pour compatibilité
     val bestHours: List<Int> = emptyList(),                // ✅ ANCIEN FORMAT (gardé)
-    val preferredTime: List<String> = emptyList(),         // 🆕 NOUVEAU FORMAT
+    val preferredTime: List<String> = emptyList(),         // 🆕 ANCIEN FORMAT (gardé)
+    val preferredTimePeriods: List<TimePeriod> = emptyList(), // 🆕 NOUVEAU FORMAT
 
     // 🌤️ MÉTÉO - Double format pour compatibilité
     val bestWeather: List<WeatherType> = emptyList(),      // ✅ ANCIEN FORMAT (gardé)
@@ -50,6 +52,26 @@ data class Fish(
 
     // 🌤️ Météo unifiée
     val finalPreferredWeather: List<WeatherType> get() = preferredWeather.ifEmpty { bestWeather }
+
+    // 🆕 NOUVELLE PROPRIÉTÉ : Périodes de temps unifiées
+    val finalPreferredTimePeriods: List<TimePeriod> get() {
+        return if (preferredTimePeriods.isNotEmpty()) {
+            preferredTimePeriods // Nouveau format
+        } else if (preferredTime.isNotEmpty()) {
+            // Conversion de l'ancien format string vers énumération
+            preferredTime.mapNotNull { timeString ->
+                when (timeString) {
+                    "Matin", "Matinée" -> TimePeriod.MORNING
+                    "Journée", "Jour" -> TimePeriod.DAY
+                    "Soirée" -> TimePeriod.EVENING
+                    "Nuit" -> TimePeriod.NIGHT
+                    else -> null
+                }
+            }
+        } else {
+            emptyList()
+        }
+    }
 }
 
 // 🌍 EXTENSIONS POUR LA TRADUCTION
@@ -67,24 +89,45 @@ fun Fish.getLocalizedDescription(context: Context): String {
     }
 }
 
-// 🎨 ÉNUMÉRATIONS GARDÉES IDENTIQUES
+// 🎨 ÉNUMÉRATIONS
 @Serializable
-enum class FishRarity(val colorValue: Long, val displayName: String, val points: Int) {
-    COMMON(0xFF4CAF50, "Commun", 1),
-    UNCOMMON(0xFF2196F3, "Peu commun", 2),
-    RARE(0xFF9C27B0, "Rare", 5),
-    EPIC(0xFFFF9800, "Épique", 10),
-    LEGENDARY(0xFFE91E63, "Légendaire", 25)
+enum class FishRarity(
+    val colorValue: Long,
+    val displayName: String,
+    val stringResId: Int,  // 🆕 AJOUTÉ pour la traduction
+    val points: Int
+) {
+    COMMON(0xFF4CAF50, "Commun", R.string.rarity_common, 1),
+    UNCOMMON(0xFF2196F3, "Peu commun", R.string.rarity_uncommon, 2),
+    RARE(0xFF9C27B0, "Rare", R.string.rarity_rare, 5),
+    EPIC(0xFFFF9800, "Épique", R.string.rarity_epic, 10),
+    LEGENDARY(0xFFE91E63, "Légendaire", R.string.rarity_legendary, 25)
 }
 
 @Serializable
-enum class WeatherType(val displayName: String, val emoji: String) {
-    SUNNY("Ensoleillé", "☀️"),
-    CLOUDY("Nuageux", "☁️"),
-    OVERCAST("Couvert", "🌫️"),
-    LIGHT_RAIN("Pluie légère", "🌦️"),
-    RAIN("Pluie", "🌧️"),
-    FOG("Brouillard", "🌫️"),
-    WIND("Venteux", "💨"),
-    ANY("Toutes conditions", "🌤️")
+enum class WeatherType(
+    val displayName: String,
+    val stringResId: Int,  // 🆕 AJOUTÉ pour la traduction
+    val emoji: String
+) {
+    SUNNY("Ensoleillé", R.string.weather_sunny, "☀️"),
+    CLOUDY("Nuageux", R.string.weather_cloudy, "☁️"),
+    OVERCAST("Couvert", R.string.weather_overcast, "🌫️"),
+    LIGHT_RAIN("Pluie légère", R.string.weather_light_rain, "🌦️"),
+    RAIN("Pluie", R.string.weather_rain, "🌧️"),
+    FOG("Brouillard", R.string.weather_fog, "🌫️"),
+    WIND("Venteux", R.string.weather_wind, "💨"),
+    ANY("Toutes conditions", R.string.weather_any, "🌤️")
+}
+
+@Serializable
+enum class TimePeriod(
+    val displayName: String,
+    val stringResId: Int,  // 🆕 Pour la traduction
+    val emoji: String
+) {
+    MORNING("Matin", R.string.time_morning, "🌅"),
+    DAY("Journée", R.string.time_day, "☀️"),
+    EVENING("Soirée", R.string.time_evening, "🌇"),
+    NIGHT("Nuit", R.string.time_night, "🌙")
 }

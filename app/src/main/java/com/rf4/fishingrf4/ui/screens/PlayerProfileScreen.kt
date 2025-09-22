@@ -12,15 +12,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.auth.AuthManager
 import com.rf4.fishingrf4.data.models.FishRarity
 import com.rf4.fishingrf4.data.models.FishingEntry
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.components.BackButton
+
 @Composable
 fun PlayerProfileScreen(
     playerStats: PlayerStats,
@@ -35,7 +38,12 @@ fun PlayerProfileScreen(
         ) {
             BackButton(onClick = onBack)
             Spacer(modifier = Modifier.width(16.dp))
-            Text("👤 Profil du Pêcheur", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(
+                text = stringResource(R.string.screen_profile_title),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
@@ -54,9 +62,9 @@ fun PlayerProfileScreen(
 
             // ✅ GARDÉ : Plus grosse prise (si elle existe)
 
-            }
         }
     }
+}
 
 /** Carte de gestion du compte Google (affichée en haut du Profil) */
 @Composable
@@ -96,28 +104,45 @@ private fun GoogleAccountCard() {
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            Text("Compte Google", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            Text(
+                text = stringResource(R.string.profile_google_account),
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
 
             if (currentUser == null) {
                 Spacer(Modifier.height(6.dp))
-                Text("Connecte-toi pour sauvegarder en ligne et participer aux Top 5.", color = Color.White)
+                Text(
+                    text = stringResource(R.string.profile_login_message),
+                    color = Color.White
+                )
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = {
                     val intent = authManager.googleClient().signInIntent
                     googleLauncher.launch(intent)
                 }) {
-                    Text("Se connecter avec Google")
+                    Text(stringResource(R.string.profile_login_button))
                 }
             } else {
                 Spacer(Modifier.height(4.dp))
-                Text("Connecté en tant que :", color = Color.White)
-                Text(currentUser?.displayName ?: currentUser?.email ?: "Utilisateur", color = Color.White)
+                Text(
+                    text = stringResource(R.string.profile_logged_as),
+                    color = Color.White
+                )
+                Text(
+                    text = currentUser?.displayName
+                        ?: currentUser?.email
+                        ?: stringResource(R.string.profile_unknown_user),
+                    color = Color.White
+                )
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
                         authManager.signOut()
                         authManager.signOutGoogle()
-                    }) { Text("Se déconnecter") }
+                    }) {
+                        Text(stringResource(R.string.profile_logout))
+                    }
 
                     Button(onClick = {
                         authManager.signOut()
@@ -125,12 +150,15 @@ private fun GoogleAccountCard() {
                             val intent = authManager.googleClient().signInIntent
                             googleLauncher.launch(intent)
                         }
-                    }) { Text("Changer de compte") }
+                    }) {
+                        Text(stringResource(R.string.profile_change_account))
+                    }
                 }
             }
         }
     }
 }
+
 @Composable
 private fun PlayerStatsSummaryCard(playerStats: PlayerStats) {
     Card(
@@ -141,9 +169,21 @@ private fun PlayerStatsSummaryCard(playerStats: PlayerStats) {
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            StatColumn("🐟", "${playerStats.totalCatches}", "Prises")
-            StatColumn("🏆", "${playerStats.totalPoints}", "Points")
-            StatColumn("📍", playerStats.favoriteSpot.ifEmpty { "N/A" }, "Spot favori")
+            StatColumn(
+                emoji = "🐟",
+                value = "${playerStats.totalCatches}",
+                label = stringResource(R.string.profile_catches)
+            )
+            StatColumn(
+                emoji = "🏆",
+                value = "${playerStats.totalPoints}",
+                label = stringResource(R.string.profile_points)
+            )
+            StatColumn(
+                emoji = "📍",
+                value = playerStats.favoriteSpot.ifEmpty { "N/A" },
+                label = stringResource(R.string.profile_favorite_spot)
+            )
         }
     }
 }
@@ -156,6 +196,7 @@ private fun StatColumn(emoji: String, value: String, label: String) {
         Text(text = label, fontSize = 10.sp, color = Color(0xFF9CA3AF))
     }
 }
+
 @Composable
 private fun RarityStatsCard(rareFishCount: Map<FishRarity, Int>) {
     Card(
@@ -164,7 +205,7 @@ private fun RarityStatsCard(rareFishCount: Map<FishRarity, Int>) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "🌟 Poissons par rareté",
+                text = stringResource(R.string.profile_fish_by_rarity),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -185,7 +226,11 @@ private fun RarityStatsCard(rareFishCount: Map<FishRarity, Int>) {
                                 modifier = Modifier.size(12.dp)
                             ) {}
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = rarity.displayName, fontSize = 14.sp, color = Color.White)
+                            Text(
+                                text = stringResource(rarity.stringResId),
+                                fontSize = 14.sp,
+                                color = Color.White
+                            )
                         }
                         Text(text = count.toString(), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }

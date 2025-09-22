@@ -160,6 +160,7 @@ fun FishSearchContent(
     fishingEntries: List<FishingEntry>,
     onFishDetail: (Fish, Lake) -> Unit
 ) {
+    val context = LocalContext.current
     // États pour les filtres et la recherche
     var searchQuery by remember { mutableStateOf("") }
     var showFilters by remember { mutableStateOf(false) }
@@ -180,7 +181,7 @@ fun FishSearchContent(
         .mapValues { (_, entries) -> entries.size }
 
     // Logique de filtrage
-    val filteredAndSortedFish = remember(searchQuery, selectedLake, selectedRarity, sortOption, onlyCaught, allFish, fishCaptureStats) {
+    val filteredAndSortedFish = remember(searchQuery, selectedLake, selectedRarity, sortOption, onlyCaught, allFish, fishCaptureStats, context) {
         var filtered = allFish
 
         // Filtre par recherche textuelle
@@ -210,7 +211,7 @@ fun FishSearchContent(
 
         // Tri
         when (sortOption) {
-            SortOption.NAME -> filtered.sortedBy { it.name }
+            SortOption.NAME -> filtered.sortedBy { it.getLocalizedName(context) }
             SortOption.RARITY -> filtered.sortedBy { it.rarity.ordinal }
             SortOption.LEVEL -> filtered.sortedBy { fish ->
                 allLakes.filter { lake -> lake.availableFish.any { it.name == fish.name } }

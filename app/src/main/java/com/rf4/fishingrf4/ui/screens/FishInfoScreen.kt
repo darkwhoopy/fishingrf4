@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.data.models.Fish
 import com.rf4.fishingrf4.data.models.Lake
+import com.rf4.fishingrf4.data.models.getLocalizedName
 import com.rf4.fishingrf4.ui.components.BackButton
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
 import com.rf4.fishingrf4.utils.getLocalizedBaitName
@@ -60,6 +62,7 @@ fun FishInfoScreen(
     viewModel: FishingViewModel,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var showAddBaitDialog by remember { mutableStateOf(false) }
     var showCommunityBaitDialog by remember { mutableStateOf(false) }
     var votingMessage by remember { mutableStateOf("") }
@@ -89,13 +92,13 @@ fun FishInfoScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = fish.name,
+                        text = fish.getLocalizedName(context), // ← MODIFIER ICI
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = fish.species,
+                        text = fish.finalScientificName, // ← MODIFIER ICI
                         fontSize = 14.sp,
                         color = Color.Gray,
                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
@@ -247,12 +250,15 @@ fun FishInfoScreen(
         item {
             FishCard(icon = "🕐", title = stringResource(R.string.fish_info_optimal_hours)) {
                 when {
-                    // Nouvelle structure : preferredTime (List<String>)
-                    fish.preferredTime.isNotEmpty() -> {
-                        val timesText = fish.preferredTime.joinToString(", ")
+                    // 🆕 NOUVEAU FORMAT avec TimePeriod
+                    fish.finalPreferredTimePeriods.isNotEmpty() -> {
+                        val translatedTimes = fish.finalPreferredTimePeriods.map {
+                            stringResource(it.stringResId)
+                        }
+                        val timesText = translatedTimes.joinToString(", ")
                         Text(timesText, color = Color.White)
                     }
-                    // Ancienne structure : bestHours (List<Int>)
+                    // Ancien format : bestHours (List<Int>)
                     fish.bestHours.isNotEmpty() -> {
                         val hoursText = fish.bestHours.sorted().joinToString("h, ") + "h"
                         Text(hoursText, color = Color.White)
@@ -269,19 +275,22 @@ fun FishInfoScreen(
         item {
             FishCard(icon = "🌤️", title = stringResource(R.string.fish_info_favorable_weather)) {
                 val weatherList = if (fish.preferredWeather.isNotEmpty()) {
-                    fish.preferredWeather // Nouvelle structure
+                    fish.preferredWeather
                 } else {
-                    fish.bestWeather // Ancienne structure (fallback)
+                    fish.bestWeather
                 }
 
                 if (weatherList.isNotEmpty()) {
-                    val weatherText = weatherList.joinToString(", ") { it.displayName }
+                    // ✅ CRÉER LA LISTE TRADUITE D'ABORD
+                    val translatedWeather = weatherList.map { stringResource(it.stringResId) }
+                    val weatherText = translatedWeather.joinToString(", ")
                     Text(weatherText, color = Color.White)
                 } else {
                     Text(stringResource(R.string.fish_info_all_conditions), color = Color.Gray)
                 }
             }
         }
+
 
         // Mes meilleurs spots - ✅ TRADUIT
         if (topSpots.isNotEmpty()) {
@@ -599,6 +608,7 @@ fun CommunityBaitVotingDialog(
     onVoteSuccess: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     var selectedBait by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -618,7 +628,10 @@ fun CommunityBaitVotingDialog(
         text = {
             Column {
                 Text(
-                    text = stringResource(R.string.fish_info_community_vote_question, fish.name),
+                    text = stringResource(
+                        R.string.fish_info_community_vote_question,
+                        fish.getLocalizedName(context) // ← MAINTENANT context EST DÉFINI
+                    ),
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
