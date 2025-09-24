@@ -730,7 +730,7 @@
 
     <!-- Fonctionnalités de la version 0.8D -->
     <string name="update_feature_1_title">🎯 Mis à jour des traductions</string>
-    <string name="update_feature_1_desc">plusieurs écrans de traduits</string>
+    <string name="update_feature_1_desc"> TopFiveScreen complètement traduit :</string>
 
     <string name="update_feature_2_title">⭐ amélioration de la recherche des appats</string>
     <string name="update_feature_2_desc">Recherche par appats amélioré avec le détail complet</string>

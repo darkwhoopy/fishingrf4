@@ -2,6 +2,8 @@ package com.rf4.fishingrf4.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.BuildConfig
+
 
 /**
  * Gestionnaire des annonces de mise à jour
@@ -15,7 +17,12 @@ class UpdateManager(context: Context) {
 
     companion object {
         private const val KEY_LAST_SHOWN_VERSION = "last_shown_update_version"
-        const val CURRENT_VERSION = "v0.8.2" // Mettre à jour à chaque release
+
+        /**
+         * Version actuelle récupérée automatiquement depuis build.gradle
+         */
+        val CURRENT_VERSION: String
+            get() = "v${BuildConfig.VERSION_NAME}"
     }
 
     /**

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import com.google.firebase.BuildConfig
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -33,6 +34,7 @@ import com.rf4.fishingrf4.auth.AuthManager
 import com.rf4.fishingrf4.utils.LanguageManager
 import kotlinx.coroutines.delay
 import com.rf4.fishingrf4.utils.getLocalizedName
+
 
 @Composable
 fun AppHeader(
@@ -238,7 +240,7 @@ fun AppHeader(
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "v0.8.2",  // ✅ SE MET À JOUR version
+                                        text = "v${BuildConfig.VERSION_NAME}",
                                         fontSize = 8.sp,
                                         color = Color.White,
                                         fontWeight = FontWeight.ExtraBold,

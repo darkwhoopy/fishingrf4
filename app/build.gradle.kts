@@ -25,8 +25,8 @@ android {
         applicationId = "com.rf4.fishingrf4"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
-        versionName = "0.8.2"
+        versionCode = 19
+        versionName = "0.8.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // ✅ AJOUT : Support multilingue pour AAB
@@ -43,6 +43,22 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // 🚀 SOLUTION : Génération des symboles de débogage natifs
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+
+            // ✅ OPTIONNEL : Désactiver le débogage en release
+            isDebuggable = false
+        }
+
+        // ✅ AJOUT : Configuration debug pour les symboles aussi
+        debug {
+            isDebuggable = true
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 
@@ -50,17 +66,33 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+        // ✅ AJOUT : Pour accéder à BuildConfig.VERSION_NAME
+        buildConfig = true
     }
 
     // ✅ AJOUT : Configuration AAB pour garder toutes les langues
     bundle {
         language {
             enableSplit = false
+        }
+    }
+
+    // 🎯 AJOUT : Optimisations pour les bibliothèques natives
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+
+        // Pour les bibliothèques natives (si vous en ajoutez plus tard)
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 }
