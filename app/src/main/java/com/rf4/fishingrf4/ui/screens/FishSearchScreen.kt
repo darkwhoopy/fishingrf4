@@ -454,34 +454,35 @@ fun FishSearchContent(
 fun BaitSearchContent() {
     var searchQuery by remember { mutableStateOf("") }
     var selectedSearchType by remember { mutableStateOf("Nom") }
-    var selectedCategory by remember { mutableStateOf("Toutes") }
+    var selectedTargetFish by remember { mutableStateOf("Tous") }
     var selectedTimeOfDay by remember { mutableStateOf("Tous") }
     var selectedWaterType by remember { mutableStateOf("Tous") }
     var showAdvancedFilters by remember { mutableStateOf(false) }
+    var showFishDropdown by remember { mutableStateOf(false) }
+    var showTimeDropdown by remember { mutableStateOf(false) }
 
     // Types de recherche disponibles
-    val searchTypes = listOf("Nom", "Poisson", "Catégorie")
-    val categories = listOf("Toutes") + BaitDatabase.getAllCategories()
-    val timeOptions = listOf("Tous", "Jour", "Nuit", "Crépuscule")
+    val searchTypes = listOf("Nom", "Catégorie")
+    val allTargetFish = listOf("Tous") + BaitDatabase.getAllTargetFish()
+    val timeOptions = listOf("Tous", "Jour", "Nuit", "Crépuscule", "Matin", "Soir", "Tôt matin", "Toute la journée")
     val waterTypes = listOf("Tous", "Eau douce", "Mer", "Saumâtre")
 
     // Logique de filtrage avec tri alphabétique
-    val filteredBaits = remember(searchQuery, selectedSearchType, selectedCategory, selectedTimeOfDay, selectedWaterType) {
+    val filteredBaits = remember(searchQuery, selectedSearchType, selectedTargetFish, selectedTimeOfDay, selectedWaterType) {
         val results = when {
-            searchQuery.isEmpty() && selectedCategory == "Toutes" &&
+            searchQuery.isEmpty() && selectedTargetFish == "Tous" &&
                     selectedTimeOfDay == "Tous" && selectedWaterType == "Tous" -> BaitDatabase.allBaits
 
             else -> {
                 val searchResults = when (selectedSearchType) {
                     "Nom" -> BaitDatabase.searchByName(searchQuery)
-                    "Poisson" -> BaitDatabase.searchByFish(searchQuery)
                     "Catégorie" -> BaitDatabase.searchByCategory(searchQuery)
                     else -> BaitDatabase.allBaits
                 }
 
                 // Appliquer les filtres additionnels
                 searchResults.filter { bait ->
-                    (selectedCategory == "Toutes" || bait.category.contains(selectedCategory, ignoreCase = true)) &&
+                    (selectedTargetFish == "Tous" || bait.targetFish.any { it.contains(selectedTargetFish, ignoreCase = true) }) &&
                             (selectedTimeOfDay == "Tous" || bait.timeOfDay.contains(selectedTimeOfDay, ignoreCase = true)) &&
                             (selectedWaterType == "Tous" || bait.waterType.contains(selectedWaterType, ignoreCase = true))
                 }
@@ -506,7 +507,7 @@ fun BaitSearchContent() {
             Column(
                 modifier = Modifier.padding(12.dp)
             ) {
-                // Type de recherche - Plus compact
+                // Type de recherche - Plus compact (retiré "Poisson")
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
@@ -520,7 +521,6 @@ fun BaitSearchContent() {
                                 Icon(
                                     imageVector = when (type) {
                                         "Nom" -> Icons.Default.Search
-                                        "Poisson" -> Icons.Default.SetMeal
                                         "Catégorie" -> Icons.Default.Category
                                         else -> Icons.Default.Search
                                     },
@@ -542,7 +542,6 @@ fun BaitSearchContent() {
                         Text(
                             text = when (selectedSearchType) {
                                 "Nom" -> "Nom d'appât..."
-                                "Poisson" -> "Nom de poisson..."
                                 "Catégorie" -> "Catégorie..."
                                 else -> "Rechercher..."
                             },
@@ -574,7 +573,7 @@ fun BaitSearchContent() {
                                 Icon(
                                     imageVector = Icons.Default.Tune,
                                     contentDescription = "Filtres",
-                                    tint = if (selectedCategory != "Toutes" || selectedTimeOfDay != "Tous" || selectedWaterType != "Tous")
+                                    tint = if (selectedTargetFish != "Tous" || selectedTimeOfDay != "Tous" || selectedWaterType != "Tous")
                                         Color(0xFF10B981) else Color.Gray,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -592,57 +591,160 @@ fun BaitSearchContent() {
                     textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
                 )
 
-                // Filtres avancés compacts
+                // Filtres principaux toujours visibles
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Filtre Poisson cible - Liste déroulante
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Poisson cible",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
+
+                        Box {
+                            FilterChip(
+                                onClick = { showFishDropdown = !showFishDropdown },
+                                label = {
+                                    Text(
+                                        text = if (selectedTargetFish.length > 10)
+                                            selectedTargetFish.take(10) + "..."
+                                        else selectedTargetFish,
+                                        fontSize = 10.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
+                                selected = selectedTargetFish != "Tous",
+                                modifier = Modifier.fillMaxWidth().height(28.dp),
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = if (showFishDropdown) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            )
+
+                            // Menu déroulant pour les poissons
+                            DropdownMenu(
+                                expanded = showFishDropdown,
+                                onDismissRequest = { showFishDropdown = false },
+                                modifier = Modifier
+                                    .heightIn(max = 300.dp)
+                                    .background(Color(0xFF1E293B))
+                            ) {
+                                allTargetFish.forEach { fish ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = fish,
+                                                color = if (selectedTargetFish == fish) Color(0xFF10B981) else Color.White,
+                                                fontSize = 12.sp
+                                            )
+                                        },
+                                        onClick = {
+                                            selectedTargetFish = fish
+                                            showFishDropdown = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Filtre Time of Day - Liste déroulante
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Moment",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
+
+                        Box {
+                            FilterChip(
+                                onClick = { showTimeDropdown = !showTimeDropdown },
+                                label = { Text(selectedTimeOfDay, fontSize = 10.sp) },
+                                selected = selectedTimeOfDay != "Tous",
+                                modifier = Modifier.fillMaxWidth().height(28.dp),
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = if (showTimeDropdown) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            )
+
+                            // Menu déroulant pour les moments
+                            DropdownMenu(
+                                expanded = showTimeDropdown,
+                                onDismissRequest = { showTimeDropdown = false },
+                                modifier = Modifier.background(Color(0xFF1E293B))
+                            ) {
+                                timeOptions.forEach { time ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = time,
+                                                color = if (selectedTimeOfDay == time) Color(0xFF10B981) else Color.White,
+                                                fontSize = 12.sp
+                                            )
+                                        },
+                                        onClick = {
+                                            selectedTimeOfDay = time
+                                            showTimeDropdown = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Filtres avancés (reste identique mais simplifié)
                 AnimatedVisibility(visible = showAdvancedFilters) {
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // Filtres en lignes compactes
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        // Type d'eau uniquement
+                        Text(
+                            text = "Type d'eau",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.padding(top = 4.dp)
                         ) {
-                            // Catégorie
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Catégorie",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.Gray
-                                )
+                            items(waterTypes) { waterType ->
                                 FilterChip(
-                                    onClick = {
-                                        selectedCategory = if (selectedCategory == "Toutes") categories[1] else "Toutes"
-                                    },
-                                    label = {
-                                        Text(
-                                            text = selectedCategory.split(" - ").lastOrNull() ?: selectedCategory,
-                                            fontSize = 10.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    },
-                                    selected = selectedCategory != "Toutes",
-                                    modifier = Modifier.fillMaxWidth().height(28.dp)
+                                    onClick = { selectedWaterType = waterType },
+                                    label = { Text(waterType, fontSize = 10.sp) },
+                                    selected = selectedWaterType == waterType,
+                                    modifier = Modifier.height(28.dp)
                                 )
                             }
+                        }
 
-                            // Moment
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Moment",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.Gray
-                                )
-                                FilterChip(
-                                    onClick = {
-                                        val currentIndex = timeOptions.indexOf(selectedTimeOfDay)
-                                        selectedTimeOfDay = timeOptions[(currentIndex + 1) % timeOptions.size]
-                                    },
-                                    label = { Text(selectedTimeOfDay, fontSize = 10.sp) },
-                                    selected = selectedTimeOfDay != "Tous",
-                                    modifier = Modifier.fillMaxWidth().height(28.dp)
-                                )
-                            }
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Bouton reset
+                        OutlinedButton(
+                            onClick = {
+                                selectedTargetFish = "Tous"
+                                selectedTimeOfDay = "Tous"
+                                selectedWaterType = "Tous"
+                                searchQuery = ""
+                                showAdvancedFilters = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                        ) {
+                            Text("Effacer tous les filtres", fontSize = 12.sp)
                         }
                     }
                 }
@@ -652,7 +754,7 @@ fun BaitSearchContent() {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Compteur de résultats compact
-        if (searchQuery.isNotEmpty() || selectedCategory != "Toutes" || selectedTimeOfDay != "Tous") {
+        if (searchQuery.isNotEmpty() || selectedTargetFish != "Tous" || selectedTimeOfDay != "Tous" || selectedWaterType != "Tous") {
             Text(
                 text = "${filteredBaits.size} appât(s) trouvé(s)",
                 color = Color.Gray,
@@ -662,7 +764,7 @@ fun BaitSearchContent() {
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Résultats - Liste compacte avec bulles expansibles
+        // Résultats - Liste compacte avec bulles expansibles (reste identique)
         if (filteredBaits.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),

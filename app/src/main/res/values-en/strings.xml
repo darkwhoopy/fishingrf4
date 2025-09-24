@@ -856,6 +856,28 @@
 
     <string name="position_partagé">Position shared by :  !</string>
 
+    <!-- À AJOUTER dans values-en/strings.xml -->
+
+    <string name="top5_catches_format">%d catches</string>
+    <string name="top5_visits_format">%d visits</string>
+    <string name="top5_total_captures_format">%d catches</string>
+    <string name="top5_rank_format">#%d</string>
+    <string name="top5_bait_count_format">×%d</string>
+    <string name="top5_captures_format">%d catches</string>
+
+    <string name="top5_no_players_title">No players found</string>
+    <string name="top5_no_players_message">No data for this period</string>
+    <string name="top5_no_lakes_title">No lakes found</string>
+    <string name="top5_no_lakes_message">No data for this period</string>
+    <string name="top5_no_species_title">No species found</string>
+    <string name="top5_no_species_message">No data for this period</string>
+    <string name="top5_no_baits_title">No baits found</string>
+    <string name="top5_no_baits_message">No bait data available. Make catches with baits to see statistics.</string>
+
+    <string name="top5_top_baits_label">🎯 Top baits used:</string>
+    <string name="top5_no_baits_for_species">No baits used for this species</string>
+
+
 
 
 </resources>

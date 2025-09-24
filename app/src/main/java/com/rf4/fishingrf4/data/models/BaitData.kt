@@ -1,6 +1,8 @@
 package com.rf4.fishingrf4.data.models
 
 // BaitData.kt - Base de données complète des appâts Russian Fishing 4
+import android.content.Context
+import com.rf4.fishingrf4.utils.LanguageManager
 
 data class BaitInfo(
     val name: String,                    // Nom français
@@ -39,6 +41,660 @@ object BaitDatabase {
             waterType = "Eau douce",
             depth = "80-100cm",
             hookSize = "S8-S12"
+        ),
+        // APPÂTS MANQUANTS À AJOUTER dans BaitDatabase.allBaits
+
+        // ============= VERS ET LARVES MANQUANTS =============
+        BaitInfo(
+            name = "Lombric",
+            englishName = "Earthworm Large",
+            category = "Appâts naturels - Vers",
+            description = "Gros ver de terre épais, plus grand que le ver classique. Excellent pour filtrer les petites prises.",
+            effectiveness = "Très efficace pour cibler les poissons de taille moyenne à grande. Filtre les petites espèces indésirables.",
+            targetFish = listOf("Brème", "Carpe", "Tanche", "Carassin", "Chevesne"),
+            acquisition = "Creusage avec pelle ou achat",
+            tips = "Alternative au ver de nuit pour cibler les gros poissons sans payer le prix premium.",
+            price = "Économique",
+            level = "Niveau 8+",
+            timeOfDay = "Nuit optimal",
+            waterType = "Eau douce",
+            depth = "70-120cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Chrysalides",
+            englishName = "Chrysalis",
+            category = "Appâts naturels - Larves",
+            description = "Cocons d'insectes en transformation. Appât naturel prisé par les poissons insectivores.",
+            effectiveness = "Excellente pour perches et poissons insectivores. Appât saisonnier très efficace.",
+            targetFish = listOf("Perche", "Gardon", "Chevesne", "Ide", "Truite"),
+            acquisition = "Récolte spécialisée ou achat",
+            tips = "Particulièrement efficace au printemps et en été. Imite parfaitement la nourriture naturelle.",
+            price = "Modéré",
+            level = "Niveau 15+",
+            timeOfDay = "Matin et soir",
+            waterType = "Eau douce",
+            depth = "30-80cm",
+            hookSize = "S6-S10"
+        ),
+
+        BaitInfo(
+            name = "Ver haché",
+            englishName = "Chopped Worm",
+            category = "Appâts naturels - Vers",
+            description = "Morceaux de vers préparés. Excellent pour amorçage et pêche fine.",
+            effectiveness = "Très efficace en complément d'amorce. Libère des attractifs naturels dans l'eau.",
+            targetFish = listOf("Gardon", "Ablette", "Brème", "Carassin"),
+            acquisition = "Préparation maison ou achat",
+            tips = "Parfait pour mélanger à l'amorce. Créé un nuage attractif.",
+            price = "Bon marché",
+            level = "Niveau 5+",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "20-60cm",
+            hookSize = "S4-S8"
+        ),
+
+        BaitInfo(
+            name = "Larve de scolyte",
+            englishName = "Bark Beetle Larvae",
+            category = "Appâts naturels - Larves",
+            description = "Larve trouvée sous l'écorce des arbres. Appât naturel excellent pour les poissons de rivière.",
+            effectiveness = "Très efficace sur les poissons sauvages habitués à cette nourriture naturelle.",
+            targetFish = listOf("Chevesne", "Ide", "Perche", "Truite", "Ombre"),
+            acquisition = "Récolte sous écorces ou achat spécialisé",
+            tips = "Appât premium pour pêche naturelle. Irrésistible pour les poissons sauvages.",
+            price = "Cher",
+            level = "Compétence spécialisée",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce courante",
+            depth = "50-150cm",
+            hookSize = "S8-S12"
+        ),
+
+        BaitInfo(
+            name = "Larve d'éphémère",
+            englishName = "Mayfly Larvae",
+            category = "Appâts naturels - Larves",
+            description = "Larve aquatique d'éphémère. Nourriture naturelle premium des truites et ombres.",
+            effectiveness = "Exceptionnelle pour truites et salmonidés. Imite parfaitement la nourriture naturelle.",
+            targetFish = listOf("Truite", "Ombre", "Saumon", "Perche", "Chevesne"),
+            acquisition = "Récolte en rivière ou achat premium",
+            tips = "Appât de choix pour la pêche à la truite en rivière. Très fragile mais très efficace.",
+            price = "Très cher",
+            level = "Compétence aquatique 60%+",
+            timeOfDay = "Matin et crépuscule",
+            waterType = "Eau courante froide",
+            depth = "30-100cm",
+            hookSize = "S6-S12"
+        ),
+
+        BaitInfo(
+            name = "Larve de plécoptère",
+            englishName = "Stonefly Larvae",
+            category = "Appâts naturels - Larves",
+            description = "Larve de perle trouvée sous les pierres des rivières froides. Appât premium pour salmonidés.",
+            effectiveness = "Excellente pour pêche en eau froide. Appât naturel très prisé des truites.",
+            targetFish = listOf("Truite", "Saumon", "Ombre", "Perche"),
+            acquisition = "Récolte sous pierres rivières ou achat rare",
+            tips = "Réservé aux eaux froides et oxygénées. Appât fragile mais très efficace.",
+            price = "Très cher",
+            level = "Compétence aquatique 70%+",
+            timeOfDay = "Tôt matin",
+            waterType = "Eau froide oxygénée",
+            depth = "40-120cm",
+            hookSize = "S8-S14"
+        ),
+
+        BaitInfo(
+            name = "Larve de phrygane",
+            englishName = "Caddisfly Larvae",
+            category = "Appâts naturels - Larves",
+            description = "Larve aquatique construisant un fourreau. Excellent appât pour poissons de rivière.",
+            effectiveness = "Très efficace sur les poissons habitués à ce type de nourriture naturelle.",
+            targetFish = listOf("Truite", "Perche", "Chevesne", "Ide", "Ombre"),
+            acquisition = "Récolte aquatique ou achat spécialisé",
+            tips = "Appât naturel excellent. Le fourreau peut être retiré ou conservé selon les conditions.",
+            price = "Cher",
+            level = "Compétence aquatique 50%+",
+            timeOfDay = "Jour et crépuscule",
+            waterType = "Eau douce courante",
+            depth = "40-100cm",
+            hookSize = "S8-S12"
+        ),
+
+        // ============= PÂTES MANQUANTES =============
+        BaitInfo(
+            name = "Pain mouillé",
+            englishName = "Wet Bread",
+            category = "Appâts fabriqués",
+            description = "Pain trempé dans l'eau, premier appât artisanal. Base absolue pour débuter.",
+            effectiveness = "Efficacité basique mais suffisante pour débuter. Très économique pour l'apprentissage.",
+            targetFish = listOf("Gardon", "Carassin", "Carpe", "Brème"),
+            acquisition = "Fabrication maison (pain + eau)",
+            tips = "Le plus simple des appâts fabriqués. Idéal pour comprendre les bases de la fabrication.",
+            price = "Très bon marché",
+            level = "Niveau 0",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "30-80cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Pâte sucrée",
+            englishName = "Sweet Paste",
+            category = "Appâts fabriqués",
+            description = "Pâte additionnée de sucre. Attractive pour les cyprinidés gourmands.",
+            effectiveness = "Bonne efficacité sur carpes et gros cyprinidés. Le sucre attire de loin.",
+            targetFish = listOf("Carpe", "Brème", "Tanche", "Carassin"),
+            acquisition = "Fabrication avec sucre ajouté",
+            tips = "Excellente en eau froide où les poissons cherchent des calories. Attention aux écrevisses.",
+            price = "Économique",
+            level = "Compétence 25-40%",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "60-150cm",
+            hookSize = "S12-S18"
+        ),
+
+        BaitInfo(
+            name = "Pâte au miel",
+            englishName = "Honey Paste",
+            category = "Appâts fabriqués",
+            description = "Pâte parfumée au miel. Très attractive pour les gros cyprinidés.",
+            effectiveness = "Excellente efficacité grâce au parfum sucré naturel. Attractive de loin.",
+            targetFish = listOf("Carpe", "Tanche", "Brème", "Amour blanc"),
+            acquisition = "Fabrication avec miel premium",
+            tips = "Appât haut de gamme pour sessions importantes. Le miel attire mais attire aussi les petites espèces.",
+            price = "Cher",
+            level = "Compétence 45-65%",
+            timeOfDay = "Crépuscule et nuit",
+            waterType = "Eau douce",
+            depth = "80-200cm",
+            hookSize = "S15-S1/0"
+        ),
+
+        BaitInfo(
+            name = "Pâte au fromage blanc",
+            englishName = "Cottage Cheese Paste",
+            category = "Appâts fabriqués",
+            description = "Pâte riche en protéines à base de fromage blanc. Très nutritive et attractive.",
+            effectiveness = "Excellente pour gros poissons. Haute valeur nutritive et goût attractif.",
+            targetFish = listOf("Carpe", "Amour blanc", "Tanche", "Brème géante"),
+            acquisition = "Fabrication avec fromage blanc frais",
+            tips = "Appât riche idéal pour l'hiver. Se conserve mal par forte chaleur.",
+            price = "Modéré à cher",
+            level = "Compétence 40-60%",
+            timeOfDay = "Nuit et tôt matin",
+            waterType = "Eau douce",
+            depth = "100-250cm",
+            hookSize = "S15-S2/0"
+        ),
+
+        // ============= GRAINES ET CÉRÉALES MANQUANTES =============
+        BaitInfo(
+            name = "Semoule",
+            englishName = "Semolina",
+            category = "Graines et céréales",
+            description = "Semoule de blé fine. Excellent pour progression compétence et pêche fine.",
+            effectiveness = "Bonne efficacité pour progression compétence. Économique et polyvalente.",
+            targetFish = listOf("Gardon", "Brème", "Carassin", "Ide"),
+            acquisition = "Fabrication à partir semoule brute",
+            tips = "Progression 30-35% idéale. Peut être mélangée à d'autres appâts.",
+            price = "Bon marché",
+            level = "Compétence 30-35%",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce",
+            depth = "40-100cm",
+            hookSize = "S8-S12"
+        ),
+
+        BaitInfo(
+            name = "Flocons d'avoine",
+            englishName = "Oat Flakes",
+            category = "Graines et céréales",
+            description = "Flocons d'avoine nutritifs. Excellent pour l'amorçage et comme appât de fond.",
+            effectiveness = "Très bon pour amorçage. Reste longtemps sur le fond et attire durablement.",
+            targetFish = listOf("Carpe", "Brème", "Tanche", "Carassin", "Amour blanc"),
+            acquisition = "Achat épicerie ou fabrication",
+            tips = "Excellent composant d'amorce. Gonfle dans l'eau et crée un tapis nourricier.",
+            price = "Bon marché",
+            level = "Niveau 12+",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "80-180cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Grains de blé",
+            englishName = "Wheat Grains",
+            category = "Graines et céréales",
+            description = "Grains de blé entiers préparés. Classique pour cyprinidés, résistant aux écrevisses.",
+            effectiveness = "Excellente tenue à l'hameçon. Résiste bien aux écrevisses et petits poissons.",
+            targetFish = listOf("Carpe", "Brème", "Tanche", "Ide", "Chevesne"),
+            acquisition = "Préparation grains entiers ou achat",
+            tips = "Nécessite trempage et cuisson. Très résistant, parfait en zone à écrevisses.",
+            price = "Économique",
+            level = "Niveau 15+",
+            timeOfDay = "Nuit et tôt matin",
+            waterType = "Eau douce",
+            depth = "60-150cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Tournesol",
+            englishName = "Sunflower Seeds",
+            category = "Graines et céréales",
+            description = "Graines de tournesol décortiquées. Riches en huile, très attractives.",
+            effectiveness = "Très attractives grâce aux huiles naturelles. Excellent pour carpes et gros poissons.",
+            targetFish = listOf("Carpe", "Amour blanc", "Brème", "Tanche"),
+            acquisition = "Préparation graines décortiquées ou achat",
+            tips = "Les huiles se diffusent bien dans l'eau. Attention à bien décortiquer.",
+            price = "Modéré",
+            level = "Niveau 18+",
+            timeOfDay = "Crépuscule et nuit",
+            waterType = "Eau douce",
+            depth = "100-200cm",
+            hookSize = "S12-S18"
+        ),
+
+        BaitInfo(
+            name = "Graines de lin",
+            englishName = "Flax Seeds",
+            category = "Graines et céréales",
+            description = "Petites graines riches en huile. Premium pour cyprinidés difficiles.",
+            effectiveness = "Très efficace sur poissons méfiants. Taille réduite mais très attractive.",
+            targetFish = listOf("Carpe", "Tanche", "Brème", "Ide"),
+            acquisition = "Achat spécialisé ou préparation",
+            tips = "Appât sélectif pour gros poissons méfiants. Libère des huiles attractives.",
+            price = "Cher",
+            level = "Niveau 25+",
+            timeOfDay = "Nuit optimal",
+            waterType = "Eau douce",
+            depth = "120-250cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Chènevis",
+            englishName = "Hemp Seeds",
+            category = "Graines et céréales",
+            description = "Graines de chanvre. Appât traditionnel très prisé des carpes et gros cyprinidés.",
+            effectiveness = "Efficacité légendaire sur carpes. Appât traditionnel incontournable.",
+            targetFish = listOf("Carpe", "Brème", "Tanche", "Barbeau", "Amour blanc"),
+            acquisition = "Achat spécialisé pêche ou préparation",
+            tips = "Nécessite préparation spéciale. Un des meilleurs appâts pour carpes difficiles.",
+            price = "Cher",
+            level = "Niveau 30+",
+            timeOfDay = "Nuit et très tôt matin",
+            waterType = "Eau douce",
+            depth = "150-300cm",
+            hookSize = "S12-S1/0"
+        ),
+
+        // ============= BOUILLIES MANQUANTES =============
+        BaitInfo(
+            name = "Bouillie de pois",
+            englishName = "Pea Porridge",
+            category = "Appâts fabriqués",
+            description = "Bouillie épaisse à base de pois cassés. Nutritive et très attractive.",
+            effectiveness = "Excellente pour gros poissons gourmands. Très nutritive et rassasiante.",
+            targetFish = listOf("Carpe", "Brème géante", "Amour blanc", "Tanche"),
+            acquisition = "Cuisson pois cassés avec épices",
+            tips = "Bouillie épaisse qui tient bien. Parfaite pour sessions longues en eau froide.",
+            price = "Économique",
+            level = "Compétence 35-50%",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "80-200cm",
+            hookSize = "S15-S1/0"
+        ),
+
+        BaitInfo(
+            name = "Bouillie de semoule",
+            englishName = "Semolina Porridge",
+            category = "Appâts fabriqués",
+            description = "Bouillie crémeuse à base de semoule. Facile à faire et économique.",
+            effectiveness = "Bonne efficacité générale. Excellent rapport qualité-prix pour débuter.",
+            targetFish = listOf("Gardon", "Brème", "Carassin", "Ide", "Chevesne"),
+            acquisition = "Cuisson semoule avec lait ou eau",
+            tips = "Une des premières bouillies à maîtriser. Consistance ajustable selon les besoins.",
+            price = "Très bon marché",
+            level = "Compétence 20-35%",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce",
+            depth = "40-120cm",
+            hookSize = "S10-S15"
+        ),
+
+        BaitInfo(
+            name = "Bouillie de millet",
+            englishName = "Millet Porridge",
+            category = "Appâts fabriqués",
+            description = "Bouillie fine à base de millet. Digestible et attractive pour petits et moyens poissons.",
+            effectiveness = "Très bonne pour poissons de taille moyenne. Digestion facile, usage prolongé possible.",
+            targetFish = listOf("Gardon", "Brème", "Carassin", "Perche", "Ide"),
+            acquisition = "Cuisson graines de millet",
+            tips = "Bouillie légère idéale en été. Ne sature pas rapidement les poissons.",
+            price = "Bon marché",
+            level = "Compétence 25-40%",
+            timeOfDay = "Jour et crépuscule",
+            waterType = "Eau douce",
+            depth = "50-120cm",
+            hookSize = "S8-S12"
+        ),
+
+        // ============= AUTRES APPÂTS VIVANTS MANQUANTS =============
+        BaitInfo(
+            name = "Morceaux de poisson",
+            englishName = "Fish Pieces",
+            category = "Appâts vivants",
+            description = "Morceaux de poisson frais. Excellent pour prédateurs et gros poissons de fond.",
+            effectiveness = "Très efficace pour prédateurs. Libère des attractifs naturels dans l'eau.",
+            targetFish = listOf("Silure", "Lotte", "Brochet", "Sandre", "Anguille"),
+            acquisition = "Découpe de poissons pêchés ou achat",
+            tips = "Utiliser poissons gras de préférence. Excellent pour pêche de nuit au silure.",
+            price = "Gratuit si auto-produit",
+            level = "Niveau 20+",
+            timeOfDay = "Nuit optimal",
+            waterType = "Eau douce",
+            depth = "200-400cm",
+            hookSize = "S2/0-S8/0"
+        ),
+
+        BaitInfo(
+            name = "Moule de rivière",
+            englishName = "River Mussel",
+            category = "Appâts vivants",
+            description = "Mollusque d'eau douce. Chair tendre très appréciée des gros poissons de fond.",
+            effectiveness = "Excellente pour gros poissons de fond. Chair tendre et parfumée naturellement.",
+            targetFish = listOf("Tanche", "Brème géante", "Carpe", "Barbeau", "Lotte"),
+            acquisition = "Récolte en rivière ou achat spécialisé",
+            tips = "Ouvrir la coquille au dernier moment. Chair très fragile mais très attractive.",
+            price = "Modéré",
+            level = "Niveau 25+",
+            timeOfDay = "Nuit et tôt matin",
+            waterType = "Eau douce",
+            depth = "150-300cm",
+            hookSize = "S15-S2/0"
+        ),
+
+        BaitInfo(
+            name = "Moule zébrée",
+            englishName = "Zebra Mussel",
+            category = "Appâts vivants",
+            description = "Petite moule invasive. Chair délicate très appréciée, notamment des perches.",
+            effectiveness = "Très efficace sur perches et poissons de taille moyenne. Goût très attractif.",
+            targetFish = listOf("Perche", "Sandre", "Brème", "Gardon", "Ide"),
+            acquisition = "Récolte sur structures immergées ou achat",
+            tips = "Taille réduite parfaite pour perches. Coquille coupante, manipulation prudente.",
+            price = "Bon marché",
+            level = "Niveau 15+",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce",
+            depth = "80-180cm",
+            hookSize = "S8-S12"
+        ),
+
+        // ============= APPÂTS SPÉCIAUX MANQUANTS =============
+        BaitInfo(
+            name = "Cubes de fromage",
+            englishName = "Cheese Cubes",
+            category = "Appâts spécialisés",
+            description = "Cubes de fromage dur. Appât original très efficace sur cyprinidés gourmands.",
+            effectiveness = "Très efficace sur carpes et gros cyprinidés. Goût fort et attractif.",
+            targetFish = listOf("Carpe", "Chevesne", "Ide", "Barbeau", "Amour blanc"),
+            acquisition = "Découpe fromage dur en cubes",
+            tips = "Utiliser fromage dur qui tient à l'hameçon. Odeur forte très attractive.",
+            price = "Modéré",
+            level = "Niveau 20+",
+            timeOfDay = "Nuit et crépuscule",
+            waterType = "Eau douce",
+            depth = "100-200cm",
+            hookSize = "S12-S18"
+        ),
+
+        BaitInfo(
+            name = "Polenta",
+            englishName = "Polenta",
+            category = "Appâts fabriqués",
+            description = "Bouillie de maïs italienne. Consistance parfaite pour l'eschage, très nutritive.",
+            effectiveness = "Excellente tenue à l'hameçon. Très nutritive et attractive pour cyprinidés.",
+            targetFish = listOf("Carpe", "Brème", "Tanche", "Carassin", "Amour blanc"),
+            acquisition = "Cuisson farine de maïs spécialisée",
+            tips = "Consistance idéale pour l'eschage. Se travaille facilement, tient parfaitement.",
+            price = "Économique",
+            level = "Compétence 40-60%",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce",
+            depth = "80-180cm",
+            hookSize = "S12-S18"
+        ),
+
+        BaitInfo(
+            name = "Poisson mort",
+            englishName = "Dead Fish",
+            category = "Appâts spécialisés",
+            description = "Poisson entier mort. Appât naturel premium pour gros prédateurs et silures.",
+            effectiveness = "Exceptionnelle pour silures et gros prédateurs. Libère des attractifs puissants.",
+            targetFish = listOf("Silure", "Lotte", "Brochet géant", "Anguille"),
+            acquisition = "Poissons pêchés conservés ou achat spécialisé",
+            tips = "Laisser légèrement avarier pour plus d'efficacité. Réservé aux très gros prédateurs.",
+            price = "Variable",
+            level = "Niveau 35+",
+            timeOfDay = "Nuit exclusive",
+            waterType = "Eau douce",
+            depth = "300-600cm",
+            hookSize = "S5/0-S12/0"
+        ),
+
+        BaitInfo(
+            name = "Viande de pétoncle",
+            englishName = "Scallop Meat",
+            category = "Appâts marins",
+            description = "Chair de pétoncle premium. Délicatesse marine pour poissons fins.",
+            effectiveness = "Excellente pour poissons marins gourmets. Chair ferme et parfumée.",
+            targetFish = listOf("Daurade", "Loup de mer", "Lieu", "Turbot", "Sole"),
+            acquisition = "Achat poissonnerie spécialisée",
+            tips = "Appât premium pour pêche fine marine. Chair ferme qui tient bien à l'hameçon.",
+            price = "Très cher",
+            level = "Accès mer + niveau 30+",
+            timeOfDay = "Marée montante",
+            waterType = "Mer",
+            depth = "20-50m",
+            hookSize = "S1/0-S3/0"
+        ),
+
+        BaitInfo(
+            name = "Crabe",
+            englishName = "Crab",
+            category = "Appâts marins",
+            description = "Crabe entier ou en morceaux. Appât naturel marin très attractif pour les gros poissons.",
+            effectiveness = "Exceptionnelle pour gros poissons marins. Appât naturel très recherché.",
+            targetFish = listOf("Loup de mer", "Lieu", "Congre", "Raie", "Turbot"),
+            acquisition = "Pêche aux crabes ou achat spécialisé",
+            tips = "Utiliser entier pour très gros poissons, en morceaux pour autres espèces.",
+            price = "Cher",
+            level = "Accès mer + niveau 25+",
+            timeOfDay = "Nuit et marée",
+            waterType = "Mer",
+            depth = "30-80m",
+            hookSize = "S2/0-S6/0"
+        ),
+
+        BaitInfo(
+            name = "Ver marin",
+            englishName = "Marine Worm",
+            category = "Appâts marins",
+            description = "Ver spécialisé pour pêche marine. Très résistant et attractif en milieu salé.",
+            effectiveness = "Excellente pour pêche marine généraliste. Résiste bien au milieu salé.",
+            targetFish = listOf("Lieu", "Morue", "Merlan", "Plie", "Maquereau"),
+            acquisition = "Achat magasins pêche marine ou récolte",
+            tips = "Appât de base incontournable pour pêche marine. Très polyvalent.",
+            price = "Modéré",
+            level = "Accès mer",
+            timeOfDay = "Toute la journée",
+            waterType = "Mer",
+            depth = "10-60m",
+            hookSize = "S1/0-S4/0"
+        ),
+
+        BaitInfo(
+            name = "Crevette",
+            englishName = "Shrimp",
+            category = "Appâts marins",
+            description = "Crevette fraîche ou congelée. Appât marin classique très attractif.",
+            effectiveness = "Très efficace pour nombreuses espèces marines. Odeur et goût très attractifs.",
+            targetFish = listOf("Loup de mer", "Daurade", "Lieu", "Maquereau", "Congre"),
+            acquisition = "Achat poissonnerie ou pêche aux crevettes",
+            tips = "Décortiquer ou non selon l'espèce visée. Très polyvalent et efficace.",
+            price = "Modéré à cher",
+            level = "Accès mer",
+            timeOfDay = "Marée et crépuscule",
+            waterType = "Mer",
+            depth = "15-50m",
+            hookSize = "S1/0-S3/0"
+        ),
+
+        // ============= LEURRES DURS MANQUANTS =============
+        BaitInfo(
+            name = "Wobblers",
+            englishName = "Wobbler",
+            category = "Leurres - Poissons nageurs",
+            description = "Leurre dur oscillant. Action de nage hypnotique très efficace sur prédateurs.",
+            effectiveness = "Très efficace en récupération lente à moyenne. Action oscillante irrésistible.",
+            targetFish = listOf("Brochet", "Sandre", "Perche", "Loup de mer", "Lieu"),
+            acquisition = "Achat magasins spécialisés leurres",
+            tips = "Varier vitesse récupération. Excellent pour prospecter zones encombrées.",
+            price = "Modéré à cher",
+            level = "Niveau 25+",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce et mer",
+            depth = "Variable selon modèle",
+            hookSize = "Triples intégrés"
+        ),
+
+        BaitInfo(
+            name = "Poppers",
+            englishName = "Popper",
+            category = "Leurres - Surface",
+            description = "Leurre de surface créant des éclaboussures. Technique spectaculaire pour prédateurs actifs.",
+            effectiveness = "Exceptionnelle en surface par temps calme. Attaque visuelle spectaculaire.",
+            targetFish = listOf("Brochet", "Loup de mer", "Perche", "Black Bass"),
+            acquisition = "Achat spécialisé leurres surface",
+            tips = "Animation saccadée obligatoire. Réservé aux poissons actifs en surface.",
+            price = "Cher",
+            level = "Niveau 30+",
+            timeOfDay = "Matin et soir",
+            waterType = "Eau douce et mer",
+            depth = "Surface exclusive",
+            hookSize = "Triples intégrés"
+        ),
+
+        BaitInfo(
+            name = "Jerkbaits",
+            englishName = "Jerkbait",
+            category = "Leurres - Poissons nageurs",
+            description = "Leurre dur pour animation saccadée. Imite parfaitement un poisson blessé.",
+            effectiveness = "Très efficace avec animation stop and go. Déclenche l'instinct de prédation.",
+            targetFish = listOf("Brochet", "Sandre", "Perche", "Loup de mer"),
+            acquisition = "Achat magasins leurres avancés",
+            tips = "Animation jerking obligatoire. Technique exigeante mais très efficace.",
+            price = "Cher",
+            level = "Niveau 35+",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce et mer",
+            depth = "Variable",
+            hookSize = "Triples renforcés"
+        ),
+
+        BaitInfo(
+            name = "Cuillères",
+            englishName = "Spoon",
+            category = "Leurres - Cuillers",
+            description = "Cuiller ondulante classique. Action hypnotique efficace à toutes vitesses.",
+            effectiveness = "Très polyvalente, efficace à toutes profondeurs. Action attractive universelle.",
+            targetFish = listOf("Brochet", "Perche", "Sandre", "Truite", "Saumon"),
+            acquisition = "Achat magasins pêche généraliste",
+            tips = "Récupération variée possible. Leurre incontournable pour débuter aux leurres.",
+            price = "Bon marché à modéré",
+            level = "Niveau 20+",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce et mer",
+            depth = "Variable selon poids",
+            hookSize = "Simple ou triple"
+        ),
+
+        BaitInfo(
+            name = "Spinners",
+            englishName = "Spinner",
+            category = "Leurres - Cuillers tournantes",
+            description = "Cuiller à palette tournante. Vibrations irrésistibles pour prédateurs actifs.",
+            effectiveness = "Excellent pour prédateurs actifs. Vibrations perçues de loin.",
+            targetFish = listOf("Brochet", "Perche", "Truite", "Sandre", "Saumon"),
+            acquisition = "Achat magasins pêche aux leurres",
+            tips = "Récupération constante obligatoire. Stop and go très efficace.",
+            price = "Modéré",
+            level = "Niveau 22+",
+            timeOfDay = "Jour optimal",
+            waterType = "Eau douce",
+            depth = "Surface à mi-eau",
+            hookSize = "Triple intégré"
+        ),
+
+        BaitInfo(
+            name = "Plastique Souple",
+            englishName = "Soft Plastic",
+            category = "Leurres - Souples",
+            description = "Leurre souple polyvalent. Texture réaliste et animation naturelle.",
+            effectiveness = "Très efficace avec animation variée. Texture réaliste trompe les poissons méfiants.",
+            targetFish = listOf("Sandre", "Perche", "Brochet", "Lieu", "Loup de mer"),
+            acquisition = "Achat magasins leurres souples",
+            tips = "Montage avec tête plombée. Animation lente et naturelle recommandée.",
+            price = "Bon marché",
+            level = "Niveau 25+",
+            timeOfDay = "Toute la journée",
+            waterType = "Eau douce et mer",
+            depth = "Fond à surface",
+            hookSize = "Simple texan"
+        ),
+
+        BaitInfo(
+            name = "Swimbaits",
+            englishName = "Swimbait",
+            category = "Leurres - Souples",
+            description = "Leurre imitant parfaitement un poisson nageur. Réalisme extrême pour gros prédateurs.",
+            effectiveness = "Exceptionnelle pour très gros prédateurs. Réalisme troublant.",
+            targetFish = listOf("Brochet géant", "Silure", "Sandre trophée", "Loup de mer"),
+            acquisition = "Achat spécialisé leurres premium",
+            tips = "Récupération très lente. Réservé aux gros poissons et pêcheurs expérimentés.",
+            price = "Très cher",
+            level = "Niveau 40+",
+            timeOfDay = "Crépuscule et nuit",
+            waterType = "Eau douce et mer",
+            depth = "Mi-eau",
+            hookSize = "Hameçons renforcés"
+        ),
+
+        BaitInfo(
+            name = "Spinnerbaits",
+            englishName = "Spinnerbait",
+            category = "Leurres - Spécialisés",
+            description = "Leurre à palettes multiples avec jupe. Anti-accroc parfait pour zones encombrées.",
+            effectiveness = "Excellent en zones encombrées. Palettes attractives et montage anti-accroc.",
+            targetFish = listOf("Brochet", "Black Bass", "Perche", "Sandre"),
+            acquisition = "Achat magasins spécialisés bass fishing",
+            tips = "Parfait pour herbiers et obstacles. Récupération constante avec pauses.",
+            price = "Cher",
+            level = "Niveau 35+",
+            timeOfDay = "Jour et crépuscule",
+            waterType = "Eau douce",
+            depth = "Surface à mi-eau",
+            hookSize = "Simple intégré"
         ),
 
         BaitInfo(
@@ -519,6 +1175,12 @@ object BaitDatabase {
     // Fonction pour obtenir tous les poissons cibles
     fun getAllTargetFish(): List<String> {
         return allBaits.flatMap { it.targetFish }.distinct().sorted()
+    }
+    fun BaitInfo.getLocalizedName(context: Context): String {
+        return when (LanguageManager.getCurrentLanguage(context)) {
+            LanguageManager.Language.ENGLISH -> this.englishName
+            LanguageManager.Language.FRENCH -> this.name
+        }
     }
 
     // Fonction de recherche avancée

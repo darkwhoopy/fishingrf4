@@ -855,7 +855,27 @@
     <string name="position_validate_count">Valider (%d)</string>
     <string name="position_share_this_spot">Partager ce spot</string>
 
+    <!-- Nouvelles clés à ajouter -->
 
+
+    <string name="top5_catches_format">%d captures</string>
+    <string name="top5_visits_format">%d visites</string>
+    <string name="top5_total_captures_format">%d captures</string>
+    <string name="top5_rank_format">#%d</string>
+    <string name="top5_bait_count_format">×%d</string>
+
+    <string name="top5_no_players_title">Aucun joueur trouvé</string>
+    <string name="top5_no_players_message">Aucune donnée pour cette période</string>
+    <string name="top5_no_lakes_title">Aucun lac trouvé</string>
+    <string name="top5_no_lakes_message">Aucune donnée pour cette période</string>
+    <string name="top5_no_species_title">Aucune espèce trouvée</string>
+    <string name="top5_no_species_message">Aucune donnée pour cette période</string>
+    <string name="top5_no_baits_title">Aucun appât trouvé</string>
+    <string name="top5_no_baits_message">Aucune donnée d\'appâts disponible. Effectuez des captures avec des appâts pour voir les statistiques.</string>
+
+    <string name="top5_top_baits_label">🎯 Top appâts utilisés :</string>
+    <string name="top5_no_baits_for_species">Aucun appât utilisé pour cette espèce</string>
+    <string name="top5_captures_format">%d captures</string>
 
     <!-- Clés manquantes pour PositionSelectionScreen -->
 
