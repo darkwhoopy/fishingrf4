@@ -25,16 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import com.google.firebase.BuildConfig
+import com.rf4.fishingrf4.BuildConfig
 import com.rf4.fishingrf4.data.models.PlayerStats
 import com.rf4.fishingrf4.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.rf4.fishingrf4.R
 import com.rf4.fishingrf4.auth.AuthManager
 import com.rf4.fishingrf4.utils.LanguageManager
+import com.rf4.fishingrf4.ui.components.WelcomeUpdatePopup
+import com.rf4.fishingrf4.ui.components.PopupMode
+import com.rf4.fishingrf4.utils.UpdateManager
 import kotlinx.coroutines.delay
 import com.rf4.fishingrf4.utils.getLocalizedName
-
 
 @Composable
 fun AppHeader(
@@ -44,21 +46,27 @@ fun AppHeader(
     onLevelChange: (Int) -> Unit
 ) {
     val context = LocalContext.current
+    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
     val activity = context as? Activity
 
-    // ✅ États existants pour la recomposition
+    // États existants pour la recomposition
     var refreshTrigger by remember { mutableStateOf(0) }
     var currentLanguage by remember { mutableStateOf(LanguageManager.getCurrentLanguage(context)) }
     var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
 
-    // ✅ NOUVEAUX états pour le popup de connexion
+    // États existants pour le popup de connexion
     val authManager = remember { if (activity != null) AuthManager(activity) else null }
     var showConnectionPopup by remember { mutableStateOf(false) }
     var hasShownPopupOnce by remember { mutableStateOf(false) }
     var authMessage by remember { mutableStateOf<String?>(null) }
     var isAuthLoading by remember { mutableStateOf(false) }
 
-    // ✅ Launcher pour Google Sign-In
+    // NOUVEAUX ÉTATS pour le popup d'accueil/mise à jour
+    val updateManager = remember { UpdateManager(context) }
+    var showWelcomeUpdatePopup by remember { mutableStateOf<PopupMode?>(null) }
+    var hasCheckedWelcomeUpdate by remember { mutableStateOf(false) }
+
+    // Launcher pour Google Sign-In
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -81,7 +89,7 @@ fun AppHeader(
         }
     }
 
-    // ✅ Surveillance existante du changement de langue et de connexion
+    // Surveillance du changement de langue et de connexion
     LaunchedEffect(refreshTrigger) {
         while (true) {
             delay(500) // Vérification toutes les 500ms
@@ -96,17 +104,29 @@ fun AppHeader(
         }
     }
 
-    // ✅ NOUVEAU : Afficher le popup automatiquement au démarrage si pas connecté
-    LaunchedEffect(currentUser, hasShownPopupOnce) {
-        if (currentUser == null && !hasShownPopupOnce && authManager != null) {
-            // Délai pour laisser l'app se charger complètement
-            delay(2000)
+    // NOUVEAU : Vérifier le popup d'accueil/mise à jour AU DÉMARRAGE
+    LaunchedEffect(Unit) {
+        if (!hasCheckedWelcomeUpdate) {
+            // Priorité 1 : Popup d'accueil/mise à jour
+            val popupMode = updateManager.getPopupMode()
+            if (popupMode != null) {
+                showWelcomeUpdatePopup = popupMode
+            }
+            hasCheckedWelcomeUpdate = true
+        }
+    }
+
+    // MODIFIÉ : Popup de connexion SEULEMENT si pas de popup d'accueil
+    LaunchedEffect(currentUser, hasShownPopupOnce, showWelcomeUpdatePopup) {
+        if (currentUser == null && !hasShownPopupOnce && authManager != null && showWelcomeUpdatePopup == null) {
+            // Délai pour laisser l'app se charger + laisser passer le popup d'accueil
+            delay(4000) // Augmenté à 4 secondes
             showConnectionPopup = true
             hasShownPopupOnce = true
         }
     }
 
-    // ✅ NOUVEAU : Gestion de l'affichage des messages d'auth
+    // Gestion de l'affichage des messages d'auth
     LaunchedEffect(authMessage) {
         if (authMessage != null) {
             delay(3000)
@@ -169,7 +189,7 @@ fun AppHeader(
                     Column {
                         // Titre principal avec gradient
                         Text(
-                            text = stringResource(R.string.app_title),  // ✅ SE MET À JOUR
+                            text = stringResource(R.string.app_title),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
@@ -182,7 +202,7 @@ fun AppHeader(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // ✅ MODIFIÉ : Badge de connexion stylisé - CLIQUABLE
+                            // Badge de connexion stylisé - CLIQUABLE
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = if (currentUser != null) Color(0xFF10B981) else Color(0xFFF59E0B)
@@ -216,7 +236,7 @@ fun AppHeader(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = if (currentUser != null) stringResource(R.string.status_online) else stringResource(R.string.status_offline),  // ✅ SE MET À JOUR
+                                        text = if (currentUser != null) stringResource(R.string.status_online) else stringResource(R.string.status_offline),
                                         fontSize = 8.sp,
                                         color = Color.White,
                                         fontWeight = FontWeight.ExtraBold,
@@ -240,7 +260,7 @@ fun AppHeader(
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "v${BuildConfig.VERSION_NAME}",
+                                        text = "v$versionName",
                                         fontSize = 8.sp,
                                         color = Color.White,
                                         fontWeight = FontWeight.ExtraBold,
@@ -263,7 +283,7 @@ fun AppHeader(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 NavButton(
-                    text = stringResource(R.string.nav_search),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_search),
                     icon = Icons.Default.Search,
                     color = Color(0xFF10B981),
                     modifier = Modifier.weight(1f)
@@ -272,7 +292,7 @@ fun AppHeader(
                 }
 
                 NavButton(
-                    text = stringResource(R.string.nav_profile),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_profile),
                     icon = Icons.Default.Person,
                     color = Color(0xFF8B5CF6),
                     modifier = Modifier.weight(1f)
@@ -281,7 +301,7 @@ fun AppHeader(
                 }
 
                 NavButton(
-                    text = stringResource(R.string.nav_journal),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_journal),
                     icon = Icons.Default.Book,
                     color = Color(0xFF0EA5E9),
                     modifier = Modifier.weight(1f)
@@ -298,7 +318,7 @@ fun AppHeader(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 NavButton(
-                    text = stringResource(R.string.nav_settings),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_settings),
                     icon = Icons.Default.Settings,
                     color = Color(0xFF6B7280),
                     modifier = Modifier.weight(1f)
@@ -307,7 +327,7 @@ fun AppHeader(
                 }
 
                 NavButton(
-                    text = stringResource(R.string.nav_community),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_community),
                     icon = Icons.Default.Group,
                     color = Color(0xFFE11D48),
                     modifier = Modifier.weight(1f)
@@ -316,7 +336,7 @@ fun AppHeader(
                 }
 
                 NavButton(
-                    text = stringResource(R.string.nav_top5),  // ✅ SE MET À JOUR
+                    text = stringResource(R.string.nav_top5),
                     icon = Icons.Default.EmojiEvents,
                     color = Color(0xFFFFB74D),
                     modifier = Modifier.weight(1f)
@@ -326,7 +346,7 @@ fun AppHeader(
             }
         }
 
-        // ✅ NOUVEAU : Message d'authentification
+        // Message d'authentification
         authMessage?.let { message ->
             Card(
                 modifier = Modifier
@@ -348,8 +368,20 @@ fun AppHeader(
             }
         }
 
-        // ✅ NOUVEAU : Popup de connexion non-intrusif
-        if (showConnectionPopup && authManager != null) {
+        // NOUVEAU : Popup d'accueil/mise à jour (PRIORITÉ 1)
+        showWelcomeUpdatePopup?.let { mode ->
+            WelcomeUpdatePopup(
+                mode = mode,
+                currentVersion = updateManager.getCurrentVersion(),
+                onDismiss = {
+                    updateManager.markPopupShown()
+                    showWelcomeUpdatePopup = null
+                }
+            )
+        }
+
+        // Popup de connexion (PRIORITÉ 2) - AFFICHÉ SEULEMENT SI PAS DE POPUP D'ACCUEIL
+        if (showConnectionPopup && authManager != null && showWelcomeUpdatePopup == null) {
             Dialog(
                 onDismissRequest = { showConnectionPopup = false }
             ) {
@@ -529,7 +561,7 @@ private fun LevelSelector(level: Int, onLevelChange: (Int) -> Unit) {
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
         ) {
             Text(
-                text = stringResource(R.string.level_label),  // ✅ SE MET À JOUR
+                text = stringResource(R.string.level_label),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White.copy(alpha = 0.8f)

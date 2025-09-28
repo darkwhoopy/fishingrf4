@@ -743,6 +743,26 @@
     <string name="update_feature_4_title">🔧 Optimized interface</string>
     <string name="update_feature_4_desc">Better navigation between spots and addition of advanced options</string>
 
+    <string name="welcome_title">🎣 Welcome to RF4 Assistant!</string>
+    <string name="welcome_subtitle">Your ultimate fishing companion</string>
+    <string name="welcome_features_title">🌟 Main Features</string>
+    <string name="welcome_button_start">Start Fishing! 🎣</string>
+    <string name="welcome_message">RF4 Assistant helps you master fishing in Fishing Planet. Explore all spots and catch the biggest fish!</string>
+
+    <!-- Welcome features -->
+    <string name="welcome_feature_1_title">Smart fishing assistant</string>
+    <string name="welcome_feature_1_desc">Find the best spots, baits and techniques for each fish</string>
+
+    <string name="welcome_feature_2_title">Complete database</string>
+    <string name="welcome_feature_2_desc">Access to all lakes, fish and baits in the game</string>
+
+    <string name="welcome_feature_3_title">Catch journal</string>
+    <string name="welcome_feature_3_desc">Record your catches and track your statistics</string>
+
+    <string name="welcome_feature_4_title">Multilingual interface</string>
+    <string name="welcome_feature_4_desc">Available in French and English</string>
+
+
     <!-- Time management -->
     <string name="position_selection_title">Choose your position</string>
     <string name="position_coordinates_title">Position by coordinates</string>
@@ -877,7 +897,10 @@
     <string name="top5_top_baits_label">🎯 Top baits used:</string>
     <string name="top5_no_baits_for_species">No baits used for this species</string>
 
-
+    <string name="reset_option_entries_stats">Journal and statistics</string>
+    <string name="reset_option_lakes">Lake configuration</string>
+    <string name="reset_option_baits">Custom baits</string>
+    <string name="reset_option_favorites">Favorite lakes</string>
 
 
 </resources>

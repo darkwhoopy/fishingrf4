@@ -25,8 +25,8 @@ android {
         applicationId = "com.rf4.fishingrf4"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "0.8.3"
+        versionCode = 20
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // ✅ AJOUT : Support multilingue pour AAB

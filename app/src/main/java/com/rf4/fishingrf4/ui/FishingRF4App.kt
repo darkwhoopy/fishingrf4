@@ -14,11 +14,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rf4.fishingrf4.data.models.*
 import com.rf4.fishingrf4.ui.components.AppHeader
-import com.rf4.fishingrf4.ui.components.UpdateAnnouncementPopup // ✅ NOUVEAU IMPORT
+import com.rf4.fishingrf4.ui.components.WelcomeUpdatePopup // ✅ NOUVEAU IMPORT
+import com.rf4.fishingrf4.ui.components.PopupMode // ✅ NOUVEAU IMPORT
 import com.rf4.fishingrf4.ui.navigation.Screen
 import com.rf4.fishingrf4.ui.screens.*
 import com.rf4.fishingrf4.ui.viewmodel.FishingViewModel
-import com.rf4.fishingrf4.utils.UpdateManager // ✅ NOUVEAU IMPORT
+import com.rf4.fishingrf4.utils.UpdateManager // ✅ CORRIGÉ
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -29,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.rf4.fishingrf4.data.online.SpeciesCount
 import com.rf4.fishingrf4.ui.screens.TopFiveScreen
-import kotlinx.coroutines.delay // ✅ NOUVEAU IMPORT
+import kotlinx.coroutines.delay
 
 // Vue modèle pour la création de FishingViewModel
 class FishingViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -48,9 +49,10 @@ fun FishingRF4App() {
     val context = LocalContext.current
     val viewModel: FishingViewModel = viewModel(factory = FishingViewModelFactory(context))
 
-    // ✅ NOUVEAU : Gestionnaire de mise à jour
+    // ✅ NOUVEAU : Gestionnaire intelligent de popups
     val updateManager = remember { UpdateManager(context) }
-    var showUpdatePopup by remember { mutableStateOf(false) }
+    var showWelcomeUpdatePopup by remember { mutableStateOf<PopupMode?>(null) }
+    var hasCheckedPopup by remember { mutableStateOf(false) }
 
     // État de l'utilisateur Firebase
     var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
@@ -64,12 +66,16 @@ fun FishingRF4App() {
         onDispose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
     }
 
-    // ✅ NOUVEAU : Vérification du popup de mise à jour au démarrage
+    // ✅ NOUVEAU : Vérification intelligente du popup au démarrage
     LaunchedEffect(Unit) {
-        // Délai pour laisser l'app se charger complètement
-        delay(2500) // 2.5 secondes après le démarrage
-        if (updateManager.shouldShowUpdatePopup()) {
-            showUpdatePopup = true
+        if (!hasCheckedPopup) {
+            // Délai pour laisser l'app se charger complètement
+            delay(2500)
+            val popupMode = updateManager.getPopupMode()
+            if (popupMode != null) {
+                showWelcomeUpdatePopup = popupMode
+            }
+            hasCheckedPopup = true
         }
     }
 
@@ -191,7 +197,7 @@ fun FishingRF4App() {
                         viewModel.navigateTo(Screen.FISH_SELECTION)
                     },
                     onBack = { viewModel.navigateTo(Screen.LAKE_SELECTION) },
-                    onAddFavoriteSpot = {  // ← Remettre ce paramètre
+                    onAddFavoriteSpot = {
                         viewModel.navigateTo(Screen.ADD_FAVORITE_SPOT)
                     }
                 )
@@ -302,13 +308,14 @@ fun FishingRF4App() {
         }
     }
 
-    // ✅ NOUVEAU : Popup de mise à jour
-    if (showUpdatePopup) {
-        UpdateAnnouncementPopup(
+    // ✅ NOUVEAU : Popup intelligent d'accueil/mise à jour
+    showWelcomeUpdatePopup?.let { mode ->
+        WelcomeUpdatePopup(
+            mode = mode,
             currentVersion = updateManager.getCurrentVersion(),
             onDismiss = {
-                updateManager.markUpdatePopupShown()
-                showUpdatePopup = false
+                updateManager.markPopupShown()
+                showWelcomeUpdatePopup = null
             }
         )
     }

@@ -743,6 +743,26 @@
 
     <string name="button_close">Fermer</string>
 
+    <!-- Popup d'accueil nouveaux utilisateurs -->
+    <string name="welcome_title">🎣 Bienvenue dans RF4 Assistant !</string>
+    <string name="welcome_subtitle">Votre compagnon de pêche ultime</string>
+    <string name="welcome_features_title">🌟 Fonctionnalités principales</string>
+    <string name="welcome_button_start">Commencer à pêcher ! 🎣</string>
+    <string name="welcome_message">RF4 Assistant vous aide à maîtriser la pêche dans Fishing Planet. Explorez tous les spots et attrapez les plus gros poissons !</string>
+
+    <!-- Fonctionnalités d'accueil -->
+    <string name="welcome_feature_1_title">Assistant de pêche intelligent</string>
+    <string name="welcome_feature_1_desc">Trouvez les meilleurs spots, appâts et techniques pour chaque poisson</string>
+
+    <string name="welcome_feature_2_title">Base de données complète</string>
+    <string name="welcome_feature_2_desc">Accès à tous les lacs, poissons et appâts du jeu</string>
+
+    <string name="welcome_feature_3_title">Journal de captures</string>
+    <string name="welcome_feature_3_desc">Enregistrez vos prises et suivez vos statistiques</string>
+
+    <string name="welcome_feature_4_title">Interface multilingue</string>
+    <string name="welcome_feature_4_desc">Disponible en français et anglais</string>
+
 
     <!-- Gestion du temps -->
     <!-- Sélection de position -->
@@ -876,6 +896,14 @@
     <string name="top5_top_baits_label">🎯 Top appâts utilisés :</string>
     <string name="top5_no_baits_for_species">Aucun appât utilisé pour cette espèce</string>
     <string name="top5_captures_format">%d captures</string>
+
+    <!-- Options de réinitialisation -->
+    <string name="reset_option_entries_stats">Journal et statistiques</string>
+    <string name="reset_option_lakes">Configuration des lacs</string>
+    <string name="reset_option_baits">Appâts personnalisés</string>
+    <string name="reset_option_favorites">Lacs favoris</string>
+
+
 
     <!-- Clés manquantes pour PositionSelectionScreen -->
 
